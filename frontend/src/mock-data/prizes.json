@@ -1,0 +1,6 @@
+[
+  { "id": 1, "name": "Voucher 10k", "type": "voucher", "value": 10000, "color": "#4F46E5", "textColor": "#FFFFFF", "icon": "🎫", "description": "Giảm 10.000đ cho đơn hàng từ 0đ" },
+  { "id": 2, "name": "Miễn phí vận chuyển", "type": "points", "color": "#7C3AED", "textColor": "#FFFFFF", "icon": "⭐", "description": "Miễn phí vận chuyển cho đơn hàng từ 0đ" },
+  { "id": 3, "name": "Voucher 50k", "type": "voucher", "value": 50000, "color": "#EC4899", "textColor": "#FFFFFF", "icon": "🎫", "description": "Giảm 50.000đ cho đơn từ 0đ" },
+  { "id": 4, "name": "Chúc bạn may mắn lần sau", "type": "none", "color": "#4F46F7", "textColor": "#FFFFFF", "icon": "🔄", "description": "Chúc bạn may mắn lần sau" }
+]

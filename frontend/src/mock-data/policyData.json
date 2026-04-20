@@ -1,0 +1,22 @@
+[
+  {
+    "id": 1,
+    "iconClass": "fas fa-shield-alt",
+    "title": "Bảo hành 12 tháng"
+  },
+  {
+    "id": 2,
+    "iconClass": "fas fa-sync-alt",
+    "title": "Đổi trả trong 7 ngày"
+  },
+  {
+    "id": 3,
+    "iconClass": "fas fa-truck",
+    "title": "Giao hàng toàn quốc"
+  },
+  {
+    "id": 4,
+    "iconClass": "fas fa-money-bill-wave",
+    "title": "Thanh toán khi nhận hàng"
+  }
+]

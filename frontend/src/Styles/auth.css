@@ -1,0 +1,171 @@
+/* src/styles/auth.css */
+
+/* === AUTHENTICATION LAYOUT (Login, Register) === */
+
+.auth-page-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: var(--color-background);
+}
+
+.auth-container {
+    max-width: 420px;
+    padding: 40px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    background-color: white;
+    position: relative; /* Thêm position relative cho nút đóng */
+}
+
+.auth-container h2 {
+    color: var(--color-secondary);
+    margin-bottom: 30px;
+    font-weight: 700;
+    font-size: 1.8em;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.auth-input {
+    padding: 14px;
+    border-radius: 8px;
+    border: 1px solid var(--color-gray-border);
+    font-size: 16px;
+    color: var(--color-text-dark);
+    transition: border-color 0.3s;
+}
+
+.auth-input:focus {
+    border-color: var(--color-primary);
+    outline: none;
+    box-shadow: 0 0 5px rgba(255, 138, 101, 0.4);
+}
+
+.auth-button {
+    padding: 14px;
+    background-color: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 17px;
+    font-weight: bold;
+    transition: background-color 0.3s, transform 0.1s;
+}
+
+.auth-button:hover {
+    background-color: var(--color-secondary);
+    transform: translateY(-1px);
+}
+
+.auth-error {
+    color: #D32F2F;
+    background-color: #FFCDD2;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+.auth-message {
+    color: #388E3C;
+    background-color: #C8E6C9;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+.auth-link {
+    color: var(--color-secondary);
+    text-decoration: none;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.auth-link:hover {
+    text-decoration: underline;
+}
+
+/* NÚT ĐÓNG (CLOSE BUTTON) */
+.auth-close-button {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 2em;
+    color: var(--color-gray-border);
+    cursor: pointer;
+    line-height: 1;
+    padding: 5px;
+    transition: color 0.2s;
+}
+
+.auth-close-button:hover {
+    color: var(--color-secondary);
+}
+.captcha-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 5px 0;
+    text-align: left;
+}
+
+.captcha-label {
+    font-size: 0.85rem;
+    color: #666;
+    margin-left: 5px;
+}
+
+.captcha-display {
+    background-color: #f8f9fa;
+    font-weight: 900;
+    font-style: italic;
+    font-family: 'Courier New', Courier, monospace;
+    letter-spacing: 10px;
+    text-align: center;
+    padding: 15px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    user-select: none;
+    border-radius: 8px;
+    border: 2px dashed #ddd;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    background-image: 
+        linear-gradient(45deg, rgba(0,0,0,0.03) 25%, transparent 25%), 
+        linear-gradient(-45deg, rgba(0,0,0,0.03) 25%, transparent 25%);
+    background-size: 10px 10px;
+    transition: all 0.2s ease;
+}
+
+.captcha-display:hover {
+    background-color: #eee;
+    border-color: var(--color-primary);
+}
+
+.captcha-input {
+    text-align: center;
+    letter-spacing: 2px;
+    font-weight: bold;
+    border: 1px solid var(--color-gray-border);
+}
+
+.auth-switch-text {
+    margin-top: 20px;
+    font-size: 0.95rem;
+    color: #555;
+}
+
+
+.auth-link {
+    color: var(--color-secondary);
+    text-decoration: none;
+    font-weight: bold;
+    cursor: pointer;
+    margin-left: 5px;
+}

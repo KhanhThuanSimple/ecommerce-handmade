@@ -1,0 +1,152 @@
+[
+  {
+    "id": "VC001",
+    "code": "NEW10",
+    "title": "Giảm 10% cho khách hàng mới",
+    "description": "Áp dụng cho đơn đầu tiên, tối đa 50.000đ",
+    "type": "PERCENT",
+    "value": 10,
+    "maxDiscount": 50000,
+    "minOrder": 200000,
+    "target": "NEW_USER",
+    "maxOrderCount": 0,
+    "quantity": 1000,
+    "used": 320,
+    "status": "ACTIVE",
+    "startDate": "2025-01-01",
+    "expiredAt": "2026-12-31"
+  },
+
+  {
+    "id": "VC002",
+    "code": "LOYAL50K",
+    "title": "Giảm 50.000đ cho khách thân thiết",
+    "description": "Áp dụng cho khách đã mua từ 5 đơn",
+    "type": "FIXED",
+    "value": 50000,
+    "minOrder": 500000,
+    "target": "LOYAL_USER",
+    "minOrderCount": 5,
+    "quantity": 300,
+    "used": 120,
+    "status": "ACTIVE",
+    "startDate": "2025-06-01",
+    "expiredAt": "2026-06-01"
+  },
+
+  {
+    "id": "VC003",
+    "code": "VIP20",
+    "title": "Giảm 20% cho khách VIP",
+    "description": "Chỉ áp dụng cho khách hàng VIP",
+    "type": "PERCENT",
+    "value": 20,
+    "maxDiscount": 200000,
+    "minOrder": 1000000,
+    "target": "VIP_USER",
+    "minOrderCount": 20,
+    "quantity": 100,
+    "used": 20,
+    "status": "ACTIVE",
+    "startDate": "2025-07-01",
+    "expiredAt": "2026-07-01"
+  },
+
+  {
+    "id": "VC004",
+    "code": "SHIPFREE30",
+    "title": "Miễn phí vận chuyển",
+    "description": "Giảm tối đa 30.000đ phí ship",
+    "type": "FIXED",
+    "value": 30000,
+    "minOrder": 150000,
+    "target": "ALL",
+    "quantity": 5000,
+    "used": 2100,
+    "status": "ACTIVE",
+    "startDate": "2025-01-01",
+    "expiredAt": "2026-12-31"
+  },
+
+  {
+    "id": "VC005",
+    "code": "WEEKEND20",
+    "title": "Giảm 20% cuối tuần",
+    "description": "Chỉ áp dụng Thứ 7 & Chủ nhật",
+    "type": "PERCENT",
+    "value": 20,
+    "maxDiscount": 100000,
+    "minOrder": 500000,
+    "target": "ALL",
+    "quantity": 300,
+    "used": 40,
+    "status": "ACTIVE",
+    "validDays": ["SATURDAY", "SUNDAY"],
+    "startDate": "2026-01-01",
+    "expiredAt": "2026-12-31"
+  },
+
+  {
+    "id": "VC006",
+    "code": "FLASH100K",
+    "title": "Flash Sale 100K",
+    "description": "Số lượng có hạn – áp dụng trong 2 giờ",
+    "type": "FIXED",
+    "value": 100000,
+    "minOrder": 1000000,
+    "target": "ALL",
+    "quantity": 50,
+    "used": 48,
+    "status": "ACTIVE",
+    "startDate": "2026-02-01T18:00:00",
+    "expiredAt": "2026-02-01T20:00:00"
+  },
+
+  {
+    "id": "VC007",
+    "code": "EXPIRED50",
+    "title": "Voucher đã hết hạn",
+    "description": "Không còn hiệu lực",
+    "type": "FIXED",
+    "value": 50000,
+    "minOrder": 300000,
+    "target": "ALL",
+    "quantity": 100,
+    "used": 80,
+    "status": "EXPIRED",
+    "startDate": "2025-01-01",
+    "expiredAt": "2025-03-01"
+  },
+
+  {
+    "id": "VC008",
+    "code": "USEDUP",
+    "title": "Voucher đã dùng hết",
+    "description": "Số lượng đã hết",
+    "type": "FIXED",
+    "value": 30000,
+    "minOrder": 200000,
+    "target": "ALL",
+    "quantity": 100,
+    "used": 100,
+    "status": "USED_UP",
+    "startDate": "2025-01-01",
+    "expiredAt": "2026-01-01"
+  },
+
+  {
+    "id": "VC009",
+    "code": "ADMINOFF",
+    "title": "Voucher bị admin khóa",
+    "description": "Voucher đang tạm ngưng",
+    "type": "FIXED",
+    "value": 20000,
+    "minOrder": 100000,
+    "target": "ALL",
+    "quantity": 999,
+    "used": 0,
+    "status": "DISABLED",
+    "startDate": "2025-01-01",
+    "expiredAt": "2026-01-01"
+  }
+]

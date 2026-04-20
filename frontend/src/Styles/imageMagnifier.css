@@ -1,0 +1,38 @@
+/* Khung bao và vị trí ảnh gốc */
+.mag-container {
+    position: relative;
+    width: 100%;
+    cursor: crosshair;
+    padding-top: 30px; /* Đẩy ảnh gốc xuống dưới một chút */
+    display: flex;
+    justify-content: center;
+}
+
+/* Style cho ảnh chính */
+.mag-original {
+    width: 100%;
+    max-width: 450px;
+    height: auto;
+    display: block;
+    border: 1px solid #eee;
+}
+
+/* Cửa sổ phóng to bên trái */
+.mag-zoom-window {
+    position: absolute;
+    right: 100%;
+    top: 30px;
+    width: 230px;
+    height: 230px;
+    border: 1px solid #333;
+    background-repeat: no-repeat;
+    background-size: 250%; /* Độ phóng to */
+    background-color: #fff;
+    z-index: 9999;
+    pointer-events: none;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.product-detail-image-wrapper {
+    overflow: visible !important;
+}

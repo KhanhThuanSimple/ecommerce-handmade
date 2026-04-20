@@ -1,0 +1,34 @@
+# --- IDEs & System Files ---
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+
+# --- Frontend (React/TypeScript) ---
+# frontend/node_modules/
+frontend/build/
+frontend/dist/
+frontend/.env
+# frontend/.env.local
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+ 
+# --- Backend (Spring Boot / Maven) ---
+backend/target/
+backend/bin/
+backend/*.jar
+backend/*.war
+backend/.mvn/
+backend/.factorypath
+
+# --- Legacy/Temporary (Nếu bạn gom vào folder legacy) ---
+legacy/node_modules/
+db.json
+npm-debug.log*
+
+# --- Others ---
+.pnp
+.pnp.js
+/coverage

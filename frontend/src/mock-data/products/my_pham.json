@@ -1,0 +1,202 @@
+[
+  {
+    "id": 141,
+    "name": "SPOT OUT BEAUTY CONCENTRATE – Tinh chất mờ thâm nám làm đều màu da",
+    "price": 600000,
+    "category": "Mỹ phẩm",
+    "categoryId": 7,
+    "imageUrl": "https://product.hstatic.net/200000928605/product/anh-600x600__1__f2fa576190434b2380492451c94b3221_1024x1024.jpg",
+    "description": "Ức chế phản ứng oxy hóa, ngăn ngừa tổn thương tế bào DNA do tia UV gây ra. Giảm viêm, giảm hiện tượng giãn mạch, mẩn đỏ. Giải quyết vấn đề tăng sinh melanin trên da theo nhiều cơ chế: kiểm soát gen MITF – gen điều hòa chính về sự phát triển và biệt hóa của tế bào hắc tố; cản trở sự chuyển giao melanin đến các lớp da trên cùng; ngăn chặn sự tổng hợp melanin một cách thái quá dưới tác động của tia UV.",
+    "inventory": 20
+  },
+  {
+    "id": 142,
+    "name": "PURIFYING FACIAL CLEANSER PHA & MANDELIC ACID – Sữa rửa mặt làm sạch sâu PHA và Mandelic Acid",
+    "price": 370000,
+    "category": "Mỹ phẩm",
+    "categoryId": 7,
+    "imageUrl": "https://product.hstatic.net/200000928605/product/srm-sachsau-150ml-01-600x600__1__565797efc50c4e23b89f20565c24729e_1024x1024.jpg",
+    "description": "Có bạn sẽ đặt câu hỏi rằng những acid tẩy da chết hóa học khi sử dụng trong sữa rửa mặt – một sản phẩm chỉ dùng trên da khoảng 01 phút thì liệu có thể phát huy tác dụng không? Câu trả lời là có. Sữa rửa mặt Purifying Facial Cleanser Mandelic Acid làm sạch sâu nhưng vẫn thân thiện với lớp hàng rào bảo vệ da, loại bỏ hiệu quả bã nhờn, bụi bẩn, mỹ phẩm tồn dư trả lại làn da sạch tối ưu hóa chế độ dưỡng da phía sau.",
+    "inventory": 20
+  },
+  {
+    "id": 143,
+    "name": "INSTANT RELIEF SKIN HEALING SERUM – Tinh chất phục hồi giảm kích ứng",
+    "price": 240000,
+    "category": "Mỹ phẩm",
+    "categoryId": 7,
+    "imageUrl": "https://product.hstatic.net/200000928605/product/giam-kich-ung-600x600__1__bb1c7d1b10994831918cb010b3e576fb_1024x1024.jpg",
+    "description": "Tinh chất phục hồi giảm kích ứng Instant Relief Skin Healing Serum là một sản phẩm chăm sóc đặc biệt cho những làn da bị kích ứng, dị ứng với mỹ phẩm hoặc thời tiết.\nBản chất của làn da bị kích ứng, dị ứng là sự hoạt động “năng nổ” của hệ miễn dịch dưới da để chống lại những yếu tố bên ngoài mà cơ thể cảm thấy không an toàn. Nhưng, rất nhiều khi sự tích cực này vượt khỏi khả năng chịu đựng của cơ thể và tạo ra những phản ứng vô cùng khó chịu, hoặc mất thẩm mỹ cho làn da chúng ta.",
+    "inventory": 20
+  },
+  {
+    "id": 144,
+    "name": "BRIGHTENING HEALTHY CREAM – Kem dưỡng sáng da mờ thâm sạm",
+    "price": 470000,
+    "category": "Mỹ phẩm",
+    "categoryId": 7,
+    "imageUrl": "https://product.hstatic.net/200000928605/product/kemduongsangda-30gr-01-600x600_e852067112e84c02b4450592cd8bf4c9_1024x1024.jpg",
+    "description": "Silicone và Copolymer không phải là những thành phần xấu, chúng rất hữu ích trong việc tạo ra kết cấu đẹp, trơn mượt và nâng cao khả năng khóa ẩm cho các sản phẩm dưỡng da. Tuy nhiên, qua thực tế từ quá trình tư vấn vấn chăm sóc da cho khách hàng, SheaGhana nhận ra có một bộ phận không nhỏ người dùng mỹ phẩm bị dị ứng hoặc sinh mụn ẩn khi dùng mỹ phẩm có chứa các thành phần thuộc 2 nhóm này. Nhất là những làn da bị vấn đề do từng dùng rượu thuốc kem trộn.",
+    "inventory": 20
+  },
+  {
+    "id": 145,
+    "name": "APPLE CLEANSING WATER – Nước tẩy trang táo đỏ",
+    "price": 200000,
+    "category": "Mỹ phẩm",
+    "categoryId": 7,
+    "imageUrl": "https://product.hstatic.net/200000928605/product/nuoctaytrang-tao-do-01-600x600_fe30370d668a470aac5b72b15a4c6a74_1024x1024.jpg",
+    "description": "- Nước tẩy trang chiết xuất táo đỏ làm sạch lớp trang điểm, kem chống nắng, bui bẩn và bã nhờn mà không làm khô da, không ảnh hưởng đến lớp màng lipid bảo vệ da. \n- Kết hợp với những thành phần tự nhiên như chiết xuất táo có khả năng loại bỏ da chết nhẹ nhàng \n- Cân bằng ẩm, bổ sung dưỡng chất chống lại các gốc tự do cho da. ",
+    "inventory": 20
+  },
+  {
+    "id": 146,
+    "name": "SPOT OUT BEAUTY OIL – Dầu dưỡng mờ thâm nám làm đều màu da",
+    "price": 450000,
+    "category": "Mỹ phẩm",
+    "categoryId": 7,
+    "imageUrl": "https://product.hstatic.net/200000928605/product/z5244362372198_da7c3d61800bf6e4a2c571e0f8b758aa_dc735d0f0e014fe89104fb301cfe2133_1024x1024.jpg",
+    "description": "Dầu dưỡng có kết cấu lỏng nhẹ, cực nhanh thấm. Giúp sáng đều màu da an toàn, đẩy lùi các vết thâm, điều hòa quá trình sản sinh sắc tố trên da nhịp nhàng, cân bằng giữa quá trình hình thành và phân hủy melanin, nhờ vậy tình trạng nám được cải thiện. Chiết xuất hoa nhung tuyết cùng Tinh dầu hạt cà rốt organic với khả năng chống oxy hoá mạnh mẽ sẽ duy trì nét thanh xuân thật lâu trên khuôn mặt của bạn. ",
+    "inventory": 20
+  },
+  {
+    "id": 147,
+    "name": "CLEANSING OIL BETTER NEAKED SKIN – Dầu tẩy trang làm sạch sâu bảo vệ da",
+    "price": 305000,
+    "category": "Mỹ phẩm",
+    "categoryId": 7,
+    "imageUrl": "https://product.hstatic.net/200000928605/product/11_dautaytrang_1_f737f81e77b44ec8b6a2a9f3ea8cc4a7_1024x1024.jpg",
+    "description": "CÔNG DỤNG: Dầu tẩy trang là sản phẩm làm sạch không thể thiếu đối với những làn da dễ bị bí tắc lỗ chân lông. Đây là phiên bản dầu tẩy trang tối ưu nhất từ trước đến nay SheaGhana từng làm.\n- Làm sạch tối ưu sebum (bã nhờn), kem chống nắng và mỹ phẩm dư thừa trên da. \n- Chỉ cần một vài thao tác rửa nước cũng giúp nhũ hóa hoàn toàn sản phẩm này. ",
+    "inventory": 20
+  },
+  {
+    "id": 148,
+    "name": "BATH & BODY BALM SCRUB SALT COFFEE – Bơ tắm dưỡng thể cà phê muối",
+    "price": 295000,
+    "category": "Mỹ phẩm",
+    "categoryId": 7,
+    "imageUrl": "https://product.hstatic.net/200000928605/product/botamduongthe-01-600x600_37fff916ad214f1bae9d3ee2a601e327_1024x1024.jpg",
+    "description": "Bơ tắm dưỡng thể cà phê muối sẽ là một loại bơ tắm mà bạn sẽ “nghiện” ngay từ lần đầu tiên sử dụng – sản phẩm có khả năng tẩy da chết, làm mềm mịn da và cải thiện hiệu quả những vấn đề của da body từ mụn đến viêm lỗ chân lông.",
+    "inventory": 20
+  },
+  {
+    "id": 149,
+    "name": "INTENSIVE CARE 72H FACE CREAM – Kem dưỡng ẩm chuyên sâu 72h",
+    "price": 350000,
+    "category": "Mỹ phẩm",
+    "categoryId": 7,
+    "imageUrl": "https://product.hstatic.net/200000928605/product/kemduongam-30gr-01-600x600_6a5609ddbc444a3fa5c7e1cee6d3b87c_1024x1024.jpg",
+    "description": "Bạn có biết vì sao da em bé lại trông rất mịn màng và căng mọng không? Bởi vì các tế bào da của một em bé luôn chứa nước và các lipid duy trì sự ẩm mượt của da ở trạng thái cân bằng nhất.\nKhi chúng ta lớn dần, khả năng giữ nước của tế bào dần suy giảm, cơ chế tổng hợp các acid béo, collagen, elastin dần suy kiệt, các gốc tự do được dịp càn quét phá hủy các tế bào khỏe mạnh.",
+    "inventory": 20
+  },
+  {
+    "id": 150,
+    "name": "SERUM VITAMIN C – Tinh chất sáng da chống lão hóa Vitamin C",
+    "price": 320000,
+    "category": "Mỹ phẩm",
+    "categoryId": 7,
+    "imageUrl": "https://product.hstatic.net/200000928605/product/vitaminc-1-600x600_544cdbde967b4c2eaa67dfb48a62ddfc_1024x1024.jpg",
+    "description": "Tinh chất sáng da chống lão hóa YOUTH TO SKIN VITAMIN C SERUM làm sáng da, mờ thâm và ngăn ngừa lão hóa với 10% vitamin C và 3% Alpha Arbutin. Có thể sử dụng cho cả da nhạy cảm.",
+    "inventory": 20
+  },
+  {
+    "id": 151,
+    "name": "PEPTIDE DREAM SKIN SERUM- Serum tái sinh da tươi trẻ",
+    "price": 590000,
+    "category": "Mỹ phẩm",
+    "categoryId": 7,
+    "imageUrl": "https://product.hstatic.net/200000928605/product/27_peptide_skin_no_logo_5e5f378d659b4d6d9d646e0e30c5128a_1024x1024.jpg",
+    "description": "Phiên bản tinh chất giàu dinh dưỡng đậm đặc, đáp ứng nhu cầu chăm sóc cho những làn da cần tái tạo, da tổn thương hoặc lão hóa.",
+    "inventory": 20
+  },
+  {
+    "id": 152,
+    "name": "GENTLE EXFOLIATING SOLUTION 5% PHA & 10% MANDELIC ACID",
+    "price": 390000,
+    "category": "Mỹ phẩm",
+    "categoryId": 7,
+    "imageUrl": "https://product.hstatic.net/200000928605/product/5pha-10man-01-600x600_bbdf4a3a498649e6a63a7693cb073dd0_1024x1024.jpg",
+    "description": "Sản phẩm này có tính treatment nhưng KHÔNG HỀ THÔ BẠO, giúp cải thiện HIỆU QUẢ các vấn đề da về mụn, vết thâm, làm sáng da.",
+    "inventory": 20
+  },
+  {
+    "id": 153,
+    "name": "Phôi xà phòng dạng vảy",
+    "price": 120000,
+    "category": "Mỹ phẩm",
+    "categoryId": 7,
+    "imageUrl": "https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img,w_440,h_330/https://hoclammypham.com.vn/wp-content/uploads/IMG_0190.jpg",
+    "description": "Phôi xà phòng dạng vảy là sản phẩm của quá trình xà phòng hoá các acid béo là dầu dừa bằng kiềm. Sử dụng để làm xà phòng handmade cực kỳ đơn giản.",
+    "inventory": 20
+  },
+  {
+    "id": 154,
+    "name": "Dầu MCT 100ml",
+    "price": 50000,
+    "category": "Mỹ phẩm",
+    "categoryId": 7,
+    "imageUrl": "https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img,w_440,h_330/https://hoclammypham.com.vn/wp-content/uploads/dau-mct-tu-dau-dua.jpg",
+    "description": "Dầu MCT nguyên chất chiết xuất từ dầu dừa, không mùi, không màu, giúp dưỡng ẩm và làm nền cho các sản phẩm mỹ phẩm handmade.",
+    "inventory": 20
+  },
+  {
+    "id": 155,
+    "name": "Dầu nụ tầm xuân giúp đánh thức vẻ đẹp làn da",
+    "price": 70000,
+    "category": "Mỹ phẩm",
+    "categoryId": 7,
+    "imageUrl": "https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img,w_440,h_330/https://hoclammypham.com.vn/wp-content/uploads/dau-nu-tam-xuan-3.jpg",
+    "description": "Dầu nụ tầm xuân được chiết xuất từ nụ hoa của cây tầm xuân, mang lại hiệu quả tái tạo và phục hồi làn da vượt trội.",
+    "inventory": 20
+  },
+  {
+    "id": 156,
+    "name": "100g bột đậu đỏ hạt nhỏ nguyên chất",
+    "price": 11000,
+    "category": "Mỹ phẩm",
+    "categoryId": 7,
+    "imageUrl": "https://down-vn.img.susercontent.com/file/sg-11134253-8259w-mgcpxw2sw3yi0d.webp",
+    "description": "Bột đậu đỏ xay mịn nguyên chất, hỗ trợ dưỡng trắng, tẩy tế bào chết và ngăn ngừa mụn hiệu quả.",
+    "inventory": 20
+  },
+  {
+    "id": 157,
+    "name": "KEM NGHỆ SỮA ONG CHÚA (HANDMADE)",
+    "price": 99000,
+    "category": "Mỹ phẩm",
+    "categoryId": 7,
+    "imageUrl": "https://down-vn.img.susercontent.com/file/67bd32a9a49660602f53c630e9fda72c.webp",
+    "description": "Sản phẩm thiên nhiên an toàn cho mẹ bầu và đang cho con bú, hỗ trợ giảm thâm nám và làm sáng da.",
+    "inventory": 20
+  },
+  {
+    "id": 158,
+    "name": "SỮA RỬA MẶT NGHỆ GẤC BƠ (HANDMADE)",
+    "price": 135000,
+    "category": "Mỹ phẩm",
+    "categoryId": 7,
+    "imageUrl": "https://down-vn.img.susercontent.com/file/cddf92118031d6c0e84e8c0ac414d50c.webp",
+    "description": "Sữa rửa mặt 100% thiên nhiên từ gấc, nghệ và bơ. Giúp làm sạch dịu nhẹ và không gây khô da.",
+    "inventory": 20
+  },
+  {
+    "id": 159,
+    "name": "CỐT NGHỆ HẠT GẤC HẠ THỔ FACE 500ML",
+    "price": 130000,
+    "category": "Mỹ phẩm",
+    "categoryId": 7,
+    "imageUrl": "https://down-vn.img.susercontent.com/file/vn-11134201-23030-romj4qg9s9nv8f.webp",
+    "description": "Sản phẩm hạ thổ 100 ngày, giúp mờ thâm nám, trắng da, đặc biệt tốt cho phụ nữ sau sinh.",
+    "inventory": 20
+  },
+  {
+    "id": 160,
+    "name": "DƯỠNG MÔI DẦU GẤC 10ML THƠM XỊN",
+    "price": 16000,
+    "category": "Mỹ phẩm",
+    "categoryId": 7,
+    "imageUrl": "https://down-vn.img.susercontent.com/file/b6f3e6715e766a2b39a72014ad9856c2.webp",
+    "description": "Dưỡng môi dầu gấc giúp trị nẻ, làm hồng môi và cung cấp độ ẩm cần thiết cho đôi môi mềm mịn.",
+    "inventory": 20
+  }
+]

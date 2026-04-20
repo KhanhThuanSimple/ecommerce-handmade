@@ -1,0 +1,213 @@
+[
+  {
+    "id": 20,
+    "name": "Đèn Bàn Hình Vầng Trăng Phản Quang Halo Bowl Độc Đáo",
+    "price": 2256000,
+    "category": "Trang trí nhà cửa",
+    "categoryId": 2,
+    "imageUrl": "https://cdn.hstatic.net/products/1000203256/o1cn01ijngm220n3aa07mps___2210171316893-0-cib_f082eb4d360348598d2e40e484765f07_1024x1024.jpg",
+    "description": "Đèn Bàn Hình Vầng Trăng Phản Quang Halo Bowl mang đến sự sang trọng và tinh tế cho không gian sống của bạn. Thiết kế hiện đại cùng ánh sáng phản quang nhẹ nhàng giúp căn phòng trở nên ấm áp, cuốn hút và nổi bật hơn. Đây là món decor hoàn hảo để làm nổi bật bàn, kệ hay bất kỳ góc nào trong phòng khách, phòng ngủ hay không gian làm việc.",
+    "inventory": 50
+  },
+  {
+    "id": 21,
+    "name": "Đồng Hồ Treo Tường Kim Loại Đa Giác Chéo",
+    "price": 599000,
+    "category": "Trang trí nhà cửa",
+    "categoryId": 2,
+    "imageUrl": "https://product.hstatic.net/1000203256/product/dong-ho-treo-tuong-kim-loai-da-giac-cheo__9__d1d96f3a397d46cba6f4533758219852_1024x1024.jpg",
+    "description": "Đồng hồ treo tường không chỉ là công cụ giúp bạn quản lý thời gian hiệu quả mà còn là món đồ trang trí quan trọng, góp phần định hình phong cách cho không gian sống. Một chiếc đồng hồ treo tường đẹp có thể biến không gian nhà bạn trở nên sang trọng, hiện đại và nghệ thuật hơn. Với thiết kế đa dạng từ cổ điển đến hiện đại, đồng hồ treo tường có thể phù hợp với mọi phong cách trang trí nội thất.",
+    "inventory": 24
+  },
+  {
+    "id": 22,
+    "name": "Tranh Thảm Treo Tường Dệt Sợi Hammock Chiếc Lá Xanh",
+    "price": 399000,
+    "category": "Trang trí nhà cửa",
+    "categoryId": 2,
+    "imageUrl": "https://product.hstatic.net/1000203256/product/o1cn01esbyc81oxkxbl7stf___3041635291-0-cib_af9e5d01ed8c4f1fbb55f8dfee537bd7_1024x1024.jpg",
+    "description": "Tranh Thảm Treo Tường Dệt Sợi Hammock Chiếc Lá Xanh là một tác phẩm decor trang trí độc đáo, kết hợp giữa vẻ đẹp tự nhiên của chiếc lá xanh tươi mát và sự tinh tế của sợi dệt thủ công. Sản phẩm này không chỉ là một vật dụng trang trí mà còn mang đến một không gian sống gần gũi với thiên nhiên, thư thái và tràn đầy sức sống.",
+    "inventory": 12
+  },
+  {
+    "id": 23,
+    "name": "Set Decor Ánh Kim Huyền Bí – Modern Luxury",
+    "price": 1599000,
+    "category": "Trang trí nhà cửa",
+    "categoryId": 2,
+    "imageUrl": "https://cdn.hstatic.net/products/1000203256/dsc07664_b1a57bcd6b4041eb8f2ed1b706107871_1024x1024.jpg",
+    "description": "Set Decor Ánh Kim Huyền Bí – Modern Luxury",
+    "inventory": 24
+  },
+  {
+    "id": 24,
+    "name": "Ghế Sofa Da Onyx Hiện Đại Tối Giản",
+    "price": 11599000,
+    "category": "Trang trí nhà cửa",
+    "categoryId": 2,
+    "imageUrl": "https://cdn.hstatic.net/products/1000203256/sofa-da-pu-cao-cap-onyx_80db2e4fcbf7441f8dae373f05cdbc90_1024x1024.jpg",
+    "description": "Sofa Onyx mang phong cách tối giản hiện đại kết hợp electric đầy sáng tạo. Với kích thước 2480 x 900 x 850mm dành cho 3 người ngồi, sản phẩm được tính toán kỹ lưỡng để đảm bảo sự cân đối trong từng đường nét. Thiết kế gọn gàng, sắc sảo nhưng vẫn mềm mại, biến sofa trở thành tâm điểm trong không gian phòng khách.",
+    "inventory": 2
+  },
+  {
+    "id": 25,
+    "name": "Ghế Ăn Lót Đệm Bo Cong Sang Trọng",
+    "price": 1599000,
+    "category": "Trang trí nhà cửa",
+    "categoryId": 2,
+    "imageUrl": "https://cdn.hstatic.net/products/1000203256/ghe-an-bo-cong-thanh-lich_d088d71e617a436ab9f852740c4b15f8_1024x1024.jpg",
+    "description": "Được chế tác từ gỗ tần bì tự nhiên, chiếc ghế sở hữu độ bền chắc, khả năng chịu lực tốt và vân gỗ nổi bật mang vẻ đẹp tự nhiên. Phần lót đệm êm ái không chỉ mang lại sự thoải mái trong từng bữa ăn mà còn nâng cao trải nghiệm sử dụng lâu dài, giúp chiếc ghế trở thành người bạn đồng hành bền vững trong ngôi nhà.",
+    "inventory": 14
+  },
+  {
+    "id": 26,
+    "name": "Đèn Sàn Cây Đứng Chân Gỗ Thân Cong Kim Loại",
+    "price": 3599000,
+    "category": "Trang trí nhà cửa",
+    "categoryId": 2,
+    "imageUrl": "https://cdn.hstatic.net/products/1000203256/o1cn0167i11d20n32blbk0a___2210171316893-0-cib_b937bc90c79c4880a9e422beaa942afc_1024x1024.jpg",
+    "description": "Tại Passion, chúng tôi không chỉ cung cấp những sản phẩm nội thất và đèn trang trí độc đáo, mà còn mang đến trải nghiệm mua sắm tiện lợi, an tâm và phong cách. Mỗi sản phẩm đều được tuyển chọn kỹ lưỡng, kết hợp giữa thẩm mỹ hiện đại và chất lượng bền bỉ, giúp bạn nâng tầm không gian sống một cách tinh tế.",
+    "inventory": 4
+  },
+  {
+    "id": 27,
+    "name": "Bình Gốm 3D Kiểu Pháp Trang Trí Xếp Ply Cong",
+    "price": 2599000,
+    "category": "Trang trí nhà cửa",
+    "categoryId": 2,
+    "imageUrl": "https://cdn.hstatic.net/products/1000203256/binh-gom-3d-don-gian-nghe-thuat_d518fe503f1e47188297fed625220243_1024x1024.jpg",
+    "description": "Hãy tưởng tượng một bình gốm 3D xếp ply cong, đặt trên bàn trà, kệ trang trí hay bàn ăn, với đường nét uốn lượn mềm mại, tinh tế và sang trọng. Bình Gốm 3D Kiểu Pháp Xếp Ply Cong không chỉ là nơi cắm hoa, mà còn là tác phẩm decor nghệ thuật, mang đến sự thanh lịch, hiện đại và độc đáo cho không gian sống. kế lấy cảm hứng từ nghệ thuật Pháp cổ điển, kết hợp kỹ thuật tráng men hiện đại, tạo cảm giác chuyển động nhẹ nhàng cho từng lớp ply, giúp bình gốm trở thành điểm nhấn tinh tế trong mọi góc phòng.",
+    "inventory": 24
+  },
+  {
+    "id": 28,
+    "name": "Bình Gốm 3D Kiểu Pháp Trang Trí Xếp Ply Cong",
+    "price": 599000,
+    "category": "Trang trí nhà cửa",
+    "categoryId": 2,
+    "imageUrl": "https://cdn.hstatic.net/products/1000203256/binh_hoa_gom_su_lon_trang_tri_phong_khach_c93321609e614f2a998d6b2b6953b4c1_1024x1024.jpg",
+    "description": "Bình Hoa Gốm Sứ Jingdezhen Cổ Điển là sản phẩm mang đậm nét nghệ thuật truyền thống Trung Hoa, kết hợp với phong cách vintage tinh tế. Sản phẩm được chế tác từ gốm sứ cao cấp, phủ men bóng và phun mực thủ công tạo họa tiết độc đáo, không chiếc nào giống chiếc nào.",
+    "inventory": 24
+  },
+  {
+    "id": 29,
+    "name": "Ghế Tựa thư giãn",
+    "price": 599000,
+    "category": "Trang trí nhà cửa",
+    "categoryId": 2,
+    "imageUrl": "https://product.hstatic.net/1000203256/product/5a_3cc6ac6595fd4f6ca5e080af4ae125ae_1024x1024.png",
+    "description": "Trong thời đại mà thiết kế nội thất không chỉ đáp ứng nhu cầu sử dụng mà còn thể hiện gu thẩm mỹ và cá tính của gia chủ, việc lựa chọn một món nội thất phù hợp là điều vô cùng quan trọng. Ghế ngồi chân gỗ Ginger không chỉ là một sản phẩm nội thất đơn thuần mà còn là điểm nhấn nghệ thuật trong không gian sống hiện đại. Với chất liệu cao cấp, kiểu dáng tinh tế và tính ứng dụng cao, mẫu ghế này đang được ưa chuộng trong các không gian sống đậm chất cá nhân. Hãy cùng Passion xem qua sản phẩm này nhé!",
+    "inventory": 24
+  },
+  {
+    "id": 30,
+    "name": "Đôn Ngồi Kiểu Nắp Rời Hiện Đại Daily Queen",
+    "price": 1599000,
+    "category": "Trang trí nhà cửa",
+    "categoryId": 2,
+    "imageUrl": "https://cdn.hstatic.net/products/1000203256/dsc03654_551076a4007042718e1a04d0fa328ad4_1024x1024.jpg",
+    "description": "Trong xu hướng nội thất hiện đại, những món đôn ngồi nhỏ gọn, đa năng và thẩm mỹ đang trở thành lựa chọn được nhiều gia đình yêu thích. Không chỉ mang chức năng ngồi tiện dụng, đôn ngồi nắp rời còn giúp bạn tận dụng không gian lưu trữ thông minh, đồng thời tạo nên nét điểm xuyết cho căn phòng. Đôn ngồi Daily Queen là một trong những sản phẩm nổi bật của Passion - thương hiệu tiên phong trong dòng nội thất decor hiện đại, mang đến sự kết hợp hoàn hảo giữa chất lượng, công năng và phong cách.",
+    "inventory": 24
+  },
+  {
+    "id": 31,
+    "name": "Bàn Trà Gỗ Mặt Kính Decor Tiện Di Chuyển ",
+    "price": 2599000,
+    "category": "Trang trí nhà cửa",
+    "categoryId": 2,
+    "imageUrl": "https://product.hstatic.net/1000203256/product/pa231020-01_88bc4f084f3c487da36ae1c964a74c2f_1024x1024.jpg",
+    "description": "Với thiết kế mộc mạc mang phong cách Bắc Âu, sản phẩm ưu tiên về tính tiện nghi cho người sử dụng. Những bộ phần được nối liền với nhau bằng ốc vặn dễ dàng cho bạn lắp đặt và tháo gỡ để di chuyển đến nhiều vị trí khác nhau. Bạn có thể sử dụng sản phẩm để trang trí trong phòng khách, phối với ghế sofa, phòng đọc sách, làm việc hoặc làm tủ táp đầu giường,... đều rất thích hợp. ",
+    "inventory": 14
+  },
+  {
+    "id": 32,
+    "name": "Thảm Lau Chân Cotton Len Thấm Hút Họa Tiết Cầu Vồng Vũ Trụ",
+    "price": 18000,
+    "category": "Trang trí nhà cửa",
+    "categoryId": 2,
+    "imageUrl": "https://product.hstatic.net/1000203256/product/p1290318_7f01c269df214ce7ba6b90adbc473732_1024x1024.jpg",
+    "description": "Chất lượng của những chiếc Thảm lau chân tại nhà Passion đã được kiểm chứng với hàng loạt feedback đến từ khách hàng. Với chất liệu Lông len Cotton, Thảm Lau Chân Cầu Vồng Vũ Trụ sở hữu khả năng thấm hút nhanh, mang lại đôi chân khô ráo. Bên cạnh đó, item cũng giúp người dùng cảm thấy êm ái, mềm mịn mỗi khi sử dụng và hơn hết là bảo vệ bạn khỏi những tai nạn té ngã mỗi khi sàn nhà trơn trượt",
+    "inventory": 4
+  },
+  {
+    "id": 33,
+    "name": "Thảm Lau Chân Cotton Len Cừu Hoạt Hình",
+    "price": 99000,
+    "category": "Trang trí nhà cửa",
+    "categoryId": 2,
+    "imageUrl": "https://product.hstatic.net/1000203256/product/p1200258_35fe261a144d4722b0823385e61d5279_1024x1024.jpg",
+    "description": "Thảm được sản xuất từ vật liệu cao cấp và phổ biến trên thị trường: Vải cotton len siêu thấm, hút sạch những giọt nước trên mọi bề mặt chân của người dùng, đem lại cảm giác khô thoáng vượt trội. Ngoài ra, chất liệu này còn sở hữu độ mềm, mịn cao, khá êm chân, cho bạn cảm giác thoải mái khi sử dụng. Đường may trên thảm cẩn thận, tỉ mỉ và thật chắc chắn giúp thảm không bị rụng lông khi được giặt với máy. Thêm vào đó, thảm có thể sử dụng được cho nhiều vị trí trong ngôi nhà của bạn: phòng bếp, trước cửa ra vào, trước cửa wc, trong phòng ngủ, phòng khách, cạnh máy giặt...",
+    "inventory": 36
+  },
+  {
+    "id": 34,
+    "name": "Tranh Vải Treo Tường Hoạt Hình Đáng Yêu",
+    "price": 69000,
+    "category": "Trang trí nhà cửa",
+    "categoryId": 2,
+    "imageUrl": "https://product.hstatic.net/1000203256/product/22044941183_1682305191.640x640_1d3154410fee4f97b7bd229c0ee5be13_1024x1024.jpg",
+    "description": "Bộ sản phẩm bao gồm 2 móc treo và tranh.Dùng 2 đinh định vị 2 bên đóng vào tường, sau đó móc tranh treo lên trang tríDễ dàng tháo gỡ chuyển đổi vị trí khác nhau trang trí trong nhà",
+    "inventory": 14
+  },
+  {
+    "id": 35,
+    "name": "Vỏ Gối Tựa Lưng Bắc Âu Nhung Nỉ In Màu 2 Mặt Đen Trắng Sang Trọng",
+    "price": 99000,
+    "category": "Trang trí nhà cửa",
+    "categoryId": 2,
+    "imageUrl": "https://cdn.hstatic.net/products/1000203256/dsc02035__1__3c0ee039366b47ba99f5c2c0d13bf07b_1024x1024.jpg",
+    "description": "Vỏ Gối Tựa Lưng Bắc Âu Nhung Nỉ In Màu 2 Mặt Đen Trắng Sang Trọng",
+    "inventory": 2
+  },
+  {
+    "id": 36,
+    "name": "Vỏ Gối Tựa Lưng Nhuộm Sợi Phong Cách Ý Gối Sọc Phối Lá Bắc Âu",
+    "price": 599000,
+    "category": "Trang trí nhà cửa",
+    "categoryId": 2,
+    "imageUrl": "https://cdn.hstatic.net/products/1000203256/a6ba256fc9304587acce2cb23491813f_0fd20b205bfc47728f7eb1ba78641f38_1024x1024.jpg",
+    "description": " Vỏ Gối Tựa Lưng Nhuộm Sợi Phong Cách Ý Gối Sọc Phối Lá Bắc Âu",
+    "inventory":36
+  },
+  {
+    "id": 37,
+    "name": "Vỏ Gối Tựa Lưng Sofa Hoa Lụa Sọc Vàng Sang Trọng Chất Êm Ái",
+    "price": 599000,
+    "category": "Trang trí nhà cửa",
+    "categoryId": 2,
+    "imageUrl": "https://cdn.hstatic.net/products/1000203256/13278467830_1036115113_fbdb5c1fdbde4b6790120f0bd5e7b25a_1024x1024.jpg",
+    "description": "Vỏ Gối Tựa Lưng Sofa Hoa Lụa Sọc Vàng Sang Trọng Chất Êm Ái",
+    "inventory": 24
+  },
+  {
+    "id": 38,
+    "name": " Gấu Bông Búp Bê Khủng Long Gấu Bông Nhập Khẩu Mẫu Hot",
+    "price": 99000,
+    "category": "Trang trí nhà cửa",
+    "categoryId": 2,
+    "imageUrl": "https://cdn.hstatic.net/products/1000203256/730c3b4b44ee4c0b9129b9bc17fade6d_32e978449fe04074a46aab223e4c908f_1024x1024.jpg",
+    "description": "Gấu Bông Búp Bê Khủng Long Gấu Bông Nhập Khẩu Mẫu Hot",  
+     "inventory": 24
+  },
+  {
+    "id": 39,
+    "name": "Thảm Bếp Set 2 Chiếc Hình Chữ L Họa Tiết Chú Chó Đáng Yêu",
+    "price": 599000,
+    "category": "Trang trí nhà cửa",
+    "categoryId": 2,
+    "imageUrl": "https://cdn.hstatic.net/products/1000203256/p1250318_7e36971694b04725b3289b9e5090cdbf_1024x1024.jpg",
+    "description": "Thảm Bếp Set 2 Chiếc Hình Chữ L Họa Tiết Chú Chó Đáng Yêu",
+    "inventory": 24
+  },
+  {
+    "id": 40,
+    "name": "Thảm Phủ Sofa Họa Tiết Tranh Vẽ Trừu Tượng Chiếc Lá Xanh",
+    "price": 599000,
+    "category": "Trang trí nhà cửa",
+    "categoryId": 2,
+    "imageUrl": "https://cdn.hstatic.net/products/1000203256/16239787491_372911429_82dd23d6750143b59c301378f73b2b9d_1024x1024.jpg",
+    "description": "Thảm Phủ Sofa Họa Tiết Tranh Vẽ Trừu Tượng Chiếc Lá Xanh",
+    "inventory": 24
+  }
+  ]
+  

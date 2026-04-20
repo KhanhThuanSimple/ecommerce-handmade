@@ -1,0 +1,201 @@
+  [
+    {
+      "id": 1,
+      "name": "Túi Tote Vải Canvas In Chữ Vintage",
+      "price": 89000,
+      "category": "Túi & Ví",
+      "categoryId": 1,
+      "imageUrl": "https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=500&q=80",
+      "description": "Túi vải canvas dày dặn màu kem, in typography tối giản. Kích thước 35x40cm, đựng vừa tài liệu A4 và laptop 13 inch. Phù hợp đi học, đi làm.",
+      "inventory": 50
+    },
+    {
+      "id": 2,
+      "name": "Ví Da Nam Bifold Cổ Điển",
+      "price": 450000,
+      "category": "Túi & Ví",
+      "categoryId": 1,
+      "imageUrl": "https://images.unsplash.com/photo-1627123424574-724758594e93?auto=format&fit=crop&w=500&q=80",
+      "description": "Ví nam dáng ngang làm từ da bò sáp nhập khẩu. Thiết kế 2 ngăn lớn đựng tiền và 6 ngăn thẻ. Càng dùng da càng bóng đẹp theo thời gian.",
+      "inventory": 24
+    },
+    {
+      "id": 3,
+      "name": "Túi Đeo Chéo Da Nữ Mini",
+      "price": 320000,
+      "category": "Túi & Ví",
+      "categoryId": 1,
+      "imageUrl": "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=500&q=80",
+      "description": "Túi đeo chéo phom hộp nhỏ xinh, chất liệu da PU cao cấp chống thấm. Dây đeo kim loại phối da sang trọng, thích hợp đi dạo phố.",
+      "inventory": 15
+    },
+    {
+      "id": 4,
+      "name": "Balo Laptop Chống Sốc Urban",
+      "price": 550000,
+      "category": "Túi & Ví",
+      "categoryId": 1,
+      "imageUrl": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=500&q=80",
+      "description": "Balo thiết kế hiện đại, có ngăn chống sốc riêng cho laptop 15.6 inch. Chất liệu vải Oxford chống thấm nước, đệm lưng thoáng khí.",
+      "inventory": 30
+    },
+    {
+      "id": 5,
+      "name": "Ví Cầm Tay Clutch Dự Tiệc",
+      "price": 680000,
+      "category": "Túi & Ví",
+      "categoryId": 1,
+      "imageUrl": "https://images.unsplash.com/photo-1566150905458-1bf1fc113f0d?auto=format&fit=crop&w=500&q=80",
+      "description": "Clutch cầm tay đính đá tinh tế, khóa cài kim loại mạ vàng. Kích thước vừa điện thoại và son phấn, điểm nhấn hoàn hảo cho trang phục dạ hội.",
+      "inventory": 10
+    },{
+    "id": 6,
+    "name": "Ví Da Đen Classic",
+    "price": 199000,
+    "category": "Túi & Ví",
+    "categoryId": 1,
+    "imageUrl": "https://cdn.hstatic.net/products/200000978078/img_9694_238de6df9d724d92b75b482109442fe1_grande.jpg",
+    "description": "Ví da đen classic, bền bỉ, phù hợp cho cả nam và nữ.",
+    "inventory": 50
+  },
+  {
+    "id": 7,
+    "name": "Ví Da Màu Kem Nhẹ Nhàng",
+    "price": 399000,
+    "category": "Túi & Ví",
+    "categoryId": 1,
+    "imageUrl": "https://product.hstatic.net/200000978078/product/img_2820_0564acf96601402c9537569d754d209d_grande.jpg",
+    "description": "Ví da màu kem thanh lịch, thích hợp đi làm và dạo phố.",
+    "inventory": 50
+  },
+  {
+    "id": 8,
+    "name": "Ví Da Màu Nâu Vintage",
+    "price": 599000,
+    "category": "Túi & Ví",
+    "categoryId": 1,
+    "imageUrl": "https://cdn.hstatic.net/products/200000978078/img_2819_cf9d6177dbe24f13bc50195034bc385d_grande.jpg",
+    "description": "Ví da nâu phong cách vintage, mang vẻ đẹp cổ điển.",
+    "inventory": 50
+  },
+  {
+    "id": 9,
+    "name": "Ví Da Đen Trơn Cao Cấp",
+    "price": 699000,
+    "category": "Túi & Ví",
+    "categoryId": 1,
+    "imageUrl": "https://product.hstatic.net/200000978078/product/img_2817_0581f997fef6427da3ee1e88956c35d6_grande.jpg",
+    "description": "Ví da đen trơn, thiết kế đơn giản nhưng sang trọng.",
+    "inventory": 50
+  },
+  {
+    "id": 10,
+    "name": "Ví Dài Da Jean Phong Cách Trẻ",
+    "price": 599000,
+    "category": "Túi & Ví",
+    "categoryId": 1,
+    "imageUrl": "https://product.hstatic.net/200000978078/product/hapas_6-4-7446_39b5f76ee5f64efe8a3bd94b2370f913_grande.jpg",
+    "description": "Ví dài da jean cá tính, phù hợp học sinh sinh viên.",
+    "inventory": 50
+  },
+  {
+    "id": 11,
+    "name": "Ví Da Đen Phong Cách Hiện Đại",
+    "price": 499000,
+    "category": "Túi & Ví",
+    "categoryId": 1,
+    "imageUrl": "https://product.hstatic.net/200000978078/product/_mg_0355_3abc098ba58947e5bd7fbaf7dea97762_grande.jpg",
+    "description": "Ví da đen hiện đại, phù hợp sử dụng hằng ngày.",
+    "inventory": 50
+  },
+  {
+    "id": 12,
+    "name": "Ví Da Trắng Thanh Lịch",
+    "price": 299000,
+    "category": "Túi & Ví",
+    "categoryId": 1,
+    "imageUrl": "https://product.hstatic.net/200000978078/product/_mg_0383_cc9c089cccc34e34be5c279e1b28229a_grande.jpg",
+    "description": "Ví da trắng thanh lịch, thiết kế tinh tế.",
+    "inventory": 50
+  },
+  {
+    "id": 13,
+    "name": "Ví Da Hồng Thời Trang",
+    "price": 899000,
+    "category": "Túi & Ví",
+    "categoryId": 1,
+    "imageUrl": "https://product.hstatic.net/200000978078/product/_mg_0368_01c12bc82c584abdb21249e10d6e5d6b_grande.jpg",
+    "description": "Ví da màu hồng thời trang, phù hợp phong cách nữ tính.",
+    "inventory": 50
+  },
+  {
+    "id": 14,
+    "name": "Ví Da Bạc Ánh Kim",
+    "price": 399000,
+    "category": "Túi & Ví",
+    "categoryId": 1,
+    "imageUrl": "https://cdn.hstatic.net/products/200000978078/img_2686_28cb0380f028473d845343e3792e2204_grande.jpg",
+    "description": "Ví da màu bạc ánh kim nổi bật, phong cách hiện đại.",
+    "inventory": 50
+  },
+  {
+    "id": 15,
+    "name": "Ví Da Bạc Gương Cao Cấp",
+    "price": 199000,
+    "category": "Túi & Ví",
+    "categoryId": 1,
+    "imageUrl": "https://product.hstatic.net/200000978078/product/_mg_9421_d9d1f3c8124943d091aa5ac445c4cb5d_grande.jpg",
+    "description": "Ví da bạc gương sang trọng, tạo điểm nhấn thời trang.",
+    "inventory": 50
+  },
+  {
+    "id": 16,
+    "name": "Ví Da Đen Phom Dáng Gọn",
+    "price": 799000,
+    "category": "Túi & Ví",
+    "categoryId": 1,
+    "imageUrl": "https://cdn.hstatic.net/products/200000978078/_mg_4111_3842a7ab59fe4bd6b03957414326cb14_grande.jpg",
+    "description": "Ví da đen gọn nhẹ, tiện lợi khi mang theo.",
+    "inventory": 50
+  },
+  {
+    "id": 17,
+    "name": "Ví Da Trắng Tinh Tế",
+    "price": 699000,
+    "category": "Túi & Ví",
+    "categoryId": 1,
+    "imageUrl": "https://cdn.hstatic.net/products/200000978078/hapas110641_4bba1a7fe48a4dd7ac5967085db782cd_grande.jpg",
+    "description": "Ví da trắng tinh tế, phù hợp nhiều phong cách.",
+    "inventory": 50
+  },
+  {
+    "id": 18,
+    "name": "Ví Da Trắng Trẻ Trung",
+    "price": 289000,
+    "category": "Túi & Ví",
+    "categoryId": 1,
+    "imageUrl": "https://product.hstatic.net/200000978078/product/_mg_4134_ba76b99f08ce40abb7b648e1787b6d1d_grande.jpg",
+    "description": "Ví da trắng trẻ trung, dễ phối trang phục.",
+    "inventory": 50
+  },
+  {
+    "id": 19,
+    "name": "Ví Da Đen Basic",
+    "price": 299000,
+    "category": "Túi & Ví",
+    "categoryId": 1,
+    "imageUrl": "https://product.hstatic.net/200000978078/product/_mg_4111_1592d884e7544df18e082d7e2f40692c_grande.jpg",
+    "description": "Ví da đen basic, thiết kế đơn giản, dễ sử dụng.",
+    "inventory": 50
+  },
+  {
+    "id": 20,
+    "name": "Ví Da Hồng Nhạt Nữ Tính",
+    "price": 399000,
+    "category": "Túi & Ví",
+    "categoryId": 1,
+    "imageUrl": "https://product.hstatic.net/200000978078/product/_mg_4130_0fa83b3af79e4836b3a3115a8e26de22_grande.jpg",
+    "description": "Ví da hồng nhạt nữ tính, phù hợp làm quà tặng.",
+    "inventory": 50
+  }
+]

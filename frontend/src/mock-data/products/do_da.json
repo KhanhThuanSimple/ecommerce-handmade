@@ -1,0 +1,202 @@
+[
+  {
+    "id": 121,
+    "name": "Túi xách nữ Handmade da bò retro thời trang",
+    "price": 9000000,
+    "category": "Đồ da",
+    "categoryId": 6,
+    "imageUrl": "https://product.hstatic.net/1000260559/product/tui_xach_nu__1__acaea5fbd93844ee83531408f5d294ee_grande.jpg",
+    "description": "Độ bền da thật cao, không bong tróc, nứt gãy, không ra màu, độ đàn hồi và chịu lực tốt là những ưu điểm nổi bật giúp chất liệu này được sử dụng rộng rãi trong ngành thời trang nữ",
+    "inventory": 20
+  },
+  {
+    "id": 122,
+    "name": "Vòng tay Handmade da thật",
+    "price": 180000,
+    "category": "Đồ da",
+    "categoryId": 6,
+    "imageUrl": "https://product.hstatic.net/1000260559/product/vong_tay_handmade_da_that__3__grande.jpg",
+    "description": "Vòng tay được làm từ da bò thật với thiết kế đơn giản mang hơi hướng cổ điển nhưng vẫn vô cùng cá tính . Vòng có nhiều phiên bản màu sắc cho bạn lựa chọn .\n\n",
+    "inventory": 20
+  },
+  {
+    "id": 123,
+    "name": "Túi xách nữ Handmade da bò retro thời trang",
+    "price": 210000,
+    "category": "Đồ da",
+    "categoryId": 6,
+    "imageUrl": "https://product.hstatic.net/1000260559/product/vi_dai_nu__3__f301f02c16b24e2c83f90e0a2058ab30_grande.jpg",
+    "description": "- Kích thước: 19.5cm x 9.5cm x 2cm\n\n- Chất liệu: Da bò thật 100%",
+    "inventory": 20
+  },
+  {
+    "id": 124,
+    "name": "Balo nữ da bò thật Handmade đẹp",
+    "price": 1400000,
+    "category": "Đồ da",
+    "categoryId": 6,
+    "imageUrl": "https://product.hstatic.net/1000260559/product/ghds_grande.jpg",
+    "description": "Balo nữ da bò thật được làm từ chất liệu da bò thật nhập khẩu nổi tiếng nhờ sự bền bỉ, chắc chắn, có độ đàn hồi cao, không bong tróc, bứt gãy, vô cùng ấn tượng và thời trang\n\n",
+    "inventory": 20
+  },
+  {
+    "id": 125,
+    "name": "Ví dài Handmade đơn giản mà chất",
+    "price": 320000,
+    "category": "Đồ da",
+    "categoryId": 6,
+    "imageUrl": "https://product.hstatic.net/1000260559/product/125940__6__master.jpg",
+    "description": "Ví dài Handmade đơn giản mà chất - 125940\n\n- Kích thước: 9cm x 19cm\n\n- Da bò thật 100%",
+    "inventory": 20
+  },
+  {
+    "id": 126,
+    "name": "Balo nữ da thật Handmade độc đẹp lạ",
+    "price": 430000,
+    "category": "Đồ da",
+    "categoryId": 6,
+    "imageUrl": "https://product.hstatic.net/1000260559/product/4554239993_1515578525_grande.jpg",
+    "description": "Balo nữ da thật Handmade độc - 321482\n\n- Kích thước: 29cm x 25cm x 13cm\n\n- Da bò thật 100%\n\n- Kiểu dáng: Xách tay, đeo sau lưng, đeo trước bụng\n\n- Dành cho: Nữ\n\n- Mục đích sử dụng: Đi làm, đi chơi, du lịch, dạo phố, picnic",
+    "inventory": 20
+  },
+  {
+    "id": 127,
+    "name": "Thắt lưng da Cá sấu bản 3,4cm khóa tự động",
+    "price": 1100000,
+    "category": "Đồ da",
+    "categoryId": 6,
+    "imageUrl": "https://product.hstatic.net/1000260559/product/that-lung-da-ca-sau-ban-3-4cm-khoa-tu-dong-nau-4409716__1__2e12ac4497dd41b19dfd58fe6fb04e7d_master.jpg",
+    "description": "Thắt lưng da cá sấu cao cấp, bản 3.4cm sang trọng với khóa tự động hiện đại, bền bỉ theo thời gian.",
+    "inventory": 20
+  },
+  {
+    "id": 128,
+    "name": "Thắt lưng da Cá Sấu mặt chữ Z bản 3,8",
+    "price": 1200000,
+    "category": "Đồ da",
+    "categoryId": 6,
+    "imageUrl": "https://product.hstatic.net/1000260559/product/that_lung_da_ca_sau_mat_chu_z_ban_3_8_-_2837072__4__1f077a541f9142388345e45c6e4e2005_master.jpg",
+    "description": "Chất liệu da cá sấu thật 100%, mặt khóa chữ Z tạo điểm nhấn cá tính, bản rộng 3.8cm phù hợp nhiều loại trang phục.",
+    "inventory": 20
+  },
+  {
+    "id": 129,
+    "name": "Thắt lưng da bò khóa cài tiện lợi",
+    "price": 350000,
+    "category": "Đồ da",
+    "categoryId": 6,
+    "imageUrl": "https://product.hstatic.net/1000260559/product/that-lung-da-bo-khoa-cai-tien-loi-4290845__4__20ac7092dca74e0b9227728cbd4882c2_master.jpg",
+    "description": "Thiết kế đơn giản, khóa cài tiện dụng. Chất liệu da bò thật mềm mại, dẻo dai, phong cách thanh lịch.",
+    "inventory": 20
+  },
+  {
+    "id": 130,
+    "name": "Thắt lưng nam công sở vân cá sấu khóa lăn ",
+    "price": 500000,
+    "category": "Đồ da",
+    "categoryId": 6,
+    "imageUrl": "https://product.hstatic.net/1000260559/product/that-lung-nam-cong-so-van-ca-sau-3014191__2__69ab0ccada804f4db85cf03ec5ddff6d_master.jpg",
+    "description": "Chất liệu : Da bò\nKhóa: Khóa lăn kim loại",
+    "inventory": 20
+  },
+  {
+    "id": 131,
+    "name": "Thắt lưng da bò dập vân cá sấu mặt vuông",
+    "price": 600000,
+    "category": "Đồ da",
+    "categoryId": 6,
+    "imageUrl": "https://product.hstatic.net/1000260559/product/that-lung-da-bo-dap-van-ca-sau-mat-vuong-5_529a265de7d745e59a126e3ea43abd32_master.jpg",
+    "description": "Kích thước: 115cm -130cm x 3.5cm\n\nChất liệu: Da bò\n\nMàu sắc: Mặt bạc, Mặt vàng",
+    "inventory": 20
+  },
+  {
+    "id": 132,
+    "name": "Ví ngắn da bò mềm cao cấp",
+    "price": 400000,
+    "category": "Đồ da",
+    "categoryId": 6,
+    "imageUrl": "https://product.hstatic.net/1000260559/product/o1cn01l56sqm1biwda9dmjn_10120034_209e952f89564a7cbc4e430a4bfb1695_master.jpg",
+    "description": "Kích thước: 13cm x 9,5cm\n\nChất liệu: Da bò\n\nMàu sắc: Đen",
+    "inventory": 20
+  },
+  {
+    "id": 133,
+    "name": "Ví da cầm tay nữ dáng gọn",
+    "price": 700000,
+    "category": "Đồ da",
+    "categoryId": 6,
+    "imageUrl": "https://product.hstatic.net/1000260559/product/vi_da_cam_tay_nu_dang_gon__4__2a9ccb96ae864dbe95d8bcd07c736c1e_master.jpg",
+    "description": "Kích thước: 19cm x 10cm x 2.5cm\n\nChất liệu: Da bò \n\nMàu sắc: Đỏ, Tím, Đen",
+    "inventory": 20
+  },
+  {
+    "id": 134,
+    "name": "Ví da thuộc thảo mộc dáng đứng",
+    "price": 300000,
+    "category": "Đồ da",
+    "categoryId": 6,
+    "imageUrl": "https://product.hstatic.net/1000260559/product/vi-da-thuoc-thao-moc-dang-dung-2366273__11__6f629bdededa444f8cff94d9bddce06d_master.jpg",
+    "description": "Kích thước: 12 x 8,5 x 2 (cm)\n\nChất liệu: Da bò\n\nMàu sắc: Nâu, Đen, Xanh biển, Nâu vàng, Oliu",
+    "inventory": 20
+  },
+  {
+    "id": 135,
+    "name": "Ví nữ cầm tay một khóa kéo da bò",
+    "price": 500000,
+    "category": "Đồ da",
+    "categoryId": 6,
+    "imageUrl": "https://product.hstatic.net/1000260559/product/vi-nu-cam-tay-mot-khoa-keo-da-bo-4516882__1__0acf6eed6cc84c67a3a9c22df7b950d6_master.jpg",
+    "description": "Kích cỡ : 19,5 x 10 x 2,5 (cm)\n\nMàu sắc: Nâu đậm, Xanh biển, Xanh lá\n\nChất liệu : Da bò",
+    "inventory": 20
+  },
+  {
+    "id": 136,
+    "name": "XÓA MẪU Cặp da sáp công sở đựng Laptop 15,6",
+    "price": 1600000,
+    "category": "Đồ da",
+    "categoryId": 6,
+    "imageUrl": "https://product.hstatic.net/1000260559/product/cap-da-sap-cong-so-dung-laptop-15-6-2483338__1__329489d50cc6442dbe0f762e5202190a_master.jpg",
+    "description": "Kích thước : 42 x 30 x 8 ( cm )\n\nMàu sắc : Xanh, Nâu\n\nChất liệu : Da bò",
+    "inventory": 20
+  },
+  {
+    "id": 137,
+    "name": "Ví ngắn gấp 3 da sáp cá tính ",
+    "price": 300000,
+    "category": "Đồ da",
+    "categoryId": 6,
+    "imageUrl": "https://product.hstatic.net/1000260559/product/vi-ngan-gap-3-da-sap-ca-tinh-3551241__1__8b3152f8c6884860ae3dfc3c2b73cf52_large.jpg",
+    "description": "Ví ngắn gấp 3 da sáp cá tính - 3551241\nKích thước: 11cm x 8cm x 2cm\n\nChất liệu: Da bò sáp",
+    "inventory": 20
+  },
+  {
+    "id": 138,
+    "name": "Ví dáng đứng da bò mềm gọn, đẹp",
+    "price": 0,
+    "category": "Đồ da",
+    "categoryId": 6,
+    "imageUrl": "",
+    "description": "Ví đứng với thiết kế tối giản, da bò mềm mại, kích thước nhỏ gọn phù hợp bỏ túi quần thoải mái.",
+    "inventory": 20
+  },
+  {
+    "id": 139,
+    "name": "Túi xách nữ Handmade da bò retro thời trang",
+    "price": 300000,
+    "category": "Đồ da",
+    "categoryId": 6,
+    "imageUrl": "https://product.hstatic.net/1000260559/product/vi-dang-dung-da-bo-mem-gon-dep-3551244__6__a72465157aad4013a665ee2459145393_large.jpg",
+    "description": "Kích thước: 11,5 cm x 9,5 cm x 1.5cm\n\nChất liệu: Da bò\n\nMàu sắc: Nâu vàng, nâu đậm, xanh",
+    "inventory": 20
+  },
+  {
+    "id": 140,
+    "name": "Giày lười da công sở đai ngang",
+    "price": 600000,
+    "category": "Đồ da",
+    "categoryId": 6,
+    "imageUrl": "https://product.hstatic.net/1000260559/product/giay_luoi_cong_so_quai_ngang__2__0fcdc2a42f0a4d95aa68da2cc94fdc56_master.jpg",
+    "description": " Màu sắc : Nâu vàng\n\n Chất liệu: Da bò thật, đế cao su\n\n Size giày : 38-43",
+    "inventory": 20
+  }
+]

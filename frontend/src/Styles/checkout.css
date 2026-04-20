@@ -1,0 +1,274 @@
+/* Tổng quan container */
+.checkout-container {
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+.checkout-container h1 {
+    font-size: 26px;
+    font-weight: 800;
+    margin-bottom: 30px;
+    color: #333;
+}
+
+/* Grid chia 2 cột */
+.checkout-grid {
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    gap: 30px;
+    align-items: start;
+}
+
+/* Các thẻ Card trắng */
+.checkout-card {
+    background: white;
+    padding: 25px;
+    border-radius: 16px; /* Bo tròn lớn hiện đại */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+    border: 1px solid #f0f0f0;
+}
+
+.checkout-card h3 {
+    font-size: 18px;
+    margin-bottom: 20px;
+    color: #222;
+    border-left: 4px solid #f05d23; /* Vạch cam trang trí */
+    padding-left: 12px;
+}
+
+/* Danh sách sản phẩm thanh toán */
+.checkout-product-item {
+    display: flex;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid #f8f8f8;
+}
+
+.checkout-product-item:last-child { border-bottom: none; }
+
+.checkout-product-item img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 12px; /* Bo tròn ảnh sản phẩm */
+    margin-right: 15px;
+    border: 1px solid #eee;
+}
+
+.item-detail {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.item-detail span { font-weight: 600; color: #444; }
+.item-subtotal { color: #f05d23; font-weight: 700; }
+
+/* Phương thức thanh toán */
+.payment-methods {
+    margin-bottom: 25px;
+}
+
+.method-item {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: 0.2s;
+    font-size: 14px;
+}
+
+.method-item input { margin-right: 12px; accent-color: #f05d23; }
+
+.method-item.active {
+    border-color: #f05d23;
+    background-color: #fff9f6;
+}
+
+.checkout-total {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-top: 20px;
+    border-top: 2px dashed #eee;
+}
+
+.total-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    font-weight: 600;
+    color: #555;
+}
+
+.total-row.discount {
+    color: #2e7d32;
+}
+
+.total-row.final {
+    margin-top: 10px;
+    font-size: 18px;
+    font-weight: 800;
+    color: #f05d23;
+}
+
+.checkout-total span:first-child { color: #888; font-weight: 600; }
+
+.checkout-total .price {
+    font-size: 24px;
+    font-weight: 800;
+    color: #f05d23;
+}
+
+/* KHU VỰC NÚT BẤM (QUAN TRỌNG) */
+.checkout-actions {
+    display: flex;
+    gap: 12px; /* Khoảng cách giữa 2 nút */
+    margin-top: 10px;
+}
+
+.btn-order-confirm {
+    flex: 2; /* Nút xác nhận chiếm 2 phần */
+    background: #f05d23;
+    color: white;
+    border: none;
+    padding: 16px;
+    font-size: 15px;
+    font-weight: 700;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.btn-order-confirm:hover {
+    background: #d84a1a;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(240, 93, 35, 0.3);
+}
+
+.btn-order-cancel {
+    flex: 1; /* Nút hủy chiếm 1 phần */
+    background: #f5f5f5;
+    color: #666;
+    border: 1px solid #e0e0e0;
+    padding: 16px;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 50px; /* Bo tròn Pill-style */
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-order-cancel:hover {
+    background: #eee;
+    color: #ff4d4f; /* Chuyển sang đỏ khi hover */
+    border-color: #ff4d4f;
+}
+/* Voucher */
+.voucher-card {
+    border: 2px dashed #f05d23;
+    background: #fffdfb;
+}
+
+.voucher-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.voucher-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 16px;
+    border-radius: 14px;
+    border: 1px solid #eee;
+    cursor: pointer;
+    transition: 0.25s;
+    background: white;
+}
+
+.voucher-item:hover {
+    border-color: #f05d23;
+    background: #fff7f2;
+}
+
+.voucher-item.active {
+    border-color: #f05d23;
+    background: linear-gradient(135deg, #fff7f2, #fff);
+    box-shadow: 0 6px 16px rgba(240,93,35,0.15);
+}
+
+.voucher-left {
+    display: flex;
+    flex-direction: column;
+}
+
+.voucher-code {
+    font-weight: 800;
+    color: #f05d23;
+    font-size: 14px;
+}
+
+.voucher-desc {
+    font-size: 13px;
+    color: #666;
+}
+
+.voucher-right {
+    font-weight: 800;
+    font-size: 16px;
+    color: #f05d23;
+}
+.input-error {
+  border: 1px solid #ff4d4f;
+  background-color: #fff2f0;
+}
+
+.error-text {
+  color: #ff4d4f;
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+/* Màn hình loading & Mobile */
+.loading {
+    text-align: center;
+    padding: 100px;
+    font-size: 18px;
+    color: #f05d23;
+    font-weight: 600;
+}
+
+@media (max-width: 768px) {
+    .checkout-container {
+        margin: 20px auto;
+        padding: 0 12px;
+    }
+
+    .checkout-card {
+        padding: 18px;
+        border-radius: 14px;
+    }
+
+    .checkout-product-item img {
+        width: 50px;
+        height: 50px;
+    }
+
+    .btn-order-confirm {
+        font-size: 14px;
+        padding: 14px;
+    }
+
+    .btn-order-cancel {
+        padding: 14px;
+    }
+}

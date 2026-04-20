@@ -1,0 +1,202 @@
+[
+  {
+    "id": 41,
+    "name": "Dây Đeo Chú Lăng Nghiêm",
+    "price": 129000,
+    "category": "Phụ kiện",
+    "categoryId": 3,
+    "imageUrl": "https://antinh.vn/wp-content/uploads/2025/12/Day-Deo-Chu-Lang-Nghiem-800x800.jpg",
+    "description": "Dây Đeo Chú Lăng Nghiêm",
+    "inventory": 20
+  },
+  {
+    "id": 42,
+    "name": "Dây Chuyền Vòng Trăng Ánh Sao",
+    "price": 229000,
+    "category": "Phụ kiện",
+    "categoryId": 3,
+    "imageUrl": "https://antinh.vn/wp-content/uploads/2025/09/Day-Chuyen-Vong-Trang-Anh-Sao-800x800.jpg",
+    "description": "Dây Chuyền Vòng Trăng Ánh Sao",
+    "inventory": 20
+  },
+  {
+    "id": 43,
+    "name": "Dây Chuyền Pha Lê Ánh Trăng",
+    "price": 259000,
+    "category": "Phụ kiện",
+    "categoryId": 3,
+    "imageUrl": "https://antinh.vn/wp-content/uploads/2025/09/Day-Chuyen-Pha-Le-Anh-Trang-800x800.jpg",
+    "description": "Dây Chuyền Pha Lê Ánh Trăng",
+    "inventory": 20
+  },
+  {
+    "id": 44,
+    "name": "Dây Chuyền Đá Aquamarine",
+    "price": 279000,
+    "category": "Phụ kiện",
+    "categoryId": 3,
+    "imageUrl": "https://antinh.vn/wp-content/uploads/2025/09/Day-Chuyen-Da-Aquamarine-800x800.jpg",
+    "description": "Dây Chuyền Đá Aquamarine",
+    "inventory": 20
+  },
+  {
+    "id": 45,
+    "name": "Dây Chuyền Đá Pha Lê Chuồn Chuồn",
+    "price": 259000,
+    "category": "Phụ kiện",
+    "categoryId": 3,
+    "imageUrl": "https://antinh.vn/wp-content/uploads/2025/09/Day-Chuyen-Da-Pha-Le-Chuon-Chuon-800x800.jpg",
+    "description": "Dây Chuyền Đá Pha Lê Chuồn Chuồn",
+    "inventory": 20
+  },
+  {
+    "id": 46,
+    "name": "Dây Chuyền Đá Mã Não Đỏ",
+    "price": 289000,
+    "category": "Phụ kiện",
+    "categoryId": 3,
+    "imageUrl": "https://antinh.vn/wp-content/uploads/2025/09/Day-Chuyen-Da-Ma-Nao-Do-800x800.jpg",
+    "description": "Dây Chuyền Đá Mã Não Đỏ",
+    "inventory": 20
+  },
+  {
+    "id": 47,
+    "name": "Dây Chuyền Trái Tim Cỏ Bốn Lá May Mắn",
+    "price": 189000,
+    "category": "Phụ kiện",
+    "categoryId": 3,
+    "imageUrl": "https://antinh.vn/wp-content/uploads/2025/08/Day-Chuyen-Trai-Tim-Co-Bon-La-May-Man-800x800.jpg",
+    "description": "Dây Chuyền Trái Tim Cỏ Bốn Lá May Mắn",
+    "inventory": 20
+  },
+  {
+    "id": 48,
+    "name": "Dây Chuyền Hoa 4 Lá May Mắn",
+    "price": 219000,
+    "category": "Phụ kiện",
+    "categoryId": 3,
+    "imageUrl": "https://antinh.vn/wp-content/uploads/2025/08/Day-Chuyen-Hoa-4-La-May-Man-800x800.jpg",
+    "description": "Dây Chuyền Hoa 4 Lá May Mắn",
+    "inventory": 20
+  },
+  {
+    "id": 49,
+    "name": "Dây Chuyền Pha Lê Giọt Sương Cánh Bướm",
+    "price": 199000,
+    "category": "Phụ kiện",
+    "categoryId": 3,
+    "imageUrl": "https://antinh.vn/wp-content/uploads/2025/08/Day-Chuyen-Pha-Le-Giot-Suong-Canh-Buom-800x800.jpg",
+    "description": "Dây Chuyền Pha Lê Giọt Sương Cánh Bướm",
+    "inventory": 20
+  },
+  {
+    "id": 50,
+    "name": "Dây Chuyền Quả Cầu Chu Sa Đỏ",
+    "price": 249000,
+    "category": "Phụ kiện",
+    "categoryId": 3,
+    "imageUrl": "https://antinh.vn/wp-content/uploads/2025/08/Day-Chuyen-Qua-Cau-Chu-Sa-Do-800x800.jpg",
+    "description": "Dây Chuyền Quả Cầu Chu Sa Đỏ",
+    "inventory": 20
+  },
+  {
+    "id": 51,
+    "name": "Dây Chuyền Hạt Tròn Sáp Ong",
+    "price": 299000,
+    "category": "Phụ kiện",
+    "categoryId": 3,
+    "imageUrl": "https://antinh.vn/wp-content/uploads/2025/08/Day-Chuyen-Hat-Tron-Sap-Ong-800x800.jpg",
+    "description": "Dây Chuyền Hạt Tròn Sáp Ong",
+    "inventory": 20
+  },
+  {
+    "id": 52,
+    "name": "Dây Chuyền Pha Lê Anh Đào Đôi",
+    "price": 199000,
+    "category": "Phụ kiện",
+    "categoryId": 3,
+    "imageUrl": "https://antinh.vn/wp-content/uploads/2025/08/Day-Chuyen-Pha-Le-Anh-Dao-Doi-800x800.jpg",
+    "description": "Dây Chuyền Pha Lê Anh Đào Đôi",
+    "inventory": 20
+  },
+  {
+    "id": 53,
+    "name": "Dây Chuyền Ngọc Bích Bình An",
+    "price": 289000,
+    "category": "Phụ kiện",
+    "categoryId": 3,
+    "imageUrl": "https://antinh.vn/wp-content/uploads/2025/08/Day-Chuyen-Ngoc-Bich-Binh-An-800x800.jpg",
+    "description": "Dây Chuyền Ngọc Bích Bình An",
+    "inventory": 20
+  },
+  {
+    "id": 54,
+    "name": "Dây Chuyền Đá Hoa Nắng",
+    "price": 249000,
+    "category": "Phụ kiện",
+    "categoryId": 3,
+    "imageUrl": "https://antinh.vn/wp-content/uploads/2025/08/Day-Chuyen-Hoa-Nang-800x800.jpg",
+    "description": "Dây Chuyền Đá Hoa Nắng",
+    "inventory": 20
+  },
+  {
+    "id": 55,
+    "name": "Dây Chuyền Đá Zircon Hình Trái Tim",
+    "price": 299000,
+    "category": "Phụ kiện",
+    "categoryId": 3,
+    "imageUrl": "https://antinh.vn/wp-content/uploads/2025/08/Day-Chuyen-Da-Zircon-Hinh-Trai-Tim-800x800.jpg",
+    "description": "Dây Chuyền Đá Zircon Hình Trái Tim",
+    "inventory": 20
+  },
+  {
+    "id": 56,
+    "name": "Dây Chuyền Đồng Xu Đá Thạch Anh Tím",
+    "price": 379000,
+    "category": "Phụ kiện",
+    "categoryId": 3,
+    "imageUrl": "https://antinh.vn/wp-content/uploads/2025/08/Day-Chuyen-Dong-Xu-Da-Thach-Anh-Tim-800x800.jpg",
+    "description": "Dây Chuyền Đồng Xu Đá Thạch Anh Tím",
+    "inventory": 20
+  },
+  {
+    "id": 57,
+    "name": "Dây Chuyền Ngọc Bích Hình Mây",
+    "price": 489000,
+    "category": "Phụ kiện",
+    "categoryId": 3,
+    "imageUrl": "https://antinh.vn/wp-content/uploads/2025/08/Day-Chuyen-Ngoc-Bich-Hinh-May-800x800.jpg",
+    "description": "Dây Chuyền Ngọc Bích Hình Mây",
+    "inventory": 20
+  },
+  {
+    "id": 58,
+    "name": "Dây Chuyền Đá Thạch Anh Xanh Dương",
+    "price": 289000,
+    "category": "Phụ kiện",
+    "categoryId": 3,
+    "imageUrl": "https://antinh.vn/wp-content/uploads/2025/08/Day-Chuyen-Da-Thach-Anh-Xanh-Duong-800x800.jpg",
+    "description": "Dây Chuyền Đá Thạch Anh Xanh Dương",
+    "inventory": 20
+  },
+  {
+    "id": 59,
+    "name": "Dây Chuyền Pha Lê 12 Cung Hoàng Đạo",
+    "price": 379000,
+    "category": "Phụ kiện",
+    "categoryId": 3,
+    "imageUrl": "https://antinh.vn/wp-content/uploads/2025/08/Day-Chuyen-Pha-Le-12-Cung-Hoang-Dao-800x800.jpg",
+    "description": "Dây Chuyền Pha Lê 12 Cung Hoàng Đạo",
+    "inventory": 20
+  },
+  {
+    "id": 60,
+    "name": "Dây Chuyền Pha Lê Charm Trái Tim",
+    "price": 559000,
+    "category": "Phụ kiện",
+    "categoryId": 3,
+    "imageUrl": "https://antinh.vn/wp-content/uploads/2025/08/Day-Chuyen-Pha-Le-Charm-Trai-Tim--800x800.jpg",
+    "description": "Dây Chuyền Pha Lê Charm Trái Tim",
+    "inventory": 20
+  }
+]

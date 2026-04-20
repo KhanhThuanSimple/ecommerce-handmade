@@ -1,0 +1,231 @@
+
+
+.wishlist-container {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #2f3542;
+}
+
+
+.wishlist-header h2 {
+    font-size: 28px;
+    margin-bottom: 20px;
+    font-weight: 600;
+    text-align: center;
+}
+
+
+.wishlist-bulk-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 10px;
+    border-bottom: 1px solid #f1f2f6;
+    padding-bottom: 10px;
+}
+
+/* Chọn tất cả */
+.select-all-wrapper {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    gap: 8px;
+    font-weight: 500;
+    font-size: 16px;
+}
+
+.select-all-wrapper span {
+    user-select: none;
+}
+
+/* Button chung */
+.btn-ui {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+}
+
+.btn-ui:hover {
+    transform: translateY(-2px);
+}
+
+/* Nút thêm vào giỏ hàng */
+.btn-ui-buy {
+    background-color: #F4511E;
+    color: #fff;
+}
+
+.btn-ui-buy:hover {
+    background-color: #F4511E;
+}
+
+/* Nút xóa mục chọn */
+.btn-ui[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* --- Grid sản phẩm --- */
+.wishlist-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+}
+
+/* Card từng sản phẩm */
+.wishlist-card {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
+}
+
+.wishlist-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+
+/* Checkbox góc trên trái */
+.card-checkbox {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 10;
+    cursor: pointer;
+}
+
+/* Hình ảnh */
+.card-image-wrapper {
+    position: relative;
+    width: 100%;
+    height: 180px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f9f9f9;
+}
+
+.card-image-wrapper img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+/* Nút xóa từng sản phẩm */
+.btn-remove-single {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background-color: rgba(255, 71, 87, 0.2);
+    border-radius: 50%;
+    padding: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-remove-single:hover {
+    background-color: rgba(255, 71, 87, 0.4);
+}
+
+/* Nội dung card */
+.card-content {
+    padding: 12px 10px 16px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.card-content h4 {
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.2;
+    min-height: 40px;
+}
+
+.card-price {
+    color: #e74c3c;
+    font-weight: 600;
+}
+
+/* Nút trong card */
+.card-btns {
+    display: flex;
+    justify-content: space-between;
+    margin-top: auto;
+    gap: 6px;
+}
+
+.btn-ui-view {
+    background-color: #2C3E50;
+    color: #fff;
+}
+
+.btn-ui-view:hover {
+    background-color: #2C3E50;
+}
+
+/* --- Wishlist trống --- */
+.wishlist-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    text-align: center;
+}
+
+.wishlist-empty h3 {
+    font-size: 22px;
+    font-weight: 500;
+}
+
+/* --- Toast --- */
+.toast-box {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #fff;
+    padding: 12px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 999;
+    animation: slide-in 0.3s ease;
+    font-size: 14px;
+}
+
+@keyframes slide-in {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .wishlist-bulk-actions {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .wishlist-grid {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    }
+
+    .card-image-wrapper {
+        height: 140px;
+    }
+}

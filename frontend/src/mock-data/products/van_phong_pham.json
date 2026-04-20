@@ -1,0 +1,402 @@
+[
+  {
+    "id": 161,
+    "name": "Sticker chủ đề Phật Giáo - (9.5cm x 21cm) - Set 02 tờ",
+    "price": 399000,
+    "category": "Văn phòng phẩm",
+    "categoryId": 8,
+    "imageUrl": "https://bizweb.dktcdn.net/thumb/compact/100/061/358/products/sticker-phat-giao-1.jpg?v=1715768642130",
+    "description": "Sticker chủ đề Phật Giáo - (9.5cm x 21cm) - Set 02 tờ",
+    "inventory": 50
+  },
+  {
+    "id": 162,
+    "name": "Dụng cụ khắc, tỉa họa tiết - Bộ 03 chiếc",
+    "price": 199000,
+    "category": "Văn phòng phẩm",
+    "categoryId": 8,
+    "imageUrl": "https://bizweb.dktcdn.net/thumb/compact/100/061/358/products/dao-tia-3chiec-hop-nhua-1.jpg?v=1713694524920",
+    "description": "Dụng cụ khắc, tỉa họa tiết - Bộ 03 chiếc",
+    "inventory": 50
+  },
+  {
+    "id": 163,
+    "name": "Kit thiệp Giáng sinh tự trang trí- Kit 10 phôi thiệp_HK37",
+    "price": 699000,
+    "category": "Văn phòng phẩm",
+    "categoryId": 8,
+    "imageUrl": "https://bizweb.dktcdn.net/thumb/compact/100/061/358/products/giang-sinh-1.jpg?v=1700728714520",
+    "description": "Kit thiệp Giáng sinh tự trang trí- Kit 10 phôi thiệp_HK37",
+    "inventory": 50
+  },
+  {
+    "id": 164,
+    "name": "Kit thiệp tặng thầy, cô ngày 20/11 tự trang trí- Kit 10 phôi thiệp_HTK36",
+    "price": 599000,
+    "category": "Văn phòng phẩm",
+    "categoryId": 8,
+    "imageUrl": "https://bizweb.dktcdn.net/thumb/compact/100/061/358/products/kit-thiep-co-ban-20-11-1.jpg?v=1698485734973",
+    "description": "Kit thiệp tặng thầy, cô ngày 20/11 tự trang trí- Kit 10 phôi thiệp_HTK36",
+    "inventory": 50
+  },
+  {
+    "id": 165,
+    "name": "Kit nguyên liệu cao su khắc, tỉa hình handmade Junesix (02 dao khắc cán gỗ)_CSK05",
+    "price": 399000,
+    "category": "Văn phòng phẩm",
+    "categoryId": 8,
+    "imageUrl": "https://bizweb.dktcdn.net/thumb/compact/100/061/358/products/cao-su-kit-5-1.jpg?v=1698305253340",
+    "description": "Kit nguyên liệu cao su khắc, tỉa hình handmade Junesix (02 dao khắc cán gỗ)_CSK05",
+    "inventory": 50
+  },
+  {
+    "id": 166,
+    "name": "Bộ dụng cụ ép hoa khô cao cấp - 01 bộ",
+    "price": 899000,
+    "category": "Văn phòng phẩm",
+    "categoryId": 8,
+    "imageUrl": "https://bizweb.dktcdn.net/thumb/compact/100/061/358/products/ep-hoa-kho-cao-cap-1.jpg?v=1693500389073",
+    "description": "Bộ dụng cụ ép hoa khô cao cấp - 01 bộ",
+    "inventory": 50
+  },
+  {
+    "id": 167,
+    "name": "Tissue paper - Giấy làm hoa PomPom, gói quà, gói hoa, phông nên chụp ảnh (50cm x 70cm) - Số lượng 10 tờ/ 1 màu",
+    "price": 799000,
+    "category": "Văn phòng phẩm",
+    "categoryId": 8,
+    "imageUrl": "https://bizweb.dktcdn.net/thumb/compact/100/061/358/products/giay-tissue-50x70-1.jpg?v=1693207548157",
+    "description": "Tissue paper - Giấy làm hoa PomPom, gói quà, gói hoa, phông nên chụp ảnh (50cm x 70cm) - Số lượng 10 tờ/ 1 màu",
+    "inventory": 50
+  },
+  {
+    "id": 168,
+    "name": "Bộ dụng cụ ép hoa khô - Sổ ép hoa khô - 01 bộ",
+    "price": 699000,
+    "category": "Văn phòng phẩm",
+    "categoryId": 8,
+    "imageUrl": "https://bizweb.dktcdn.net/thumb/compact/100/061/358/products/ep-hoa-kho-1.jpg?v=1693498469647",
+    "description": "Bộ dụng cụ ép hoa khô - Sổ ép hoa khô - 01 bộ",
+    "inventory": 50
+  },
+  {
+    "id": 169,
+    "name": "Hũ sữa chua nhựa Zin - Tiêu chuẩn chất lượng về Vệ Sinh An Toàn Thực Phẩm - (100ml hoặc 120ml)",
+    "price": 199000,
+    "category": "Văn phòng phẩm",
+    "categoryId": 8,
+    "imageUrl": "https://bizweb.dktcdn.net/thumb/compact/100/061/358/products/hu-sua-chua-1-b40640e0-6118-4e33-ba65-d6e7153f068c.jpg?v=1690904450723",
+    "description": "Hũ sữa chua nhựa Zin - Tiêu chuẩn chất lượng về Vệ Sinh An Toàn Thực Phẩm - (100ml hoặc 120ml)",
+    "inventory": 50
+  },
+  {
+    "id": 170,
+    "name": "Album, scrapbook chủ đề Thanh xuân vườn trường, couple - Set nguyên liệu tự trang trí",
+    "price": 299000,
+    "category": "Văn phòng phẩm",
+    "categoryId": 8,
+    "imageUrl": "https://bizweb.dktcdn.net/thumb/compact/100/061/358/products/z4562885701904-49b1a9514d19ebab6f08139fcae54366.jpg?v=1690796651660",
+    "description": "Album, scrapbook chủ đề Thanh xuân vườn trường, couple - Set nguyên liệu tự trang trí",
+    "inventory": 50
+  },
+  {
+    "id": 171,
+    "name": "Kit thiệp Giáng sinh tự trang trí- Kit 10 phôi thiệp_HK37",
+    "price": 999000,
+    "category": "Văn phòng phẩm",
+    "categoryId": 8,
+    "imageUrl": "https://bizweb.dktcdn.net/thumb/compact/100/061/358/products/giang-sinh-1.jpg?v=1700728714520",
+    "description": "Kit thiệp Giáng sinh tự trang trí- Kit 10 phôi thiệp_HK37",
+    "inventory": 50
+  },
+  {
+    "id": 172,
+    "name": "Kit thiệp tặng thầy, cô ngày 20/11 tự trang trí- Kit 10 phôi thiệp_HTK36",
+    "price": 699000,
+    "category": "Văn phòng phẩm",
+    "categoryId": 8,
+    "imageUrl": "https://bizweb.dktcdn.net/thumb/compact/100/061/358/products/kit-thiep-co-ban-20-11-1.jpg?v=1698485734973",
+    "description": "Kit thiệp tặng thầy, cô ngày 20/11 tự trang trí- Kit 10 phôi thiệp_HTK36",
+    "inventory": 50
+  },
+  {
+    "id": 173,
+    "name": "Bộ dụng cụ ép hoa khô cao cấp - 01 bộ",
+    "price": 499000,
+    "category": "Văn phòng phẩm",
+    "categoryId": 8,
+    "imageUrl": "https://bizweb.dktcdn.net/thumb/compact/100/061/358/products/ep-hoa-kho-cao-cap-1.jpg?v=1693500389073",
+    "description": "Bộ dụng cụ ép hoa khô cao cấp - 01 bộ",
+    "inventory": 50
+  },
+  {
+    "id": 174,
+    "name": "Túi viết xóa - Dry erase pocket - (Màu giao ngẫu nhiên)",
+    "price": 199000,
+    "category": "Văn phòng phẩm",
+    "categoryId": 8,
+    "imageUrl": "https://bizweb.dktcdn.net/thumb/compact/100/061/358/products/tui-viet-xoa-1.jpg?v=1693225885023",
+    "description": "Túi viết xóa - Dry erase pocket - (Màu giao ngẫu nhiên)",
+    "inventory": 50
+  },
+  {
+    "id": 175,
+    "name": "Bộ dụng cụ ép hoa khô - Sổ ép hoa khô - 01 bộ",
+    "price": 399000,
+    "category": "Văn phòng phẩm",
+    "categoryId": 8,
+    "imageUrl": "https://bizweb.dktcdn.net/thumb/compact/100/061/358/products/ep-hoa-kho-1.jpg?v=1693498469647",
+    "description": "Bộ dụng cụ ép hoa khô - Sổ ép hoa khô - 01 bộ",
+    "inventory": 50
+  },
+  {
+    "id": 176,
+    "name": "Kit in tranh vân tay độ tuổi 3+",
+    "price": 299000,
+    "category": "Văn phòng phẩm",
+    "categoryId": 8,
+    "imageUrl": "https://bizweb.dktcdn.net/thumb/compact/100/061/358/products/kit-tranh-mau-giao-1.jpg?v=1686039954130",
+    "description": "Kit in tranh vân tay độ tuổi 3+",
+    "inventory": 50
+  },
+  {
+    "id": 177,
+    "name": "Sticker chủ đề Phật Giáo - (9.5cm x 21cm) - Set 02 tờ",
+    "price": 299000,
+    "category": "Văn phòng phẩm",
+    "categoryId": 8,
+    "imageUrl": "https://bizweb.dktcdn.net/thumb/compact/100/061/358/products/sticker-phat-giao-1.jpg?v=1715768642130",
+    "description": "Sticker chủ đề Phật Giáo - (9.5cm x 21cm) - Set 02 tờ",
+    "inventory": 50
+  },
+  {
+    "id": 178,
+    "name": "Washi Tap Noel_S201",
+    "price": 299000,
+    "category": "Văn phòng phẩm",
+    "categoryId": 8,
+    "imageUrl": "https://bizweb.dktcdn.net/thumb/compact/100/061/358/products/washi-noel-1-1.jpg?v=1700394281710",
+    "description": "Washi Tap Noel_S201",
+    "inventory": 50
+  },
+  {
+    "id": 179,
+    "name": "Tissue paper - Giấy làm hoa PomPom, gói quà, gói hoa, phông nên chụp ảnh (50cm x 70cm) - Số lượng 10 tờ/ 1 màu",
+    "price": 399000,
+    "category": "Văn phòng phẩm",
+    "categoryId": 8,
+    "imageUrl": "https://bizweb.dktcdn.net/thumb/compact/100/061/358/products/giay-tissue-50x70-1.jpg?v=1693207548157",
+    "description": "Tissue paper - Giấy làm hoa PomPom, gói quà, gói hoa, phông nên chụp ảnh (50cm x 70cm) - Số lượng 10 tờ/ 1 màu",
+    "inventory": 50
+  },
+  {
+    "id": 180,
+    "name": "Sticker chữ Meet You - Set 04 tờ",
+    "price": 499000,
+    "category": "Văn phòng phẩm",
+    "categoryId": 8,
+    "imageUrl": "https://bizweb.dktcdn.net/thumb/compact/100/061/358/products/sticker-meet-you-1.jpg?v=1688743516060",
+    "description": "Sticker chữ Meet You - Set 04 tờ",
+    "inventory": 50
+  },
+  {
+    "id": 181,
+    "name": "TRANH TRANG TRÍ “VỎ SÒ HUYẾT” TO63",
+    "price": 299000,
+    "category": "Văn phòng phẩm",
+    "categoryId": 8,
+    "imageUrl": "https://voocbien.com/wp-content/uploads/2024/10/DSC3871.jpg",
+    "description": "TRANH TRANG TRÍ “VỎ SÒ HUYẾT” TO63",
+    "inventory": 50
+  },
+  {
+    "id": 182,
+    "name": "Thuyền buồm vỏ ốc lớn TB18",
+    "price": 699000,
+    "category": "Văn phòng phẩm",
+    "categoryId": 8,
+    "imageUrl": "https://voocbien.com/wp-content/uploads/2016/02/thuyen-buom-vo-oc-lon-tb18-2-2.jpg",
+    "description": "Thuyền buồm vỏ ốc lớn TB18",
+    "inventory": 50
+  },
+  {
+    "id": 183,
+    "name": "Thuyền buồm vỏ ốc lớn TB14",
+    "price": 1499000,
+    "category": "Văn phòng phẩm",
+    "categoryId": 8,
+    "imageUrl": "https://voocbien.com/wp-content/uploads/2016/01/thuyen-buom-vo-oc-lon-tb14-3.jpg",
+    "description": "Thuyền buồm vỏ ốc lớn TB14",
+    "inventory": 50
+  },
+  {
+    "id": 184,
+    "name": "Thuyền buồm vỏ ốc lớn TB13",
+    "price": 1299000,
+    "category": "Văn phòng phẩm",
+    "categoryId": 8,
+    "imageUrl": "https://voocbien.com/wp-content/uploads/2016/01/thuyen-buom-vo-oc-lon-tb13-6.jpg",
+    "description": "Thuyền buồm vỏ ốc lớn TB13",
+    "inventory": 50
+  },
+  {
+    "id": 185,
+    "name": "Thuyền buồm vỏ ốc lớn TB12",
+    "price": 799000,
+    "category": "Văn phòng phẩm",
+    "categoryId": 8,
+    "imageUrl": "https://voocbien.com/wp-content/uploads/2016/01/thuyen-buom-vo-oc-lon-tb12-5.jpg",
+    "description": "Thuyền buồm vỏ ốc lớn TB12",
+    "inventory": 50
+  },
+  {
+    "id": 186,
+    "name": "Thuyền buồm vỏ ốc nhỏ TB09_T",
+    "price": 479000,
+    "category": "Văn phòng phẩm",
+    "categoryId": 8,
+    "imageUrl": "https://voocbien.com/wp-content/uploads/2018/11/DSC1385.jpg",
+    "description": "Thuyền buồm vỏ ốc nhỏ TB09_T",
+    "inventory": 50
+  },
+  {
+    "id": 187,
+    "name": "Thuyền buồm nhí bàu ngư đỏ TB30",
+    "price": 389000,
+    "category": "Văn phòng phẩm",
+    "categoryId": 8,
+    "imageUrl": "https://voocbien.com/wp-content/uploads/2018/10/thuyen-buom-nhi-bau-ngu-do-tb29-3.jpg",
+    "description": "Thuyền buồm nhí bàu ngư đỏ TB30",
+    "inventory": 50
+  },
+  {
+    "id": 188,
+    "name": "Thuyền buồm vỏ ốc nhỏ TB20",
+    "price": 699000,
+    "category": "Văn phòng phẩm",
+    "categoryId": 8,
+    "imageUrl": "https://voocbien.com/wp-content/uploads/2016/09/thuyen-buom-vo-oc-nho-tb20-3.jpg",
+    "description": "Thuyền buồm vỏ ốc nhỏ TB20",
+    "inventory": 50
+  },
+  {
+    "id": 189,
+    "name": "Thuyền buồm vỏ ốc nhỏ TB19",
+    "price": 14799000,
+    "category": "Văn phòng phẩm",
+    "categoryId": 8,
+    "imageUrl": "https://voocbien.com/wp-content/uploads/2016/06/thuyen-buom-vo-oc-nho-tb19-2.jpg",
+    "description": "Thuyền buồm vỏ ốc nhỏ TB19",
+    "inventory": 50
+  },
+  {
+    "id": 190,
+    "name": "Thuyền buồm vỏ ốc nhỏ TB79",
+    "price": 14799000,
+    "category": "Văn phòng phẩm",
+    "categoryId": 8,
+    "imageUrl": "https://voocbien.com/wp-content/uploads/2016/01/thuyen-buom-vo-oc-lon-tb14-3.jpg",
+    "description": "Thuyền buồm vỏ ốc nhỏ TB79",
+    "inventory": 50
+  },
+  {
+    "id": 191,
+    "name": "Thuyền buồm vỏ ốc trung TB10",
+    "price": 999000,
+    "category": "Văn phòng phẩm",
+    "categoryId": 8,
+    "imageUrl": "https://voocbien.com/wp-content/uploads/2015/08/DSC1343.jpg",
+    "description": "Thuyền buồm vỏ ốc trung TB10",
+    "inventory": 50
+  },
+  {
+    "id": 192,
+    "name": "Thuyền buồm vỏ ốc trung TB11_T",
+    "price": 299000,
+    "category": "Văn phòng phẩm",
+    "categoryId": 8,
+    "imageUrl": "https://voocbien.com/wp-content/uploads/2016/02/thuyen-buom-vo-oc-trung-tb11_t-6.jpg",
+    "description": "Thuyền buồm vỏ ốc trung TB11_T",
+    "inventory": 50
+  },
+  {
+    "id": 193,
+    "name": "Thuyền buồm vỏ ốc trung TB11_N",
+    "price": 399000,
+    "category": "Văn phòng phẩm",
+    "categoryId": 8,
+    "imageUrl": "https://voocbien.com/wp-content/uploads/2016/01/thuyen-buom-vo-oc-trung-tb11-2.jpg",
+    "description": "Thuyền buồm vỏ ốc trung TB11_N",
+    "inventory": 50
+  },
+  {
+    "id": 194,
+    "name": "Thuyền buồm vỏ sò ốc lớn TB29 ",
+    "price": 399000,
+    "category": "Văn phòng phẩm",
+    "categoryId": 8,
+    "imageUrl": "https://voocbien.com/wp-content/uploads/2017/09/thuyen-buom-vo-so-oc-lon-tb29-5.jpg",
+    "description": "Thuyền buồm vỏ sò ốc lớn TB29",
+    "inventory": 50
+  },
+  {
+    "id": 195,
+    "name": "Thuyền buồm vỏ ốc trung TB24",
+    "price": 299000,
+    "category": "Văn phòng phẩm",
+    "categoryId": 8,
+    "imageUrl": "https://voocbien.com/wp-content/uploads/2017/03/thuyen-buom-vo-oc-trung-tb24-07.jpg",
+    "description": "Thuyền buồm vỏ ốc trung TB24",
+    "inventory": 50
+  },
+  {
+    "id": 196,
+    "name": "Thuyền buồm vỏ ốc trung TB22",
+    "price": 699000,
+    "category": "Văn phòng phẩm",
+    "categoryId": 8,
+    "imageUrl": "https://voocbien.com/wp-content/uploads/2017/03/DSC1372.jpg",
+    "description": "Thuyền buồm vỏ ốc trung TB22",
+    "inventory": 50
+  },
+  {
+    "id": 197,
+    "name": "Thuyền buồm vỏ ốc trung TB23",
+    "price": 479000,
+    "category": "Văn phòng phẩm",
+    "categoryId": 8,
+    "imageUrl": "https://voocbien.com/wp-content/uploads/2017/03/DSC1359.jpg",
+    "description": "Thuyền buồm vỏ ốc trung TB23",
+    "inventory": 50
+  },
+  {
+    "id": 198,
+    "name": "THUYỀN BUỒM VỎ ỐC TRUNG TB08",
+    "price": 899000,
+    "category": "Văn phòng phẩm",
+    "categoryId": 8,
+    "imageUrl": "https://voocbien.com/wp-content/uploads/2015/09/thuyen-buom-vo-oc-tb08-4.jpg",
+    "description": "THUYỀN BUỒM VỎ ỐC TRUNG TB08",
+    "inventory": 50
+  },
+  {
+    "id": 199,
+    "name": "THUYỀN BUỒM VỎ ỐC TRUNG TB05",
+    "price": 459000,
+    "category": "Văn phòng phẩm",
+    "categoryId": 8,
+    "imageUrl": "https://voocbien.com/wp-content/uploads/2015/08/thuyen-buom-vo-oc-tb05-6.jpg",
+    "description": "THUYỀN BUỒM VỎ ỐC TRUNG TB05",
+    "inventory": 50
+  },
+  {
+    "id": 200,
+    "name": "Thuyền buồm vỏ ốc nhỏ TB03_T",
+    "price": 499000,
+    "category": "Văn phòng phẩm",
+    "categoryId": 8,
+    "imageUrl": "https://voocbien.com/wp-content/uploads/2016/01/thuyen-buom-vo-oc-nho-tb03_t-3.jpg",
+    "description": "Thuyền buồm vỏ ốc nhỏ TB03_T",
+    "inventory": 50
+  }
+]

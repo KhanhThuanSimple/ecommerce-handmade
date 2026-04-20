@@ -1,0 +1,201 @@
+[{
+    "id": 101,
+    "name": "Chén Chấm Dáng Thuyền",
+    "price": 70000,
+    "category": "Gốm sứ",
+    "categoryId": 5,
+    "imageUrl": "https://cdn.chus.vn/images/thumbnails/850/566/product_mood_image/228/10579_16_M1.jpg.webp",
+    "description": "Không đơn điệu với màu trắng thông thường, chén chấm từ Minh Tiến Ceramics mang màu sắc tươi sáng, giúp tô điểm thêm cho bàn ăn của bạn.",
+    "inventory": 20
+  },
+  {
+    "id": 102,
+    "name": "Cốc Ruy Băng Gốm Sứ, 330ml",
+    "price": 299000,
+    "category": "Gốm sứ",
+    "categoryId": 5,
+    "imageUrl": "https://cdn.chus.vn/images/thumbnails/100/100/detailed/283/1_9uko-f4.jpg.webp",
+    "description": "Vẻ Ngoài Tươi Tắn Đáng Yêu, Cốc Sứ Thủ Công, Quà Tặng Cho Nữ.",
+    "inventory": 20
+  },
+  {
+    "id": 103,
+    "name": "Tượng Gốm Sứ Hổ Nhâm Dần",
+    "price": 600000,
+    "category": "Gốm sứ",
+    "categoryId": 5,
+    "imageUrl": "https://cdn.chus.vn/images/thumbnails/767/767/detailed/209/235605443852bbadc1ecac060378dceb_w767_h1105.jpg.webp",
+    "description": "Con Đực Màu Xanh Lam, Thủ Công Mỹ Nghệ, Độc Đáo, Không Độc Hại, Quà Tặng Doanh Nghiệp",
+    "inventory": 20
+  },
+  {
+    "id": 104,
+    "name": "Gác Đũa Sứ, Đồ Dùng Nhà Bếp Thiết Yếu Cho Mọi Gia Đình",
+    "price": 27000,
+    "category": "Gốm sứ",
+    "categoryId": 5,
+    "imageUrl": "https://cdn.chus.vn/images/thumbnails/767/767/detailed/208/ef60c5179f172e25f181817012108e28_w767_h1105.jpg.webp",
+    "description": "Gác đũa là vật dụng không thể thiếu, mang đến nét đẹp tinh tế cho bàn ăn. Chúng giúp đũa không bị dơ khi không dùng đến.",
+    "inventory": 20
+  },
+  {
+    "id": 105,
+    "name": "Bình Hoa Gốm Sứ Dã Quỳ",
+    "price": 279000,
+    "category": "Gốm sứ",
+    "categoryId": 5,
+    "imageUrl": "https://cdn.chus.vn/images/thumbnails/100/100/detailed/228/10579_03_F1.jpg.webp",
+    "description": "Lấy cảm hứng từ nhành cây dã quỳ tràn sức sống, mẫu bình hoa Dã Quỳ tại Minh Tiến Ceramics là điểm nhấn độc đáo cho bất kỳ không gian sống nào.",
+    "inventory": 20
+  },
+  {
+    "id": 106,
+    "name": "Bình Hoa Gốm Sứ Lá Chuối Miệng Tim",
+    "price": 239000,
+    "category": "Gốm sứ",
+    "categoryId": 5,
+    "imageUrl": "https://cdn.chus.vn/images/thumbnails/850/566/detailed/265/DSC04935.jpg.webp",
+    "description": "Chiếc bình hình dáng độc đáo này được lấy ý tưởng từ những chiếc lá chuối - một hình ảnh quen thuộc của làng quê Việt Nam. ",
+    "inventory": 20
+  },
+  {
+    "id": 107,
+    "name": "Bình Hoa Gốm Sứ Bích Tuyền",
+    "price": 231000,
+    "category": "Gốm sứ",
+    "categoryId": 5,
+    "imageUrl": "https://cdn.chus.vn/images/thumbnails/850/566/detailed/228/10579_05_C1.jpg.webp",
+    "description": "Bình hoa Bích Tuyền phảng phất đâu đó nét hoài cổ của những chiếc bình gốm sứ truyền thống. Với lớp men bóng cùng màu sắc độc đáo, sản phẩm dù đặt trong không gian cổ điển hay hiện đại đều mang đến vẻ đẹp riêng.",
+    "inventory": 20
+  },
+  {
+    "id": 108,
+    "name": "Bình Hoa Gốm Sứ Lá Chuối Miệng Tim",
+    "price": 239000,
+    "category": "Gốm sứ",
+    "categoryId": 5,
+    "imageUrl": "https://cdn.chus.vn/images/thumbnails/850/566/detailed/265/DSC04935.jpg.webp",
+    "description": "Chiếc bình hình dáng độc đáo này được lấy ý tưởng từ những chiếc lá chuối - một hình ảnh quen thuộc của làng quê Việt Nam. ",
+    "inventory": 20
+  },
+  {
+    "id": 109,
+    "name": "Tượng Gà Trang Trí Để Tiền, Tượng Gà Gốm Sứ",
+    "price": 239000,
+    "category": "Gốm sứ",
+    "categoryId": 5,
+    "imageUrl": "https://cdn.chus.vn/images/thumbnails/767/767/detailed/228/10579_21_F1.jpg.webp",
+    "description": "Một mẫu tượng hình dáng độc đáo, lại có thể sử dụng như ống tiết kiệm tiền sẽ rất phù hợp để bạn tô điểm không gian sống của mình.",
+    "inventory": 20
+  },
+  {
+    "id": 110,
+    "name": "Cốc Sứ Tím Iris, Dòng Morning",
+    "price": 100000,
+    "category": "Gốm sứ",
+    "categoryId": 5,
+    "imageUrl": "https://cdn.chus.vn/images/thumbnails/850/566/detailed/228/10579_10_C1.jpg.webp",
+    "description": "Dịu dàng và thơ mộng tựa một đóa diên vỹ, mẫu cốc màu tím nhạt này từ Minh Tiến Ceramics sẽ rất phù hợp với những ai yêu thích phong cách nhẹ nhàng.",
+    "inventory": 20
+  },
+  {
+    "id": 111,
+    "name": "Bình Hoa Tròn Gốm Sứ",
+    "price": 239000,
+    "category": "Gốm sứ",
+    "categoryId": 5,
+    "imageUrl": "https://cdn.chus.vn/images/thumbnails/850/566/detailed/220/10557_30_C1_fuon-b6.jpg.webp",
+    "description": "Chiếc bình gốm nhỏ nhắn từ The Goods phù hợp để cắm hoa và trang trí trên bàn làm việc hay phòng khách.",
+    "inventory": 20
+  },
+  {
+    "id": 112,
+    "name": "Chén Chấm Sứ Hình Hoa",
+    "price": 52000,
+    "category": "Gốm sứ",
+    "categoryId": 5,
+    "imageUrl": "https://cdn.chus.vn/images/thumbnails/850/566/product_mood_image/175/10199_58_M1.jpg.webp",
+    "description": "Ngoài các thiết kế tối giản cho sản phẩm bát đĩa, Gốm Đông Gia còn mang đến những thiết kế tinh tế khác như sản phẩm chén chấm này.",
+    "inventory": 20
+  },
+  {
+    "id": 113,
+    "name": "Tượng Gà Gốm Sành",
+    "price": 239000,
+    "category": "Gốm sứ",
+    "categoryId": 5,
+    "imageUrl": "https://cdn.chus.vn/images/thumbnails/850/566/product_mood_image/176/10207_24_M1.jpg.webp",
+    "description": "Màu nước dưa là một sắc vàng có pha chút nâu, nhưng không quá đậm mà chỉ vừa đủ. Giúp làm bật lên nét đẹp mộc mạc, bình dị nhưng vẫn đủ nổi bật của mẫu tượng gốm.",
+    "inventory": 20
+  },
+  {
+    "id": 114,
+    "name": "Bình Hoa Bầu Gốm Sứ Lớn",
+    "price": 449000,
+    "category": "Gốm sứ",
+    "categoryId": 5,
+    "imageUrl": "https://cdn.chus.vn/images/thumbnails/850/565/product_mood_image/220/10557_32_M1_30mw-0a.jpg.webp",
+    "description": "Chiếc bình gốm mang sắc cam tươi sáng, với các hoa văn có hình dạng ngẫu nhiên nhưng mang đến tổng thể hài hòa và đẹp mắt.",
+    "inventory": 20
+  },
+  {
+    "id": 115,
+    "name": "Ấm Lục Giác Sứ Cỡ Trung",
+    "price": 400000,
+    "category": "Gốm sứ",
+    "categoryId": 5,
+    "imageUrl": "https://cdn.chus.vn/images/thumbnails/850/566/product_mood_image/175/10199_54_M1.jpg.webp",
+    "description": "Để làm đẹp cho tổ ấm yêu thương, người Việt thường tìm đến những sản phẩm gốm sứ có hoa văn tinh xảo và tính thẩm mỹ cao.",
+    "inventory": 20
+  },
+  {
+    "id": 116,
+    "name": "Bộ Chén Bát Đĩa Sứ Crystal Green (Bộ 10 Món)",
+    "price": 1500000,
+    "category": "Gốm sứ",
+    "categoryId": 5,
+    "imageUrl": "https://cdn.chus.vn/images/thumbnails/850/566/product_mood_image/175/10199_46_M1.jpg.webp",
+    "description": "Bộ Chén Bát Đĩa Sứ Crystal Green từ Gốm Đông Gia mang vẻ đẹp nhẹ nhàng và thanh lịch tựa như một viên pha lê trong trẻo. ",
+    "inventory": 20
+  },
+  {
+    "id": 117,
+    "name": "Bộ Chén Bát Đĩa Sứ Ocean Waves (Bộ 10 Món)",
+    "price": 1500000,
+    "category": "Gốm sứ",
+    "categoryId": 5,
+    "imageUrl": "https://cdn.chus.vn/images/thumbnails/850/566/product_mood_image/175/10199_47_M1.jpg.webp",
+    "description": "Được tạo tác thủ công đầy tinh tế cùng lớp men hoả biến màu xanh biển độc đáo, bộ Chén Bát Đĩa Sứ Ocean Waves từ Gốm Đông Gia mang nét đẹp hài hòa giữa sự hiện đại, sang trọng và thời thượng. ",
+    "inventory": 20
+  },
+  {
+    "id": 118,
+    "name": "Bộ Cốc & Phin Cà Phê Sứ Men Bóng",
+    "price": 343000,
+    "category": "Gốm sứ",
+    "categoryId": 5,
+    "imageUrl": "https://cdn.chus.vn/images/thumbnails/850/566/product_mood_image/175/10199_50_M1.jpg.webp",
+    "description": "Nếu bạn là một người thích uống cà phê và đặc biệt là thích tự pha cho mình một tách cà phê nóng hổi tại nhà, thì không còn gì tuyệt vời hơn một bộ sản phẩm vừa giúp pha cà phê tiện lợi, vừa tạo nét tinh tế trong căn bếp và trên góc bàn.",
+    "inventory": 20
+  },
+  {
+    "id": 119,
+    "name": "Bát Chiết Yêu Men Cánh Gián Hỏa Biến",
+    "price": 180000,
+    "category": "Gốm sứ",
+    "categoryId": 5,
+    "imageUrl": "https://cdn.chus.vn/images/thumbnails/850/850/detailed/295/z6347748756102_e82b0057519d2bcc70fe5e1728e31990_jwyv-j2.jpg.webp",
+    "description": "Bát Chiết Yêu được xem là một vật dụng ẩm thực gắn liền với nhiều thế hệ. Nay, vật phẩm này đã được Gomie Ceramic nâng tầm với diện mạo thật đẳng cấp.",
+    "inventory": 20
+  },
+  {
+    "id": 120,
+    "name": "Bộ Chén Bát Đĩa Sứ Harvest Gold 10 Món Cho 1 Người",
+    "price": 1290000,
+    "category": "Gốm sứ",
+    "categoryId": 5,
+    "imageUrl": "https://cdn.chus.vn/images/thumbnails/850/566/product_mood_image/175/10199_48_M1.jpg.webp",
+    "description": "Bộ Chén Bát Đĩa Sứ Harvest Gold mang đến vẻ đẹp nhẹ nhàng xen với chút xưa cũ, là sự lựa chọn lý tưởng cho những ai thích phong cách cổ điển và hoài niệm.",
+    "inventory": 20
+  }
+]

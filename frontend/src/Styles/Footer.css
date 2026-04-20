@@ -1,0 +1,89 @@
+.footer {
+  background: #1e1e1e;
+  color: #dcdcdc;
+  padding: 60px 20px 25px;
+  font-family: "Segoe UI", sans-serif;
+}
+
+.footer-container {
+  max-width: 1200px;
+  margin: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 40px;
+}
+
+/* BRAND */
+.footer-logo {
+  font-size: 26px;
+  font-weight: 800;
+  color: #ffffff;
+  margin-bottom: 10px;
+}
+
+.footer-logo span {
+  color: #ff7a00;
+}
+
+.footer-desc {
+  font-size: 14.5px;
+  line-height: 1.7;
+  color: #bdbdbd;
+}
+
+/* SECTION */
+.footer-section h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 14px;
+}
+
+.footer-section ul {
+  list-style: none;
+  padding: 0;
+}
+
+.footer-section ul li {
+  margin-bottom: 10px;
+}
+
+.footer-section ul li a {
+  color: #cfcfcf;
+  text-decoration: none;
+  font-size: 14.5px;
+  transition: 0.25s;
+}
+
+.footer-section ul li a:hover {
+  color: #ff7a00;
+  padding-left: 4px;
+}
+
+/* CONTACT TEXT */
+.footer-section p {
+  font-size: 14.5px;
+  color: #cfcfcf;
+  margin-bottom: 6px;
+}
+
+/* FOOTER BOTTOM */
+.footer-bottom {
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px solid #333;
+  text-align: center;
+  font-size: 13.5px;
+  color: #aaa;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .footer {
+    padding: 40px 16px 20px;
+  }
+
+  .footer-container {
+    gap: 30px;
+  }
+}
