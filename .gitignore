@@ -1,0 +1,45 @@
+# --- Hệ thống & IDE ---
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+*.log
+
+# --- FRONTEND (ReactJS) ---
+# Chặn thư mục thư viện cực nặng
+node_modules/
+frontend/node_modules/
+
+# Chặn thư mục build sản phẩm
+frontend/build/
+frontend/dist/
+
+# Chặn file cấu hình bảo mật (Chứa mật khẩu, API key)
+frontend/.env
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+
+# --- BACKEND (Spring Boot) ---
+# Chặn các file đã biên dịch của Maven/Gradle
+backend/target/
+backend/build/
+backend/bin/
+backend/out/
+
+# Chặn các file thực thi (Jar/War)
+backend/*.jar
+backend/*.war
+
+# Chặn cấu hình riêng của Maven
+backend/.mvn/
+backend/.factorypath
+
+# --- Khác ---
+legacy/node_modules/
+db.json
+/coverage
+.pnp
+.pnp.js
