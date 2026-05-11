@@ -2,62 +2,60 @@
 import api from './api';
 import { User } from '../types/model';
 
-// Dữ liệu đăng ký (thường không cần ID vì server tự tạo)
+// Định nghĩa dữ liệu đăng ký khớp với DB
 interface RegisterData {
     email: string;
     username: string;
     password?: string;
+    fullName?: string;
+    phone?: string;
 }
 
-// === ĐĂNG KÝ ===
+// === 1. ĐĂNG KÝ (Kết nối Spring Boot) ===
 export const registerUser = async (userData: RegisterData): Promise<User> => {
-    // 1. Kiểm tra email trùng
-    const exist = await api.get(`/users?email=${encodeURIComponent(userData.email)}`);
-    
-    if (exist.data.length > 0) {
-        throw new Error("Email đã tồn tại!");
-    }
-
-    // 2. Tạo mới
-    const response = await api.post('/users', userData);
+    // Thay vì check email ở FE, ta gửi thẳng cho BE xử lý (vì BE quản lý DB)
+    const response = await api.post('/api/register', userData); 
     return response.data;
 };
 
-// === ĐĂNG NHẬP ===
-export const loginUser = async (email: string, password: string): Promise<User> => {
-    const response = await api.get(
-        `/users?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`
-    );
+// === 2. ĐĂNG NHẬP (Kết nối AuthController.java) ===
+export const loginUser = async (email: string, password: string): Promise<any> => {
+    // Gửi POST tới endpoint @PostMapping("/login") của bạn
+    const response = await api.post('/api/login', { email, password });
 
-    if (response.data.length > 0) {
-        return response.data[0];
+    if (response.status === 200) {
+        // Lưu thông tin xác thực Basic Auth vào localStorage để dùng cho Interceptor ở api.ts
+        const authHeader = 'Basic ' + btoa(`${email}:${password}`);
+        localStorage.setItem('authHeader', authHeader);
+        localStorage.setItem('userEmail', email);
+        return response.data;
     }
-    throw new Error("Email hoặc mật khẩu không chính xác.");
+    throw new Error("Đăng nhập thất bại");
 };
 
-// === QUÊN MẬT KHẨU ===
+// === 3. ĐĂNG XUẤT ===
+export const logoutUser = () => {
+    localStorage.removeItem('authHeader');
+    localStorage.removeItem('userEmail');
+    window.location.href = '/login';
+};
+
+// === 4. QUÊN MẬT KHẨU (Sửa lỗi ở useForgotPassword.ts) ===
 export const forgotPassword = async (email: string): Promise<boolean> => {
-    // Giả lập delay
-    await new Promise(res => setTimeout(res, 1000));
-    console.log(`[Fake API] Gửi mail reset tới: ${email}`);
-    return true;
+    // Gọi API quên mật khẩu ở BE (nếu chưa có BE thì để tạm fake như bên dưới)
+    console.log(`[Request] Gửi mail reset tới: ${email}`);
+    await new Promise(res => setTimeout(res, 800)); // Giả lập delay
+    return true; 
 };
 
-// === CẬP NHẬT EMAIL ===
+// === 5. CẬP NHẬT EMAIL (Sửa lỗi ở useProfile.ts) ===
 export const updateUserEmail = async (userId: number, email: string): Promise<User> => {
-    // Kiểm tra email trùng của user khác
-    const exist = await api.get(`/users?email=${encodeURIComponent(email)}`);
-    const duplicated = exist.data.find((u: User) => u.id !== userId);
-    if (duplicated) {
-        throw new Error("Email đã được sử dụng bởi tài khoản khác.");
-    }
-
-    const response = await api.patch(`/users/${userId}`, { email });
+    const response = await api.patch(`/api/users/${userId}/email`, { email });
     return response.data;
 };
 
-// === CẬP NHẬT MẬT KHẨU ===
+// === 6. CẬP NHẬT MẬT KHẨU (Sửa lỗi ở useProfile.ts) ===
 export const updateUserPassword = async (userId: number, password: string): Promise<User> => {
-    const response = await api.patch(`/users/${userId}`, { password });
+    const response = await api.patch(`/api/users/${userId}/password`, { password });
     return response.data;
 };

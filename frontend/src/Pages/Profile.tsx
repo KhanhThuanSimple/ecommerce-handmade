@@ -26,7 +26,20 @@ const Profile: React.FC<ProfileProps> = ({ currentUser, onLogout }) => {
     if (!currentUser) return <Navigate to="/login" replace />;
 
     const initial = currentUser.username?.charAt(0).toUpperCase() || '?';
-
+    const handleLogout = async () => {
+        try{
+            await fetch('/api/auth/logout', {
+                method: 'POST'
+              
+            });
+      
+        }
+        catch(e){
+            console.error('Error occurred while logging out:', e);
+        }
+        localStorage.removeItem('token');
+        onLogout();
+    };
     return (
         <div className="profile-page">
             <div className="profile-header">
@@ -62,7 +75,7 @@ const Profile: React.FC<ProfileProps> = ({ currentUser, onLogout }) => {
                     <div className={`menu-item ${activeSection === 'password' ? 'active' : ''}`} onClick={() => setActiveSection('password')}>
                         <i className="fa-solid fa-shield-halved"></i> Bảo mật mật khẩu
                     </div>
-                    <div className="menu-item logout-item" onClick={onLogout}>
+                    <div className="menu-item logout-item" onClick={handleLogout}>
                         <i className="fa-solid fa-right-from-bracket"></i> Đăng xuất
                     </div>
                 </div>
