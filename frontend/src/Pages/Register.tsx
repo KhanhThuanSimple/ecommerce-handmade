@@ -14,6 +14,8 @@ const Register: React.FC<RegisterProps> = ({ onSwitchToLogin, onClose }) => {
         password, setPassword,
         username, setUsername,
         error, message,
+        fullName, setFullName, // THÊM VÀO ĐÂY
+        phone, setPhone, // THÊM VÀO ĐÂY
         captchaCode, userCaptchaInput, setUserCaptchaInput, captchaColor,
         generateCaptcha,
         handleRegister
@@ -40,6 +42,22 @@ const Register: React.FC<RegisterProps> = ({ onSwitchToLogin, onClose }) => {
                     required 
                     className="auth-input" 
                 />
+            
+                    <input 
+                        type="text" 
+                        placeholder="Họ và tên" 
+                        value={fullName} // Giả sử bạn thêm biến này vào hook useRegister
+                        onChange={(e) => setFullName(e.target.value)} 
+                        className="auth-input" 
+                    />
+
+                    <input 
+                        type="text" 
+                        placeholder="Số điện thoại" 
+                        value={phone} // Giả sử bạn thêm biến này vào hook useRegister
+                        onChange={(e) => setPhone(e.target.value)} 
+                        className="auth-input" 
+/>
                 <input 
                     type="email" 
                     placeholder="Email" 

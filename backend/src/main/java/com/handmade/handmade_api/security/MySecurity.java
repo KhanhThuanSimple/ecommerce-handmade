@@ -1,7 +1,6 @@
 package com.handmade.handmade_api.security;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.batch.BatchProperties;
+import com.handmade.handmade_api.modules.auth.repository.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -9,77 +8,138 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
-import org.springframework.security.provisioning.JdbcUserDetailsManager;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import javax.sql.DataSource;
 @Configuration
 public class MySecurity {
 
     @Bean
-    public JdbcUserDetailsManager jdbcUserDetailsManager(DataSource dataSource) {
-        JdbcUserDetailsManager userDetailsManager = new JdbcUserDetailsManager(dataSource);
-
-        // Sử dụng email làm định danh đăng nhập
-        userDetailsManager.setUsersByUsernameQuery(
-                "select email, password, enabled from users where email = ?"
-        );
-
-        // Truy vấn quyền dựa trên email
-        userDetailsManager.setAuthoritiesByUsernameQuery(
-                "select u.email, a.authority from authorities a " +
-                        "join users u on a.username = u.username " +
-                        "where u.email = ?"
-        );
-        return userDetailsManager;
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
-    @Bean
-    public org.springframework.security.crypto.password.PasswordEncoder passwordEncoder() {
-        // Vì DB bạn đang để '{noop}123456', dùng DelegatingPasswordEncoder là chuẩn nhất
-        return org.springframework.security.crypto.factory.PasswordEncoderFactories.createDelegatingPasswordEncoder();
-    }
+
     @Bean
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 
+    // =========================
+    // CORS CONFIG
+    // =========================
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
+
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:3000")
-                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // Thêm OPTIONS
-                        .allowedHeaders("*") // Cho phép mọi Header (quan trọng cho Authorization)
+                        .allowedOrigins("http://localhost:3000") // Đã chỉ định cụ thể ở đây
+                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                        .allowedHeaders("*")
                         .allowCredentials(true);
             }
         };
     }
 
+    // =========================
+    // USER DETAILS
+    // =========================
+    @Bean
+    public UserDetailsService userDetailsService(UserRepository userRepository) {
+
+        return email -> userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new UsernameNotFoundException(
+                                "User not found with email: " + email));
+    }
+
+    // =========================
+    // SECURITY FILTER
+    // =========================
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.cors(Customizer.withDefaults());
-        http.csrf(csrf -> csrf.disable());
 
-        http.authorizeHttpRequests(configure -> configure
-                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+        http
+                .cors(Customizer.withDefaults())
 
-                // THÊM DÒNG NÀY: Cho phép truy cập link login mà không cần đăng nhập trước
-                .requestMatchers("/api/login").permitAll()
+                .csrf(csrf -> csrf.disable())
 
-                .requestMatchers(HttpMethod.GET, "/products/**").hasAnyAuthority("ROLE_USER", "ROLE_TEACHER", "ROLE_ADMIN")
-                // ... các cấu hình khác
-                .anyRequest().authenticated()
-        );
+                .authorizeHttpRequests(auth -> auth
 
-        http.httpBasic(Customizer.withDefaults());
+                        // =========================
+                        // PUBLIC API
+                        // =========================
+
+                        .requestMatchers("/api/auth/**").permitAll()
+
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/products/**").permitAll()
+
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/categories/**").permitAll()
+
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/product-images/**").permitAll()
+
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/reviews/**").permitAll()
+
+                        // =========================
+                        // USER API
+                        // =========================
+
+                        .requestMatchers("/api/users/**")
+                        .hasAnyRole("USER", "ADMIN")
+
+                        .requestMatchers(HttpMethod.POST,
+                                "/api/reviews/**")
+                        .hasAnyRole("USER", "ADMIN")
+
+                        // =========================
+                        // ADMIN API
+                        // =========================
+
+                        .requestMatchers(HttpMethod.POST,
+                                "/api/products/**")
+                        .hasRole("ADMIN")
+
+                        .requestMatchers(HttpMethod.PUT,
+                                "/api/products/**")
+                        .hasRole("ADMIN")
+
+                        .requestMatchers(HttpMethod.DELETE,
+                                "/api/products/**")
+                        .hasRole("ADMIN")
+
+                        .requestMatchers(HttpMethod.POST,
+                                "/api/categories/**")
+                        .hasRole("ADMIN")
+
+                        .requestMatchers(HttpMethod.PUT,
+                                "/api/categories/**")
+                        .hasRole("ADMIN")
+
+                        .requestMatchers(HttpMethod.DELETE,
+                                "/api/categories/**")
+                        .hasRole("ADMIN")
+
+                        // =========================
+                        // OTHER REQUEST
+                        // =========================
+
+                        .anyRequest().authenticated()
+                )
+
+                // Basic Auth
+                .httpBasic(Customizer.withDefaults());
+
         return http.build();
     }
 }
