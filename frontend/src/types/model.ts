@@ -11,6 +11,8 @@ export interface Product {
     rating?: number; 
     commentCount?: number;
     viewCount?: number;
+        status?: 'active' | 'inactive' | 'lowstock';
+    soldCount?: number;
 }
 
 // Bạn cũng nên chuyển User interface vào đây luôn
@@ -18,7 +20,8 @@ export interface User {
     id: number;
     email: string;
     username: string;
-    password?: string;
+    password?: string[];
+    roles: string[];
     wishlist?: Product[];
     lastSpinDate?: string; // Lưu dạng ISO (YYYY-MM-DD)
     points?: number;
@@ -66,4 +69,15 @@ export interface Prize {
   textColor: string;
   icon: string;
   description: string;
+}
+interface AdminUser {
+    id: number;
+    name: string;
+    email: string;
+    phone: string;
+    role: 'user' | 'vip';
+    status: 'active' | 'inactive';
+    orders: number;
+    totalSpent: number;
+    joinDate: string;
 }

@@ -1,52 +1,30 @@
-package com.handmade.handmade_api.entity;
+package com.handmade.handmade_api.modules.products.dto;
 
-import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
-@Entity
-@Table(name = "products")
-@Data
-public class Product {
+@Getter
+@Setter
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+public class ProductCreateRequest {
     private String name;
-
-    private Double price;
-
-    private String category;
-
-    private Long categoryId;
-
-    private String imageUrl;
-
-    @Column(columnDefinition = "TEXT")
+    private Double price;       // Hứng trường 'price' của FE
+    private String category;    // Hứng tên danh mục chữ
+    private Long categoryId;    // Hứng ID số
     private String description;
-
     private Integer inventory;
+    private String status;      // Nhận chuỗi 'active' | 'inactive' | 'lowstock'
 
-    public Product() {
+    public ProductCreateRequest() {
     }
 
-    public Product(Long id, String name, Double price, String category, Long categoryId, String imageUrl, String description, Integer inventory) {
-        this.id = id;
+    public ProductCreateRequest(String name, Double price, String category, Long categoryId, String description, Integer inventory, String status) {
         this.name = name;
         this.price = price;
         this.category = category;
         this.categoryId = categoryId;
-        this.imageUrl = imageUrl;
         this.description = description;
         this.inventory = inventory;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
+        this.status = status;
     }
 
     public String getName() {
@@ -81,14 +59,6 @@ public class Product {
         this.categoryId = categoryId;
     }
 
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
-
     public String getDescription() {
         return description;
     }
@@ -103,5 +73,13 @@ public class Product {
 
     public void setInventory(Integer inventory) {
         this.inventory = inventory;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

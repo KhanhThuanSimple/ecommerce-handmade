@@ -10,6 +10,8 @@ export const useRegister = () => {
     const [captchaCode, setCaptchaCode] = useState('');
     const [userCaptchaInput, setUserCaptchaInput] = useState('');
     const [captchaColor, setCaptchaColor] = useState('#000');
+            const [fullName, setFullName] = useState('');
+        const [phone, setPhone] = useState('');
 
     const generateCaptcha = () => {
         const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
@@ -24,25 +26,46 @@ export const useRegister = () => {
     useEffect(() => { generateCaptcha(); }, []);
 
     const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        setError('');
-        if (userCaptchaInput !== captchaCode) {
-            setError('Mã xác nhận không chính xác.');
-            generateCaptcha();
-            return;
-        }
-        if (password.length < 6) { setError('Mật khẩu quá ngắn.'); return; }
+    e.preventDefault();
+    setError('');
 
-        try {
-            await registerUser({ email, password, username });
-            setMessage('Đăng ký thành công!');
-            setEmail(''); setPassword(''); setUsername('');
-            generateCaptcha();
-        } catch (err) {
-            setError((err as Error).message || 'Lỗi đăng ký.');
-            generateCaptcha();
-        }
-    };
+    // Kiểm tra CAPTCHA
+    if (userCaptchaInput !== captchaCode) {
+        setError('Mã xác nhận không chính xác.');
+        generateCaptcha();
+        return;
+    }
 
-    return { email, setEmail, password, setPassword, username, setUsername, error, message, captchaCode, userCaptchaInput, setUserCaptchaInput, captchaColor, generateCaptcha, handleRegister };
+    // Kiểm tra độ dài mật khẩu
+    if (password.length < 6) { 
+        setError('Mật khẩu phải có ít nhất 6 ký tự.'); 
+        return; 
+    }
+
+    try {
+        // GỬI ĐỦ 5 TRƯỜNG DỮ LIỆU SANG SERVICE
+        await registerUser({ 
+            email, 
+            password, 
+            username, 
+            fullName, 
+            phone 
+        });
+
+        setMessage('Đăng ký thành công!');
+        
+        // Reset toàn bộ form sau khi thành công
+        setEmail(''); 
+        setPassword(''); 
+        setUsername('');
+        setFullName(''); // Thêm dòng này
+        setPhone('');    // Thêm dòng này
+        generateCaptcha();
+    } catch (err) {
+        setError((err as Error).message || 'Lỗi đăng ký.');
+        generateCaptcha();
+    }
+};
+
+    return { email, setEmail, password, setPassword, username, setUsername,fullName, setFullName, phone, setPhone, error, message, captchaCode, userCaptchaInput, setUserCaptchaInput, captchaColor, generateCaptcha, handleRegister };
 };

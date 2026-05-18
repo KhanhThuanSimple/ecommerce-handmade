@@ -1,4 +1,4 @@
-package com.handmade.handmade_api.entity;
+package com.handmade.handmade_api.modules.auth.dto;
 
 public class LoginRequest {
     private String email;
