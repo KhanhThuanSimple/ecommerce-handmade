@@ -9,7 +9,6 @@ export const useProductDetail = (
     id: string | undefined,
     currentUser: User | null
 ) => {
-
     const navigate = useNavigate();
     const { addToCart } = useCart();
     const notify = useNotify();
@@ -34,232 +33,150 @@ export const useProductDetail = (
     // FETCH PRODUCT + REVIEWS
     // =========================
     useEffect(() => {
-
         const fetchData = async () => {
-
             if (!id) return;
 
             setLoading(true);
             setError(null);
 
             try {
-
                 const productId = Number(id);
 
                 // =========================
                 // 1. LẤY THÔNG TIN SẢN PHẨM
                 // =========================
-                const productRes = await api.get<Product>(
-                    `/products/${productId}`
-                );
+                const productRes = await api.get<Product>(`/products/${productId}`);
 
                 if (!productRes.data) {
                     setError('Không tìm thấy sản phẩm.');
                     return;
                 }
-
                 setProduct(productRes.data);
 
                 // =========================
                 // 2. LẤY REVIEW (NẾU CÓ)
                 // =========================
                 try {
+                    const reviewsRes = await api.get<any>(`/reviews/products/${productId}`);
+                    
+                    // Kiểm tra nếu data trả về là mảng thì xử lý, nếu là String (do 404) thì coi như mảng rỗng
+                    const reviewData = Array.isArray(reviewsRes.data) ? reviewsRes.data : [];
 
-                    const reviewsRes = await api.get<Review[]>(
-                        `/reviews/products/${productId}`
-                    );
-
-                    const reviewData = reviewsRes.data || [];
-
-                    // Review mới nhất lên đầu
+                    // Sắp xếp Review mới nhất lên đầu
                     setReviews([...reviewData].reverse());
 
-                    // Kiểm tra đã review chưa
-                    if (currentUser) {
-
+                    // Kiểm tra người dùng hiện tại đã viết đánh giá cho sản phẩm này chưa
+                    if (currentUser && reviewData.length > 0) {
                         const reviewed = reviewData.some(
-                            (r: Review) =>
-                                r.userName === currentUser.username
+                            (r: any) => String(r.userName).toLowerCase() === String(currentUser.username || currentUser.email).toLowerCase()
                         );
-
                         setAlreadyReviewed(reviewed);
+                    } else {
+                        setAlreadyReviewed(false);
                     }
 
                 } catch (reviewErr: any) {
-
-                    // Nếu chưa có review hoặc API review chưa tồn tại
+                    // Nếu lỗi 404 (chưa có review nào), đưa mảng về rỗng chứ không crash app
                     if (reviewErr.response?.status === 404) {
-
                         setReviews([]);
                         setAlreadyReviewed(false);
-
                     } else {
-
-                        console.error(
-                            'Lỗi lấy danh sách đánh giá:',
-                            reviewErr
-                        );
+                        // Nếu có dữ liệu trả về dù báo lỗi (do axios nhận diện string), kiểm tra xem có mảng ẩn không
+                        if (reviewErr.response?.data && Array.isArray(reviewErr.response.data)) {
+                            setReviews([...reviewErr.response.data].reverse());
+                        } else {
+                            console.error('Lỗi lấy danh sách đánh giá:', reviewErr);
+                            setReviews([]);
+                        }
                     }
                 }
 
             } catch (err) {
-
                 console.error('Lỗi lấy dữ liệu sản phẩm:', err);
-
-                setError(
-                    'Có lỗi xảy ra khi tải dữ liệu sản phẩm.'
-                );
-
+                setError('Có lỗi xảy ra khi tải dữ liệu sản phẩm.');
             } finally {
-
                 setLoading(false);
             }
         };
 
         void fetchData();
-
     }, [id, currentUser]);
 
     // =========================
     // KIỂM TRA ĐÃ MUA HÀNG CHƯA
     // =========================
     useEffect(() => {
-
         const checkPurchase = async () => {
-
             if (!currentUser || !product) {
                 setHasPurchased(false);
                 return;
             }
 
             try {
-
-                const res = await api.get(
-                    `/orders/user/${currentUser.id}`
-                );
-
+                const res = await api.get(`/orders/user/${currentUser.id}`);
                 const bought = res.data.some((order: any) =>
-                    order?.items?.some(
-                        (item: any) =>
-                            item?.productId === product.id
-                    )
+                    order?.items?.some((item: any) => item?.productId === product.id)
                 );
-
                 setHasPurchased(bought);
-
             } catch (err) {
-
-                console.error(
-                    'Lỗi kiểm tra lịch sử đơn hàng:',
-                    err
-                );
-
+                console.error('Lỗi kiểm tra lịch sử đơn hàng:', err);
                 setHasPurchased(false);
             }
         };
 
         void checkPurchase();
-
     }, [currentUser, product]);
 
     // =========================
     // GỬI REVIEW
     // =========================
-    const handleSubmitReview = async (
-        e: React.FormEvent
-    ) => {
-
+    const handleSubmitReview = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        // Chưa login
         if (!currentUser) {
-
-            notify.warning(
-                'Vui lòng đăng nhập để gửi đánh giá!'
-            );
-
-            navigate('/login', {
-                state: { from: `/products/${id}` }
-            });
-
+            notify.warning('Vui lòng đăng nhập để gửi đánh giá!');
+            navigate('/login', { state: { from: `/products/${id}` } });
             return;
         }
 
-        // Chưa mua
         if (!hasPurchased) {
-
-            notify.error(
-                'Bạn cần mua sản phẩm trước khi đánh giá.'
-            );
-
+            notify.error('Bạn cần mua sản phẩm trước khi đánh giá.');
             return;
         }
 
-        // Đã review rồi
         if (alreadyReviewed) {
-
-            notify.error(
-                'Bạn đã đánh giá sản phẩm này rồi.'
-            );
-
+            notify.error('Bạn đã đánh giá sản phẩm này rồi.');
             return;
         }
 
-        // Validate dữ liệu
         if (rating === 0 || !comment.trim()) {
-
-            notify.warning(
-                'Vui lòng chọn số sao và nhập bình luận.'
-            );
-
+            notify.warning('Vui lòng chọn số sao và nhập bình luận.');
             return;
         }
 
         try {
-
             const reviewPayload = {
-
                 productId: Number(id),
                 userId: currentUser.id,
                 rating,
                 comment: comment.trim()
             };
 
-            const response = await api.post<Review>(
-                '/reviews',
-                reviewPayload
-            );
+            const response = await api.post<Review>('/reviews', reviewPayload);
 
             if (response.data) {
-
-                // Thêm review mới lên đầu
-                setReviews(prev => [
-                    response.data,
-                    ...prev
-                ]);
-
+                setReviews(prev => [response.data, ...prev]);
                 setAlreadyReviewed(true);
-
-                notify.success(
-                    'Cảm ơn bạn đã đánh giá sản phẩm!'
-                );
-
+                notify.success('Cảm ơn bạn đã đánh giá sản phẩm!');
+                
                 // Reset form
                 setRating(0);
                 setHoverRating(0);
                 setComment('');
             }
-
         } catch (err) {
-
-            console.error(
-                'Lỗi gửi đánh giá:',
-                err
-            );
-
-            notify.error(
-                'Không thể gửi đánh giá lúc này.'
-            );
+            console.error('Lỗi gửi đánh giá:', err);
+            notify.error('Không thể gửi đánh giá lúc này.');
         }
     };
 
@@ -267,69 +184,41 @@ export const useProductDetail = (
     // MUA NGAY
     // =========================
     const handleBuyNow = () => {
-
         if (!product) return;
 
         if ((product.inventory ?? 0) <= 0) {
-
-            notify.error(
-                'Sản phẩm hiện đã hết hàng.'
-            );
-
+            notify.error('Sản phẩm hiện đã hết hàng.');
             return;
         }
 
         if (!currentUser) {
-
-            notify.warning(
-                'Vui lòng đăng nhập để mua hàng.'
-            );
-
+            notify.warning('Vui lòng đăng nhập để mua hàng.');
             navigate('/login', {
-                state: {
-                    from: '/checkout',
-                    buyNowItem: product
-                }
+                state: { from: '/checkout', buyNowItem: product }
             });
-
             return;
         }
 
-        navigate('/checkout', {
-            state: {
-                buyNowItem: product
-            }
-        });
+        navigate('/checkout', { state: { buyNowItem: product } });
     };
 
-    // =========================
-    // RETURN
-    // =========================
     return {
-
         product,
         reviews,
         loading,
         error,
-
         rating,
         setRating,
-
         hoverRating,
         setHoverRating,
-
         comment,
         setComment,
-
         hasPurchased,
         alreadyReviewed,
-
         showReviews,
         setShowReviews,
-
         handleSubmitReview,
         handleBuyNow,
-
         addToCart,
         navigate
     };

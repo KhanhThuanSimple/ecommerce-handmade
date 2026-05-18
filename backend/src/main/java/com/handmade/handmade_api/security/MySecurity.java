@@ -38,10 +38,9 @@ public class MySecurity {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:3000") // Đã chỉ định cụ thể ở đây
-                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                        .allowedOrigins("http://localhost:3000")
+                        .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS") // Thêm PATCH cho luồng gộp cart của FE
                         .allowedHeaders("*")
                         .allowCredentials(true);
             }
@@ -53,11 +52,8 @@ public class MySecurity {
     // =========================
     @Bean
     public UserDetailsService userDetailsService(UserRepository userRepository) {
-
         return email -> userRepository.findByEmail(email)
-                .orElseThrow(() ->
-                        new UsernameNotFoundException(
-                                "User not found with email: " + email));
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
     }
 
     // =========================
@@ -68,76 +64,48 @@ public class MySecurity {
 
         http
                 .cors(Customizer.withDefaults())
-
                 .csrf(csrf -> csrf.disable())
-
                 .authorizeHttpRequests(auth -> auth
 
                         // =========================
-                        // PUBLIC API
+                        // PUBLIC API (Mọi người đều truy cập được)
                         // =========================
-
                         .requestMatchers("/api/auth/**").permitAll()
-
-                        .requestMatchers(HttpMethod.GET,
-                                "/api/products/**").permitAll()
-
-                        .requestMatchers(HttpMethod.GET,
-                                "/api/categories/**").permitAll()
-
-                        .requestMatchers(HttpMethod.GET,
-                                "/api/product-images/**").permitAll()
-
-                        .requestMatchers(HttpMethod.GET,
-                                "/api/reviews/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/product-images/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/reviews/**").permitAll()
+                        
+                        // 🟢 CHO PHÉP GUEST GỌI GET CART: Bọc lót chuỗi userId=null không bị chặn chặn 401/403
+                        .requestMatchers(HttpMethod.GET, "/api/carts/**").permitAll()
 
                         // =========================
-                        // USER API
+                        // USER API (Cần quyền USER hoặc ADMIN)
                         // =========================
-
-                        .requestMatchers("/api/users/**")
-                        .hasAnyRole("USER", "ADMIN")
-
-                        .requestMatchers(HttpMethod.POST,
-                                "/api/reviews/**")
-                        .hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/api/users/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/reviews/**").hasAnyRole("USER", "ADMIN")
+                        
+                        // 🟢 CÁC THAO TÁC THAY ĐỔI GIỎ HÀNG: Phải đăng nhập mới cho xử lý dữ liệu
+                        .requestMatchers(HttpMethod.POST, "/api/carts/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.PATCH, "/api/carts/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/carts/**").hasAnyRole("USER", "ADMIN")
 
                         // =========================
                         // ADMIN API
                         // =========================
-
-                        .requestMatchers(HttpMethod.POST,
-                                "/api/products/**")
-                        .hasRole("ADMIN")
-
-                        .requestMatchers(HttpMethod.PUT,
-                                "/api/products/**")
-                        .hasRole("ADMIN")
-
-                        .requestMatchers(HttpMethod.DELETE,
-                                "/api/products/**")
-                        .hasRole("ADMIN")
-
-                        .requestMatchers(HttpMethod.POST,
-                                "/api/categories/**")
-                        .hasRole("ADMIN")
-
-                        .requestMatchers(HttpMethod.PUT,
-                                "/api/categories/**")
-                        .hasRole("ADMIN")
-
-                        .requestMatchers(HttpMethod.DELETE,
-                                "/api/categories/**")
-                        .hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/products/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/products/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/products/**").hasRole("ADMIN")
+                        
+                        .requestMatchers(HttpMethod.POST, "/api/categories/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/categories/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/categories/**").hasRole("ADMIN")
 
                         // =========================
                         // OTHER REQUEST
                         // =========================
-
                         .anyRequest().authenticated()
                 )
-
-                // Basic Auth
                 .httpBasic(Customizer.withDefaults());
 
         return http.build();
