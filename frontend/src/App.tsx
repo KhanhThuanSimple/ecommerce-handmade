@@ -274,7 +274,7 @@ function App() {
                         </MainLayout>
                     } />
 
-                    <Route path="/product/:id" element={
+                    <Route path="/products/:id" element={
                         <MainLayout currentUser={currentUser} onLogout={handleLogout}>
                             <ProductDetail currentUser={currentUser} onLogout={handleLogout} />
                         </MainLayout>

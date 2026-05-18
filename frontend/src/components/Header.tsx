@@ -59,7 +59,7 @@ const Header: React.FC<HeaderProps> = ({ currentUser, onLogout }) => {
                 key={item.id}
                 className="search-item"
                 onClick={() => {
-                  navigate(`/product/${item.id}`);
+                  navigate(`/products/${item.id}`);
                   setQuery("");
                 }}
               >
