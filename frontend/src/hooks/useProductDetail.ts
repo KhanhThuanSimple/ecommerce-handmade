@@ -3,13 +3,20 @@ import { useNavigate } from 'react-router-dom';
 import { Product, Review, User } from '../types/model';
 import { useCart } from '../context/CartContext';
 import { useNotify } from '../components/NotificationContext';
-import api from '../services/api'; // Đảm bảo axios instance đã cấu hình baseURL là http://localhost:8080
+import api from '../services/api';
 
-export const useProductDetail = (id: string | undefined, currentUser: User | null) => {
+export const useProductDetail = (
+    id: string | undefined,
+    currentUser: User | null
+) => {
+
     const navigate = useNavigate();
     const { addToCart } = useCart();
     const notify = useNotify();
 
+    // =========================
+    // STATE
+    // =========================
     const [product, setProduct] = useState<Product | null>(null);
     const [reviews, setReviews] = useState<Review[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
@@ -18,144 +25,311 @@ export const useProductDetail = (id: string | undefined, currentUser: User | nul
     const [rating, setRating] = useState<number>(0);
     const [hoverRating, setHoverRating] = useState<number>(0);
     const [comment, setComment] = useState<string>('');
+
     const [hasPurchased, setHasPurchased] = useState<boolean>(false);
-    const [alreadyReviewed, setAlreadyReviewed] = useState<boolean>(false); 
+    const [alreadyReviewed, setAlreadyReviewed] = useState<boolean>(false);
     const [showReviews, setShowReviews] = useState<boolean>(true);
 
-    // 1. Tải thông tin chi tiết sản phẩm và danh sách đánh giá từ Backend
+    // =========================
+    // FETCH PRODUCT + REVIEWS
+    // =========================
     useEffect(() => {
+
         const fetchData = async () => {
+
             if (!id) return;
+
             setLoading(true);
             setError(null);
-            try {
-                const productId = Number(id);
-                
-                // Gọi đồng thời API lấy chi tiết sản phẩm và API lấy review của Spring Boot
-                const [productRes, reviewsRes] = await Promise.all([
-                    api.get<Product>(`/api/products/${productId}`),
-                    api.get<Review[]>(`/api/reviews/product/${productId}`)
-                ]);
 
-                if (productRes.data) {
-                    setProduct(productRes.data);
-                    // Mới nhất xếp lên đầu
-                    setReviews(reviewsRes.data.reverse());
-                    
-                    // Kiểm tra xem tài khoản này đã từng đánh giá sản phẩm này chưa
+            try {
+
+                const productId = Number(id);
+
+                // =========================
+                // 1. LẤY THÔNG TIN SẢN PHẨM
+                // =========================
+                const productRes = await api.get<Product>(
+                    `/products/${productId}`
+                );
+
+                if (!productRes.data) {
+                    setError('Không tìm thấy sản phẩm.');
+                    return;
+                }
+
+                setProduct(productRes.data);
+
+                // =========================
+                // 2. LẤY REVIEW (NẾU CÓ)
+                // =========================
+                try {
+
+                    const reviewsRes = await api.get<Review[]>(
+                        `/reviews/products/${productId}`
+                    );
+
+                    const reviewData = reviewsRes.data || [];
+
+                    // Review mới nhất lên đầu
+                    setReviews([...reviewData].reverse());
+
+                    // Kiểm tra đã review chưa
                     if (currentUser) {
-                        const reviewed = reviewsRes.data.some((r: Review) => r.userName === currentUser.username);
+
+                        const reviewed = reviewData.some(
+                            (r: Review) =>
+                                r.userName === currentUser.username
+                        );
+
                         setAlreadyReviewed(reviewed);
                     }
-                } else {
-                    setError("Không tìm thấy sản phẩm.");
+
+                } catch (reviewErr: any) {
+
+                    // Nếu chưa có review hoặc API review chưa tồn tại
+                    if (reviewErr.response?.status === 404) {
+
+                        setReviews([]);
+                        setAlreadyReviewed(false);
+
+                    } else {
+
+                        console.error(
+                            'Lỗi lấy danh sách đánh giá:',
+                            reviewErr
+                        );
+                    }
                 }
+
             } catch (err) {
-                console.error("Lỗi lấy dữ liệu API:", err);
-                setError("Có lỗi xảy ra khi tải dữ liệu từ hệ thống.");
+
+                console.error('Lỗi lấy dữ liệu sản phẩm:', err);
+
+                setError(
+                    'Có lỗi xảy ra khi tải dữ liệu sản phẩm.'
+                );
+
             } finally {
+
                 setLoading(false);
             }
         };
+
         void fetchData();
+
     }, [id, currentUser]);
 
-    // 2. Kiểm tra xem người dùng hiện tại đã mua sản phẩm này chưa (Để kích hoạt quyền đánh giá)
+    // =========================
+    // KIỂM TRA ĐÃ MUA HÀNG CHƯA
+    // =========================
     useEffect(() => {
+
         const checkPurchase = async () => {
+
             if (!currentUser || !product) {
                 setHasPurchased(false);
                 return;
             }
+
             try {
-                // Gọi API lịch sử đơn hàng của Spring Boot Backend
-                const res = await api.get(`/api/orders/user/${currentUser.id}`);
-                const bought = res.data.some((order: any) =>
-                    order?.items?.some((item: any) => item?.productId === product.id)
+
+                const res = await api.get(
+                    `/orders/user/${currentUser.id}`
                 );
+
+                const bought = res.data.some((order: any) =>
+                    order?.items?.some(
+                        (item: any) =>
+                            item?.productId === product.id
+                    )
+                );
+
                 setHasPurchased(bought);
+
             } catch (err) {
-                console.error('Lỗi kiểm tra lịch sử đơn hàng:', err);
+
+                console.error(
+                    'Lỗi kiểm tra lịch sử đơn hàng:',
+                    err
+                );
+
                 setHasPurchased(false);
             }
         };
+
         void checkPurchase();
+
     }, [currentUser, product]);
 
-    // 3. Xử lý gửi đánh giá mới lên Backend Spring Boot
-    const handleSubmitReview = (e: React.FormEvent) => {
+    // =========================
+    // GỬI REVIEW
+    // =========================
+    const handleSubmitReview = async (
+        e: React.FormEvent
+    ) => {
+
         e.preventDefault();
-        
+
+        // Chưa login
         if (!currentUser) {
-            notify.warning('Vui lòng đăng nhập để gửi đánh giá!');
-            navigate('/login', { state: { from: `/product/${id}` } });
+
+            notify.warning(
+                'Vui lòng đăng nhập để gửi đánh giá!'
+            );
+
+            navigate('/login', {
+                state: { from: `/products/${id}` }
+            });
+
             return;
         }
+
+        // Chưa mua
         if (!hasPurchased) {
-            notify.error('Bạn cần hoàn tất mua sản phẩm này trước khi gửi đánh giá.');
+
+            notify.error(
+                'Bạn cần mua sản phẩm trước khi đánh giá.'
+            );
+
             return;
         }
+
+        // Đã review rồi
         if (alreadyReviewed) {
-            notify.error('Mỗi khách hàng chỉ được để lại đánh giá một lần duy nhất.');
+
+            notify.error(
+                'Bạn đã đánh giá sản phẩm này rồi.'
+            );
+
             return;
         }
+
+        // Validate dữ liệu
         if (rating === 0 || !comment.trim()) {
-            notify.warning('Vui lòng chọn số sao và nhập nội dung bình luận.');
+
+            notify.warning(
+                'Vui lòng chọn số sao và nhập bình luận.'
+            );
+
             return;
         }
 
-        const addReviewInternal = async () => {
-            try {
-                // Đóng gói dữ liệu dạng DTO tối giản phù hợp với cấu trúc Entity Reviews của Spring Boot
-                const reviewPayload = {
-                    productId: Number(id),
-                    userId: currentUser.id, // Backend sẽ dùng khóa ngoại liên kết bảng users
-                    rating: rating,
-                    comment: comment.trim()
-                };
+        try {
 
-                // Thực hiện gửi POST lên Spring Boot
-                const response = await api.post<Review>('/api/reviews', reviewPayload);
-                
-                if (response.data) {
-                    setReviews(prev => [response.data, ...prev]);
-                    setAlreadyReviewed(true); 
-                    notify.success("Cảm ơn bạn đã đóng góp đánh giá sản phẩm!");
-                    setRating(0);
-                    setComment('');
-                }
-            } catch (err) {
-                console.error("Lỗi gửi bài đánh giá:", err);
-                notify.error("Hệ thống không thể lưu nhận xét của bạn lúc này.");
+            const reviewPayload = {
+
+                productId: Number(id),
+                userId: currentUser.id,
+                rating,
+                comment: comment.trim()
+            };
+
+            const response = await api.post<Review>(
+                '/reviews',
+                reviewPayload
+            );
+
+            if (response.data) {
+
+                // Thêm review mới lên đầu
+                setReviews(prev => [
+                    response.data,
+                    ...prev
+                ]);
+
+                setAlreadyReviewed(true);
+
+                notify.success(
+                    'Cảm ơn bạn đã đánh giá sản phẩm!'
+                );
+
+                // Reset form
+                setRating(0);
+                setHoverRating(0);
+                setComment('');
             }
-        };
-        void addReviewInternal();
+
+        } catch (err) {
+
+            console.error(
+                'Lỗi gửi đánh giá:',
+                err
+            );
+
+            notify.error(
+                'Không thể gửi đánh giá lúc này.'
+            );
+        }
     };
 
-    // 4. Chức năng Mua Ngay
+    // =========================
+    // MUA NGAY
+    // =========================
     const handleBuyNow = () => {
-        if (!product || product.inventory <= 0) {
-            notify.error("Sản phẩm hiện đã hết hàng trong kho.");
+
+        if (!product) return;
+
+        if ((product.inventory ?? 0) <= 0) {
+
+            notify.error(
+                'Sản phẩm hiện đã hết hàng.'
+            );
+
             return;
         }
+
         if (!currentUser) {
-            notify.warning("Vui lòng đăng nhập tài khoản để mua hàng");
-            navigate('/login', { state: { from: '/checkout', buyNowItem: product } });
+
+            notify.warning(
+                'Vui lòng đăng nhập để mua hàng.'
+            );
+
+            navigate('/login', {
+                state: {
+                    from: '/checkout',
+                    buyNowItem: product
+                }
+            });
+
             return;
         }
-        navigate('/checkout', { state: { buyNowItem: product } });
+
+        navigate('/checkout', {
+            state: {
+                buyNowItem: product
+            }
+        });
     };
 
+    // =========================
+    // RETURN
+    // =========================
     return {
-        product, loading, error, reviews,
-        rating, setRating,
-        hoverRating, setHoverRating,
-        comment, setComment,
+
+        product,
+        reviews,
+        loading,
+        error,
+
+        rating,
+        setRating,
+
+        hoverRating,
+        setHoverRating,
+
+        comment,
+        setComment,
+
         hasPurchased,
-        alreadyReviewed, 
-        showReviews, setShowReviews,
+        alreadyReviewed,
+
+        showReviews,
+        setShowReviews,
+
         handleSubmitReview,
         handleBuyNow,
+
         addToCart,
         navigate
     };

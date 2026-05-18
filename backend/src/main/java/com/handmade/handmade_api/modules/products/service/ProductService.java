@@ -1,10 +1,14 @@
 package com.handmade.handmade_api.modules.products.service;
 
 import com.handmade.handmade_api.modules.products.dto.ProductCreateRequest;
+import com.handmade.handmade_api.modules.products.dto.ProductProjection;
 import com.handmade.handmade_api.modules.products.dto.ProductResponse;
 import com.handmade.handmade_api.modules.products.entity.Product;
+import com.handmade.handmade_api.modules.products.entity.ProductVariant;
 import com.handmade.handmade_api.modules.products.repository.ProductRepository;
+import com.handmade.handmade_api.modules.products.repository.ProductVariantRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -13,34 +17,30 @@ import java.util.stream.Collectors;
 public class ProductService {
 
     private final ProductRepository productRepository;
+    private final ProductVariantRepository productVariantRepository;
 
-    public ProductService(ProductRepository productRepository) {
+    public ProductService(ProductRepository productRepository, ProductVariantRepository productVariantRepository) {
         this.productRepository = productRepository;
+        this.productVariantRepository = productVariantRepository;
     }
 
+    // LUỒNG 1: LẤY DANH SÁCH SẢN PHẨM
     public List<ProductResponse> getAllProducts() {
-        // 1. Lấy danh sách mảng dữ liệu thô từ câu lệnh Native SQL
-        List<Object[]> rawResults = productRepository.findAllProductsRaw();
-
-        // 2. Map thủ công từng cột dựa theo thứ tự SELECT trong SQL sang đúng thuộc tính của DTO
-        return rawResults.stream().map(row -> ProductResponse.builder()
-                .id(((Number) row[0]).longValue())             // p.id
-                .name((String) row[1])                          // p.name
-                .price(((Number) row[2]).doubleValue())         // p.base_price (price của FE)
-                .category((String) row[3])                      // c.name (category của FE)
-                .categoryId(((Number) row[4]).longValue())      // p.category_id
-                .imageUrl((String) row[5])                      // pi.image_url
-                .description((String) row[6])                   // p.description
-                .inventory(((Number) row[7]).intValue())        // SUM(pv.inventory)
-                .rating(((Number) row[8]).doubleValue())        // rating (5.0)
-                .commentCount(((Number) row[9]).intValue())     // comment_count (0)
-                .viewCount(((Number) row[10]).intValue())       // view_count (0)
-                .status((String) row[11])                       // p.status
-                .soldCount(((Number) row[12]).intValue())       // p.sold_count
-                .build()
-        ).collect(Collectors.toList());
+        List<ProductProjection> projections = productRepository.findAllProductsRaw();
+        return projections.stream().map(this::convertToResponse).collect(Collectors.toList());
     }
 
+    // LUỒNG 2: LẤY CHI TIẾT 1 SẢN PHẨM (An toàn tuyệt đối, không lo ClassCastException)
+    public ProductResponse getProductById(Long id) {
+        ProductProjection projection = productRepository.findProductDetailRawById(id);
+        if (projection == null) {
+            throw new RuntimeException("Không tìm thấy sản phẩm với ID: " + id);
+        }
+        return convertToResponse(projection);
+    }
+
+    // LUỒNG 3: TẠO MỚI SẢN PHẨM
+    @Transactional
     public ProductResponse createProduct(ProductCreateRequest request) {
         Product product = new Product();
         product.setName(request.getName());
@@ -53,6 +53,11 @@ public class ProductService {
 
         Product saved = productRepository.save(product);
 
+        ProductVariant defaultVariant = new ProductVariant();
+        defaultVariant.setProductId(saved.getId());
+        defaultVariant.setInventory(request.getInventory() != null ? request.getInventory() : 0);
+        productVariantRepository.save(defaultVariant);
+
         return ProductResponse.builder()
                 .id(saved.getId())
                 .name(saved.getName())
@@ -61,7 +66,32 @@ public class ProductService {
                 .category(request.getCategory())
                 .status(saved.getStatus())
                 .inventory(request.getInventory() != null ? request.getInventory() : 0)
+                .rating(5.0)
+                .commentCount(0)
+                .viewCount(0)
                 .soldCount(saved.getSoldCount())
+                .build();
+    }
+
+    /**
+     * HÀM CHUYỂN ĐỔI ĐỒNG BỘ TẬP TRUNG
+     * Đọc dữ liệu qua các hàm Get có tên tường minh, chống lỗi ép kiểu ngầm của JDBC hoàn toàn
+     */
+    private ProductResponse convertToResponse(ProductProjection p) {
+        return ProductResponse.builder()
+                .id(p.getId())
+                .name(p.getName())
+                .price(p.getPrice())
+                .category(p.getCategoryName()) // c.name AS categoryName
+                .categoryId(p.getCategoryId())
+                .imageUrl(p.getImageUrl())
+                .description(p.getDescription())
+                .inventory(p.getTotalInventory()) // Khớp tổng SUM(inventory) biến thể
+                .rating(p.getRating())
+                .commentCount(p.getCommentCount())
+                .viewCount(p.getViewCount())
+                .status(p.getStatus())
+                .soldCount(p.getSoldCount())
                 .build();
     }
 }

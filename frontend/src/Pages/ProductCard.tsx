@@ -116,7 +116,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                 <p className="product-inventory">Còn lại: {product.inventory} sản phẩm</p>
 
                 <div className="product-buttons">
-                    <button className="view-button" onClick={() => navigate(`/product/${product.id}`)}>
+                    <button className="view-button" onClick={() => navigate(`/products/${product.id}`)}>
                         Xem chi tiết
                     </button>
                     <button 
