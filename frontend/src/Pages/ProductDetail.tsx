@@ -73,7 +73,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ currentUser }) => {
                         </button>
                         <button 
                             className="btn-add-cart" 
-                            onClick={() => addToCart(product, currentUser)}
+                            onClick={() => addToCart(product)}
                             disabled={product.inventory === 0}
                         >
                             Thêm vào giỏ
