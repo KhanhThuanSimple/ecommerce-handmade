@@ -2,6 +2,7 @@ package com.handmade.handmade_api.modules.cart.service;
 
 import com.handmade.handmade_api.modules.cart.dto.CartAddRequest;
 import com.handmade.handmade_api.modules.cart.dto.CartItemProjection;
+import com.handmade.handmade_api.modules.cart.dto.CartItemUpdateRequest;
 import com.handmade.handmade_api.modules.cart.dto.CartMergeRequest;
 import com.handmade.handmade_api.modules.cart.entity.Cart;
 import com.handmade.handmade_api.modules.cart.entity.CartItem;
@@ -12,7 +13,9 @@ import com.handmade.handmade_api.modules.products.service.ProductService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class CartService {
@@ -102,6 +105,70 @@ public class CartService {
         Cart cart = cartRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy giỏ hàng của bạn!"));
         cartItemRepository.deleteByCartIdAndProductId(cart.getId(), productId);
+    }
+
+    @Transactional
+    public void deductOrderedItems(Long userId, Map<Long, Integer> orderedQuantities) {
+        if (orderedQuantities == null || orderedQuantities.isEmpty()) return;
+        Cart cart = cartRepository.findByUserId(userId).orElse(null);
+        if (cart == null) return;
+
+        for (Map.Entry<Long, Integer> entry : orderedQuantities.entrySet()) {
+            Long productId = entry.getKey();
+            int quantity = entry.getValue() == null ? 0 : entry.getValue();
+            if (quantity <= 0) continue;
+
+            cartItemRepository.findByCartIdAndProductId(cart.getId(), productId).ifPresent(item -> {
+                int remaining = item.getQuantity() - quantity;
+                if (remaining <= 0) {
+                    cartItemRepository.delete(item);
+                } else {
+                    item.setQuantity(remaining);
+                    cartItemRepository.save(item);
+                }
+            });
+        }
+    }
+
+    // LUỒNG 5: CẬP NHẬT DANH SÁCH SẢN PHẨM TRONG GIỎ (FE gọi khi thanh toán xong)
+    @Transactional
+    public void updateCartItems(Long cartId, List<CartItemUpdateRequest> items) {
+        Cart cart = cartRepository.findById(cartId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy giỏ hàng: " + cartId));
+
+        List<CartItem> existingItems = cartItemRepository.findByCartId(cart.getId());
+        Map<Long, CartItem> existingByProduct = existingItems.stream()
+                .collect(Collectors.toMap(CartItem::getProductId, item -> item));
+
+        for (CartItemUpdateRequest itemRequest : items) {
+            ProductResponse product = productService.getProductById(itemRequest.getProductId());
+            if (itemRequest.getQuantity() < 0 || itemRequest.getQuantity() > product.getInventory()) {
+                throw new RuntimeException("Số lượng sản phẩm không hợp lệ cho sản phẩm " + product.getName());
+            }
+
+            if (itemRequest.getQuantity() == 0) {
+                cartItemRepository.deleteByCartIdAndProductId(cart.getId(), itemRequest.getProductId());
+                existingByProduct.remove(itemRequest.getProductId());
+                continue;
+            }
+
+            CartItem item = existingByProduct.get(itemRequest.getProductId());
+            if (item != null) {
+                item.setQuantity(itemRequest.getQuantity());
+                cartItemRepository.save(item);
+            } else {
+                CartItem newItem = CartItem.builder()
+                        .cartId(cart.getId())
+                        .productId(product.getId())
+                        .quantity(itemRequest.getQuantity())
+                        .build();
+                cartItemRepository.save(newItem);
+            }
+            existingByProduct.remove(itemRequest.getProductId());
+        }
+
+        // Nếu có sản phẩm cũ không còn trong payload thì xóa
+        existingByProduct.values().forEach(item -> cartItemRepository.delete(item));
     }
 
     // Helper tạo giỏ tự động nếu chưa có
