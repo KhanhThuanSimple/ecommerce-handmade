@@ -1,73 +1,44 @@
 package com.handmade.handmade_api.modules.cart.controller;
 
-import com.handmade.handmade_api.modules.auth.entity.User;
-import com.handmade.handmade_api.modules.cart.dto.CartRequest;
-import com.handmade.handmade_api.modules.cart.entity.Cart;
+import com.handmade.handmade_api.modules.cart.dto.CartAddRequest;
+import com.handmade.handmade_api.modules.cart.dto.CartItemProjection;
+import com.handmade.handmade_api.modules.cart.dto.CartMergeRequest;
 import com.handmade.handmade_api.modules.cart.service.CartService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/carts")
-@CrossOrigin(origins = "http://localhost:3000")
 public class CartController {
 
-    @Autowired
-    private CartService cartService;
+    private final CartService cartService;
 
-    @GetMapping
-    public ResponseEntity<List<Cart>> getCartByUserId(
-            @RequestParam(value = "userId", required = false) String userIdStr,
-            @AuthenticationPrincipal User currentUser) {
-        
-        List<Cart> responseList = new ArrayList<>();
-
-        try {
-            if (currentUser != null && currentUser.getId() != null) {
-                cartService.getCartByUserId(currentUser.getId()).ifPresent(responseList::add);
-                return ResponseEntity.ok(responseList);
-            }
-            
-            if (userIdStr == null || userIdStr.trim().isEmpty() || "null".equalsIgnoreCase(userIdStr.trim())) {
-                return ResponseEntity.ok(responseList); 
-            }
-
-            Long userId = Long.parseLong(userIdStr.trim());
-            cartService.getCartByUserId(userId).ifPresent(responseList::add);
-            
-        } catch (Exception e) {
-            return ResponseEntity.ok(new ArrayList<>());
-        }
-
-        return ResponseEntity.ok(responseList);
+    public CartController(CartService cartService) {
+        this.cartService = cartService;
     }
 
-    @PostMapping
-    public ResponseEntity<?> createCart(
-            @RequestBody CartRequest request,
-            @AuthenticationPrincipal User currentUser) {
-        
-        Long userId = (currentUser != null) ? currentUser.getId() : request.getUserId();
-        if (userId == null) {
-            return ResponseEntity.badRequest().body("Không tìm thấy thông tin User hợp lệ!");
-        }
-        
-        Cart newCart = cartService.saveCart(userId, request.getItems());
-        return ResponseEntity.status(HttpStatus.CREATED).body(newCart);
+    @GetMapping("/{userId}")
+    public ResponseEntity<List<CartItemProjection>> getCart(@PathVariable Long userId) {
+        return ResponseEntity.ok(cartService.getCartByUserId(userId));
     }
 
-    @PatchMapping("/{cartId}")
-    public ResponseEntity<?> updateCartItems(@PathVariable Long cartId, @RequestBody CartRequest request) {
-        Cart updatedCart = cartService.updateCartItems(cartId, request.getItems());
-        if (updatedCart == null) {
-            return ResponseEntity.ok(new Cart());
-        }
-        return ResponseEntity.ok(updatedCart);
+    @PostMapping("/add")
+    public ResponseEntity<String> addToCart(@Valid @RequestBody CartAddRequest request) {
+        cartService.addToCart(request);
+        return ResponseEntity.ok("Đã cập nhật giỏ hàng thành công!");
+    }
+
+    @PostMapping("/merge")
+    public ResponseEntity<String> mergeCart(@Valid @RequestBody CartMergeRequest request) {
+        cartService.mergeCart(request);
+        return ResponseEntity.ok("Đã đồng bộ hóa giỏ hàng vãng lai thành công!");
+    }
+
+    @DeleteMapping("/remove")
+    public ResponseEntity<String> removeFromCart(@RequestParam Long userId, @RequestParam Long productId) {
+        cartService.removeFromCart(userId, productId);
+        return ResponseEntity.ok("Đã xóa sản phẩm khỏi giỏ hàng.");
     }
 }

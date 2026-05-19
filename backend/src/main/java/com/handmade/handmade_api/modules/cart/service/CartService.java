@@ -1,149 +1,112 @@
 package com.handmade.handmade_api.modules.cart.service;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.handmade.handmade_api.modules.cart.dto.CartItemDto;
+import com.handmade.handmade_api.modules.cart.dto.CartAddRequest;
+import com.handmade.handmade_api.modules.cart.dto.CartItemProjection;
+import com.handmade.handmade_api.modules.cart.dto.CartMergeRequest;
 import com.handmade.handmade_api.modules.cart.entity.Cart;
 import com.handmade.handmade_api.modules.cart.entity.CartItem;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
+import com.handmade.handmade_api.modules.cart.repository.CartItemRepository;
+import com.handmade.handmade_api.modules.cart.repository.CartRepository;
+import com.handmade.handmade_api.modules.products.dto.ProductResponse;
+import com.handmade.handmade_api.modules.products.service.ProductService;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @Service
 public class CartService {
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
+    private final CartRepository cartRepository;
+    private final CartItemRepository cartItemRepository;
+    private final ProductService productService; // Giao tiếp liên module qua Service sạch
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    public CartService(CartRepository cartRepository, CartItemRepository cartItemRepository, ProductService productService) {
+        this.cartRepository = cartRepository;
+        this.cartItemRepository = cartItemRepository;
+        this.productService = productService;
+    }
 
-    /**
-     * LẤY GIỎ HÀNG TỪ DB (Tự động nạp thông tin sản phẩm thật)
-     */
-    public Optional<Cart> getCartByUserId(Long userId) {
-        Cart cart = new Cart();
-        cart.setId(userId);
-        cart.setUserId(userId);
-        cart.setItems(new ArrayList<>());
+    // LUỒNG 1: ĐỌC CHI TIẾT GIỎ HÀNG QUA PROJECTION
+    public List<CartItemProjection> getCartByUserId(Long userId) {
+        getOrCreateCart(userId); // Đảm bảo luôn tồn tại giỏ hàng cho User
+        return cartItemRepository.findCartDetailsByUserId(userId);
+    }
 
-        try {
-            String sql = "SELECT full_name FROM users WHERE id = ?";
-            String cartJson = jdbcTemplate.queryForObject(sql, String.class, userId);
+    // LUỒNG 2: THÊM HOẶC CẬP NHẬT SỐ LƯỢNG MÓN HÀNG
+    @Transactional
+    public void addToCart(CartAddRequest request) {
+        // Kiểm tra xem sản phẩm có tồn tại và đọc tổng kho của nó (Liên module)
+        ProductResponse product = productService.getProductById(request.getProductId());
 
-            if (cartJson != null && !cartJson.trim().isEmpty() && cartJson.startsWith("[")) {
-                List<CartItem> items = objectMapper.readValue(cartJson, new TypeReference<List<CartItem>>() {});
-                cart.setItems(items);
+        Cart cart = getOrCreateCart(request.getUserId());
+        Optional<CartItem> existingItemOpt = cartItemRepository.findByCartIdAndProductId(cart.getId(), product.getId());
+
+        if (existingItemOpt.isPresent()) {
+            CartItem item = existingItemOpt.get();
+            int newQuantity = item.getQuantity() + request.getQuantity();
+
+            // Chặn đứng hành vi hack số lượng vượt quá kho thực tế
+            if (newQuantity > product.getInventory()) {
+                throw new RuntimeException("Cửa hàng chỉ còn tối đa " + product.getInventory() + " sản phẩm!");
             }
-        } catch (Exception e) {
-            // Trả về giỏ trống nếu user chưa có giỏ hàng
-        }
-
-        // Đổ thông tin Live dữ liệu từ bảng products và product_images
-        enrichCartItemsWithDbData(cart.getItems());
-        return Optional.of(cart);
-    }
-
-    /**
-     * LƯU GIỎ HÀNG XUỐNG DB USERS
-     */
-    public Cart saveCart(Long userId, List<CartItemDto> itemDtos) {
-        List<CartItem> itemsToSave = convertToEntityList(itemDtos);
-        
-        try {
-            // Chuyển mảng gọn nhẹ thành chuỗi JSON
-            String cartJson = objectMapper.writeValueAsString(itemsToSave);
-
-            // Ghi đè vào trường full_name của bảng users
-            String updateSql = "UPDATE users SET full_name = ? WHERE id = ?";
-            jdbcTemplate.update(updateSql, cartJson, userId);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        Cart cart = new Cart();
-        cart.setId(userId);
-        cart.setUserId(userId);
-        cart.setItems(itemsToSave);
-        
-        // Đổ thông tin live để trả về phản hồi lập tức cho Frontend React render luôn
-        enrichCartItemsWithDbData(cart.getItems());
-        return cart;
-    }
-
-    public Cart updateCartItems(Long cartId, List<CartItemDto> itemDtos) {
-        return saveCart(cartId, itemDtos);
-    }
-
-    /**
-     * XÓA GIỎ HÀNG KHI ĐẶT HÀNG THÀNH CÔNG
-     */
-    public void clearCartInDb(Long userId) {
-        try {
-            String updateSql = "UPDATE users SET full_name = NULL WHERE id = ?";
-            jdbcTemplate.update(updateSql, userId);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private List<CartItem> convertToEntityList(List<CartItemDto> dtos) {
-        List<CartItem> items = new ArrayList<>();
-        if (dtos != null) {
-            long fakeId = 1L;
-            for (CartItemDto dto : dtos) {
-                CartItem item = new CartItem();
-                item.setId(fakeId++);
-                item.setProductId(dto.getProductId());
-                item.setQuantity(dto.getQuantity());
-                // Không set các trường productName, price, imageUrl -> Jackson sẽ tự bỏ qua khi sinh JSON
-                items.add(item);
+            item.setQuantity(newQuantity);
+            cartItemRepository.save(item);
+        } else {
+            if (request.getQuantity() > product.getInventory()) {
+                throw new RuntimeException("Số lượng đặt hàng vượt quá tồn kho hiện tại!");
             }
+            CartItem newItem = CartItem.builder()
+                    .cartId(cart.getId())
+                    .productId(product.getId())
+                    .quantity(request.getQuantity())
+                    .build();
+            cartItemRepository.save(newItem);
         }
-        return items;
     }
 
-    /**
-     * NẠP LIVE DATA: Lấy dữ liệu tên, giá, ảnh từ bảng sản phẩm gốc của bạn
-     */
-    private void enrichCartItemsWithDbData(List<CartItem> items) {
-        if (items == null || items.isEmpty()) return;
+    // LUỒNG 3: GỘP GIỎ HÀNG TỪ LOCALSTORAGE KHI USER LOG IN
+    @Transactional
+    public void mergeCart(CartMergeRequest request) {
+        if (request.getItems() == null || request.getItems().isEmpty()) return;
+        Cart cart = getOrCreateCart(request.getUserId());
 
-        for (CartItem item : items) {
+        for (CartMergeRequest.ItemMerge guestItem : request.getItems()) {
             try {
-                // 1. Lấy tên và giá từ bảng products mẫu của bạn
-                String productSql = "SELECT name, base_price FROM products WHERE id = ?";
-                List<Map<String, Object>> rows = jdbcTemplate.queryForList(productSql, item.getProductId());
-                
-                if (!rows.isEmpty()) {
-                    Map<String, Object> productData = rows.get(0);
-                    item.setProductName((String) productData.get("name"));
-                    item.setPrice(((java.math.BigDecimal) productData.get("base_price")).doubleValue());
-                } else {
-                    item.setProductName("Sản phẩm không tồn tại");
-                    item.setPrice(0.0);
-                }
+                ProductResponse product = productService.getProductById(guestItem.getProductId());
+                Optional<CartItem> userItemOpt = cartItemRepository.findByCartIdAndProductId(cart.getId(), product.getId());
 
-                // 2. Lấy link ảnh nổi bật từ bảng product_images mẫu của bạn
-                String imageSql = "SELECT image_url FROM product_images WHERE product_id = ? AND is_featured = TRUE LIMIT 1";
-                List<String> images = jdbcTemplate.queryForList(imageSql, String.class, item.getProductId());
-                
-                if (!images.isEmpty()) {
-                    item.setImageUrl(images.get(0));
+                if (userItemOpt.isPresent()) {
+                    CartItem userItem = userItemOpt.get();
+                    int mergedQty = userItem.getQuantity() + guestItem.getQuantity();
+                    userItem.setQuantity(Math.min(mergedQty, product.getInventory())); // Giới hạn tối đa bằng kho hàng
+                    cartItemRepository.save(userItem);
                 } else {
-                    item.setImageUrl("https://via.placeholder.com/150");
+                    CartItem newItem = CartItem.builder()
+                            .cartId(cart.getId())
+                            .productId(product.getId())
+                            .quantity(Math.min(guestItem.getQuantity(), product.getInventory()))
+                            .build();
+                    cartItemRepository.save(newItem);
                 }
-
             } catch (Exception e) {
-                item.setProductName("Lỗi nạp dữ liệu");
-                item.setPrice(0.0);
+                // Nếu sản phẩm vãng lai cũ bị xóa dưới DB, bỏ qua không làm sập luồng gộp
+                System.err.println("Bỏ qua gộp sản phẩm lỗi: " + guestItem.getProductId());
             }
         }
+    }
+
+    // LUỒNG 4: XÓA MÓN HÀNG
+    @Transactional
+    public void removeFromCart(Long userId, Long productId) {
+        Cart cart = cartRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy giỏ hàng của bạn!"));
+        cartItemRepository.deleteByCartIdAndProductId(cart.getId(), productId);
+    }
+
+    // Helper tạo giỏ tự động nếu chưa có
+    private Cart getOrCreateCart(Long userId) {
+        return cartRepository.findByUserId(userId)
+                .orElseGet(() -> cartRepository.save(Cart.builder().userId(userId).build()));
     }
 }

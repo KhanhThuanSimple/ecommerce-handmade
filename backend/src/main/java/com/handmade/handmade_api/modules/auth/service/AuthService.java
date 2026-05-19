@@ -33,25 +33,33 @@ public class AuthService {
     private PasswordEncoder passwordEncoder;
 
     public AuthResponse login(LoginRequest loginRequest) {
-        // Xác thực người dùng
+
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
+                new UsernamePasswordAuthenticationToken(
+                        loginRequest.getEmail(),
+                        loginRequest.getPassword()
+                )
         );
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        // Lấy thông tin user từ DB để trả về đầy đủ cho FE
         User user = userRepository.findByEmail(loginRequest.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         AuthResponse res = new AuthResponse();
+
+        // FIX QUAN TRỌNG
+        res.setId(user.getId());
+
         res.setEmail(user.getEmail());
         res.setFullName(user.getFullName());
+
         List<String> roles = user.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority) // Lấy chuỗi "ROLE_ADMIN", "ROLE_USER"...
+                .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
 
         res.setRoles(roles);
+
         return res;
     }
     @Transactional // Đảm bảo có Transaction
