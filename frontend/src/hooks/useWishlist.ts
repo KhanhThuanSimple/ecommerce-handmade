@@ -48,7 +48,7 @@ export const useWishlist = () => {
         const itemsToMove = wishlist.filter(p => selectedIds.includes(p.id));
         if (itemsToMove.length === 0) return;
         
-        itemsToMove.forEach(p => p.inventory > 0 && addToCart(p, currentUser));
+      itemsToMove.forEach(p => p.inventory > 0 && addToCart(p));
         triggerNotification(`Đã thêm ${itemsToMove.length} sản phẩm vào giỏ hàng!`);
         setSelectedIds([]);
     };

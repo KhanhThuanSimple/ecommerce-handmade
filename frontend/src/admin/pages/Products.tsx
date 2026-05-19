@@ -41,66 +41,8 @@ const Products = () => {
 
     useEffect(() => {
         setProducts([
-            {
-                id: 1,
-                name: 'Bộ ấm trà Mã Đáo Thành Công',
-                price: 1250000,
-                category: 'Trà cụ',
-                categoryId: 1,
-                imageUrl: '',
-                description: 'Bộ ấm trà phong cách truyền thống',
-                inventory: 15,
-                status: 'active',
-                soldCount: 45
-            },
-            {
-                id: 2,
-                name: 'Tượng Ngựa Phong Thủy Mạ Vàng',
-                price: 2350000,
-                category: 'Trang trí',
-                categoryId: 2,
-                imageUrl: '',
-                description: 'Tượng phong thủy cao cấp',
-                inventory: 8,
-                status: 'active',
-                soldCount: 67
-            },
-            {
-                id: 3,
-                name: 'Đĩa Gốm Hoa Mai',
-                price: 450000,
-                category: 'Gốm sứ',
-                categoryId: 3,
-                imageUrl: '',
-                description: 'Đĩa gốm trang trí hoa mai',
-                inventory: 25,
-                status: 'active',
-                soldCount: 38
-            },
-            {
-                id: 4,
-                name: 'Lọ Hoa Tết Đỏ',
-                price: 890000,
-                category: 'Trang trí',
-                categoryId: 2,
-                imageUrl: '',
-                description: 'Lọ hoa trang trí ngày Tết',
-                inventory: 5,
-                status: 'lowstock',
-                soldCount: 52
-            },
-            {
-                id: 5,
-                name: 'Set Quà Tết Cao Cấp',
-                price: 3450000,
-                category: 'Quà tặng',
-                categoryId: 4,
-                imageUrl: '',
-                description: 'Set quà handmade cao cấp',
-                inventory: 3,
-                status: 'lowstock',
-                soldCount: 29
-            }
+            
+                
         ]);
     }, []);
 
@@ -146,21 +88,7 @@ const Products = () => {
                 )
             );
         } else {
-            const newProduct: Product = {
-                id: Date.now(),
-                name: formData.name,
-                price: Number(formData.price),
-                category: formData.category,
-                categoryId:
-                    categoryMap[formData.category] || 0,
-                imageUrl: '',
-                description: formData.description,
-                inventory: Number(formData.inventory),
-                status: formData.status,
-                soldCount: 0
-            };
-
-            setProducts([...products, newProduct]);
+           
         }
 
         handleCloseModal();

@@ -15,12 +15,15 @@ const Cart: FC<CartProps> = ({ currentUser }) => {
     const navigate = useNavigate();
     const { refreshCart } = useCart();
     const notify = useNotify();
-console.log('notify:', notify);
-    const [cartItems, setCartItems] = useState<{ productId: number; quantity: number }[]>([]);
+    
+    const [cartItems, setCartItems] = useState<any[]>([]);
     const [products, setProducts] = useState<Product[]>([]);
     const [selectedItemIds, setSelectedItemIds] = useState<number[]>([]);
     const [loading, setLoading] = useState(true);
-    const [cartRecordId, setCartRecordId] = useState<string | number | null>(null);
+
+    const userString = localStorage.getItem('user');
+    const localUser: User | null = userString ? JSON.parse(userString) : null;
+    const activeUser = currentUser || localUser;
 
     useEffect(() => {
         const loadCartData = async () => {
@@ -28,17 +31,12 @@ console.log('notify:', notify);
                 const allProducts = await getProducts();
                 setProducts(allProducts);
 
-                if (currentUser) {
-                    const cartRes = await api.get(`/carts?userId=${currentUser.id}`);
-                    if (cartRes.data.length > 0) {
-                        setCartItems(cartRes.data[0].items || []);
-                        setCartRecordId(cartRes.data[0].id);
-                    }
+                if (activeUser) {
+                    const cartRes = await api.get(`/carts/${activeUser.id}`);
+                    setCartItems(cartRes.data || []);
                 } else {
                     const localData = localStorage.getItem('guestCart');
-                    if (localData) {
-                        setCartItems(JSON.parse(localData));
-                    }
+                    if (localData) setCartItems(JSON.parse(localData));
                 }
             } catch (err) {
                 console.error("Lỗi tải giỏ hàng:", err);
@@ -51,44 +49,90 @@ console.log('notify:', notify);
 
     const getProductInfo = (pid: number) => products.find(p => p.id === pid);
 
-    const updateServer = async (newItems: any[]) => {
-        setCartItems(newItems);
-        if (currentUser && cartRecordId) {
+    // Xử lý Tăng số lượng (+1)
+    const handleIncrease = async (pid: number) => {
+        if (activeUser) {
             try {
-                await api.patch(`/carts/${cartRecordId}`, { items: newItems });
+                await api.post('/carts/add', {
+                    userId: activeUser.id,
+                    productId: pid,
+                    quantity: 1
+                });
+                const res = await api.get(`/carts/${activeUser.id}`);
+                setCartItems(res.data);
                 await refreshCart();
-            } catch (err) {
-                console.error("Lỗi cập nhật server:", err);
+            } catch (err: any) {
+                const errorMsg = err.response?.data?.message || "Không thể tăng số lượng!";
+                notify.error(errorMsg);
             }
-        } else if (!currentUser) {
+        } else {
+            const prod = getProductInfo(pid);
+            const maxStock = prod?.total_inventory ?? (prod as any).inventory ?? 0;
+            const newItems = cartItems.map(i => {
+                if (i.productId === pid) {
+                    if (i.quantity >= maxStock) {
+                        notify.warning(`Sản phẩm này chỉ còn tối đa ${maxStock} chiếc!`);
+                        return i;
+                    }
+                    return { ...i, quantity: i.quantity + 1 };
+                }
+                return i;
+            });
+            setCartItems(newItems);
             localStorage.setItem('guestCart', JSON.stringify(newItems));
             await refreshCart();
         }
     };
 
-    const handleIncrease = (pid: number, currentQty: number) => {
-        const newItems = cartItems.map(i => i.productId === pid ? { ...i, quantity: currentQty + 1 } : i);
-        void updateServer(newItems);
-    };
-
-    const handleDecrease = (pid: number, currentQty: number) => {
+    // Xử lý Giảm số lượng (-1)
+    const handleDecrease = async (pid: number, currentQty: number) => {
         if (currentQty <= 1) return;
-        const newItems = cartItems.map(i => i.productId === pid ? { ...i, quantity: currentQty - 1 } : i);
-        void updateServer(newItems);
+        if (activeUser) {
+            try {
+                await api.post('/carts/add', {
+                    userId: activeUser.id,
+                    productId: pid,
+                    quantity: -1
+                });
+                const res = await api.get(`/carts/${activeUser.id}`);
+                setCartItems(res.data);
+                await refreshCart();
+            } catch (err) {
+                console.error(err);
+            }
+        } else {
+            const newItems = cartItems.map(i => i.productId === pid ? { ...i, quantity: i.quantity - 1 } : i);
+            setCartItems(newItems);
+            localStorage.setItem('guestCart', JSON.stringify(newItems));
+            await refreshCart();
+        }
     };
 
-    const handleDelete = (pid: number) => {
+    // Xử lý Xóa hẳn món hàng (DELETE)
+    const handleDelete = async (pid: number) => {
         if (window.confirm("Xóa sản phẩm này khỏi giỏ hàng?")) {
-            const newItems = cartItems.filter(i => i.productId !== pid);
-            void updateServer(newItems);
-            setSelectedItemIds(prev => prev.filter(id => id !== pid));
+            try {
+                if (activeUser) {
+                    await api.delete(`/carts/remove?userId=${activeUser.id}&productId=${pid}`);
+                    const res = await api.get(`/carts/${activeUser.id}`);
+                    setCartItems(res.data || []);
+                } else {
+                    const newItems = cartItems.filter(i => i.productId !== pid);
+                    setCartItems(newItems);
+                    localStorage.setItem('guestCart', JSON.stringify(newItems));
+                }
+                setSelectedItemIds(prev => prev.filter(id => id !== pid));
+                await refreshCart();
+                notify.success("Đã xóa sản phẩm thành công.");
+            } catch (err) {
+                console.error(err);
+                notify.error("Không thể xóa sản phẩm.");
+            }
         }
     };
 
     const handleClearSelection = () => setSelectedItemIds([]);
-
     const isAllSelected = cartItems.length > 0 && selectedItemIds.length === cartItems.length;
-
     const toggleSelectAll = () => {
         if (isAllSelected) setSelectedItemIds([]);
         else setSelectedItemIds(cartItems.map(i => i.productId));
@@ -102,10 +146,8 @@ console.log('notify:', notify);
         }, 0);
 
     const handleGoToCheckout = () => {
-        if (!currentUser) {
-                          notify.warning("Vui lòng đăng nhập để thực hiện mua hàng!");
-
-            // Điều hướng sang login và gửi kèm trạng thái để sau khi login xong quay lại đúng Checkout
+        if (!activeUser) {
+            notify.warning("Vui lòng đăng nhập để thực hiện mua hàng!");
             navigate('/login', { state: { from: '/checkout', selectedIds: selectedItemIds } });
             return;
         }
@@ -151,21 +193,17 @@ console.log('notify:', notify);
                                     <div className="item-name">{p.name}</div>
                                 </div>
                                 <div className="col-category"><span className="category-tag">{p.category}</span></div>
-
-
                                 <div className="col-unit-price">₫{p.price.toLocaleString('vi-VN')}</div>
 
                                 <div className="col-quantity">
                                     <div className="quantity-controls">
                                         <button onClick={() => handleDecrease(p.id as number, item.quantity)}>-</button>
                                         <input type="text" value={item.quantity} readOnly />
-                                        <button onClick={() => handleIncrease(p.id as number, item.quantity)}>+</button>
+                                        <button onClick={() => handleIncrease(p.id as number)}>+</button>
                                     </div>
                                 </div>
 
-
                                 <div className="col-amount highlight">₫{(p.price * item.quantity).toLocaleString('vi-VN')}</div>
-
                                 <div className="col-action">
                                     <button className="delete-btn" onClick={() => handleDelete(p.id as number)}>Xóa</button>
                                 </div>
@@ -188,16 +226,9 @@ console.log('notify:', notify);
 
                 <div className="footer-right">
                     <div className="cart-summary">
-
                         Tổng thanh toán ({selectedItemIds.length} sản phẩm): <span className="total-price">₫{totalSelectedPrice.toLocaleString('vi-VN')}</span>
-
-
                     </div>
-                    <button
-                        className="checkout-button"
-                        disabled={selectedItemIds.length === 0}
-                        onClick={handleGoToCheckout}
-                    >
+                    <button className="checkout-button" disabled={selectedItemIds.length === 0} onClick={handleGoToCheckout}>
                         Mua Hàng
                     </button>
                 </div>

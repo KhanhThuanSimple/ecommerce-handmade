@@ -13,6 +13,7 @@ export interface Product {
     viewCount?: number;
         status?: 'active' | 'inactive' | 'lowstock';
     soldCount?: number;
+    total_inventory: number;
 }
 
 // Bạn cũng nên chuyển User interface vào đây luôn

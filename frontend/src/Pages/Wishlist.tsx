@@ -62,7 +62,7 @@ const Wishlist: React.FC = () => {
                                     <p className="card-price">{item.price.toLocaleString()} VNĐ</p>
                                     <div className="card-btns">
                                         <button className="btn-ui btn-ui-view" onClick={() => navigate(`/products/${item.id}`)}>Chi tiết</button>
-                                        <button className="btn-ui btn-ui-buy" onClick={() => { addToCart(item, currentUser); triggerNotification("Đã thêm vào giỏ hàng!"); }}>
+                                        <button className="btn-ui btn-ui-buy" onClick={() => { addToCart(item); triggerNotification("Đã thêm vào giỏ hàng!"); }}>
                                             + Giỏ hàng
                                         </button>
                                     </div>

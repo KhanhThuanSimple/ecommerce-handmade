@@ -3,121 +3,120 @@ import { User } from '../types/model';
 import api from '../services/api';
 import { useNotify } from '../components/NotificationContext';
 
+interface CartItem {
+    productId: number;
+    quantity: number;
+}
+
 interface CartContextType {
     cartCount: number;
     refreshCart: () => Promise<void>;
-    addToCart: (product: any, currentUser: User | null) => Promise<void>;
-    mergeCart: (userId: string | number) => Promise<void>; // Hàm mới
+    addToCart: (product: any) => Promise<void>;
+    mergeCart: (userId: string | number) => Promise<void>;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
-export const CartProvider = ({ children, currentUser }: { children: ReactNode, currentUser: User | null }) => {
+
+export const CartProvider = ({ children, currentUser }: { children: ReactNode; currentUser: User | null }) => {
     const [cartCount, setCartCount] = useState(0);
     const notify = useNotify();
-console.log('notify:', notify);
 
-
+    // 1. Refresh Badge giỏ hàng
     const refreshCart = async () => {
-        if (!currentUser) {
-            // Nếu chưa login, đếm số loại sp trong localStorage
+        const userString = localStorage.getItem('user');
+        const localUser = userString ? JSON.parse(userString) : null;
+        const activeUser = currentUser || localUser;
+
+        if (!activeUser) {
             const localData = localStorage.getItem('guestCart');
-            const items = localData ? JSON.parse(localData) : [];
-            setCartCount(items.length);
+            const items: CartItem[] = localData ? JSON.parse(localData) : [];
+            const total = items.reduce((acc, item) => acc + item.quantity, 0);
+            setCartCount(total);
             return;
         }
+
         try {
-            const res = await api.get(`/carts?userId=${currentUser.id}`);
-            if (res.data.length > 0) {
-                setCartCount(res.data[0].items?.length || 0);
-            } else {
-                setCartCount(0);
-            }
+            const res = await api.get<any[]>(`/carts/${activeUser.id}`);
+            const total = res.data.reduce((acc, item) => acc + item.quantity, 0);
+            setCartCount(total);
         } catch (err) {
-            console.error("Lỗi cập nhật Badge:", err);
+            console.error("Lỗi cập nhật số lượng giỏ hàng từ Server:", err);
+            setCartCount(0);
         }
     };
 
-    const addToCart = async (product: any, user: User | null) => {
-        if (!product || product.inventory <= 0) {
-              notify.warning("Sản phẩm đã hết hàng!");
-            return ;
+    // 2. Thêm vào giỏ hàng an toàn
+    const addToCart = async (product: any) => {
+        const stock = product.total_inventory !== undefined ? product.total_inventory : (product as any).inventory;
+        if (!product || stock <= 0) {
+            notify.warning("Sản phẩm này hiện đã hết hàng!");
+            return;
         }
-        if (!user) {
-            // --- CHƯA LOGIN: LƯU LOCALSTORAGE ---
-            const localData = localStorage.getItem('guestCart');
-            let items = localData ? JSON.parse(localData) : [];
 
-            const existingItem = items.find((i: any) => i.productId === product.id);
+        const userString = localStorage.getItem('user');
+        const localUser = userString ? JSON.parse(userString) : null;
+        const activeUser = currentUser || localUser;
+
+        if (!activeUser) {
+            // --- LUỒNG CHƯA ĐĂNG NHẬP (GUEST) ---
+            const localData = localStorage.getItem('guestCart');
+            let items: CartItem[] = localData ? JSON.parse(localData) : [];
+
+            const existingItem = items.find((i) => i.productId === product.id);
             if (existingItem) {
-                items = items.map((i: any) =>
-                    i.productId === product.id ? { ...i, quantity: i.quantity + 1 } : i
-                );
+                if (existingItem.quantity >= stock) {
+                    notify.warning(`Sản phẩm này chỉ còn tối đa ${stock} chiếc trong kho!`);
+                    return;
+                }
+                existingItem.quantity += 1;
             } else {
                 items.push({ productId: product.id, quantity: 1 });
             }
 
             localStorage.setItem('guestCart', JSON.stringify(items));
             await refreshCart();
-            notify.success(`Đã thêm "${product.name}" vào giỏ hàng`);
-
+            notify.success(`Đã thêm "${product.name}" vào giỏ hàng tạm.`);
             return;
         }
 
-        // --- ĐÃ LOGIN: LƯU SERVER ---
+        // --- LUỒNG ĐÃ ĐĂNG NHẬP (SERVER) ---
         try {
-            const res = await api.get(`/carts?userId=${user.id}`);
-            let userCart = res.data[0];
+            const payload = {
+                userId: Number(activeUser.id), // Đảm bảo ép kiểu số sạch chống lỗi Validation
+                productId: Number(product.id),
+                quantity: 1
+            };
 
-            if (!userCart) {
-                const newCart = { userId: user.id, items: [{ productId: product.id, quantity: 1 }] };
-                await api.post('/carts', newCart);
-            } else {
-                const existingItem = userCart.items.find((i: any) => i.productId === product.id);
-                const newItems = existingItem
-                    ? userCart.items.map((i: any) =>
-                        i.productId === product.id ? { ...i, quantity: i.quantity + 1 } : i
-                    )
-                    : [...userCart.items, { productId: product.id, quantity: 1 }];
-
-                await api.patch(`/carts/${userCart.id}`, { items: newItems });
-            }
+            await api.post('/carts/add', payload);
             await refreshCart();
-        notify.success(`Đã thêm "${product.name}" vào giỏ hàng`);
-        } catch (error) {
-            notify.error("Không thể thêm vào giỏ hàng!");
-
+            notify.success(`Đã thêm "${product.name}" vào giỏ hàng hệ thống thành công!`);
+        } catch (error: any) {
+            console.error("Lỗi gửi dữ liệu giỏ hàng:", error);
+            const errorMsg = error.response?.data?.message || "Không thể thêm vào giỏ hàng lúc này!";
+            notify.error(errorMsg);
         }
     };
 
-    // Hàm gộp giỏ hàng từ LocalStorage lên Server
+    // 3. Gộp giỏ hàng vãng lai
     const mergeCart = async (userId: string | number) => {
         const localData = localStorage.getItem('guestCart');
         if (!localData) return;
 
-        const guestItems = JSON.parse(localData);
+        const guestItems: CartItem[] = JSON.parse(localData);
         if (guestItems.length === 0) return;
 
         try {
-            const res = await api.get(`/carts?userId=${userId}`);
-            let userCart = res.data[0];
+            const mergePayload = {
+                userId: Number(userId),
+                items: guestItems 
+            };
 
-            if (!userCart) {
-                await api.post('/carts', { userId, items: guestItems });
-            } else {
-                let finalItems = [...userCart.items];
-                guestItems.forEach((gItem: any) => {
-                    const exist = finalItems.find(i => i.productId === gItem.productId);
-                    if (exist) {
-                        exist.quantity += gItem.quantity;
-                    } else {
-                        finalItems.push(gItem);
-                    }
-                });
-                await api.patch(`/carts/${userCart.id}`, { items: finalItems });
-            }
-            localStorage.removeItem('guestCart'); // Xóa sau khi đã gộp thành công
+            await api.post('/carts/merge', mergePayload);
+            localStorage.removeItem('guestCart');
+            await refreshCart();
         } catch (err) {
-        notify.error("Không thể thêm vào giỏ hàng!");
+            console.error("Lỗi đồng bộ gộp giỏ hàng:", err);
+            notify.error("Không thể đồng bộ giỏ hàng vãng lai lên tài khoản!");
         }
     };
 
