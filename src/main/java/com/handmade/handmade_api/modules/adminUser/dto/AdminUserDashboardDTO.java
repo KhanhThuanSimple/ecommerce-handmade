@@ -4,7 +4,7 @@ import com.handmade.handmade_api.modules.auth.entity.User;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class UserDashboardDTO {
+public class AdminUserDashboardDTO {
     private Long id;
     private String username;
     private String email;
@@ -14,7 +14,7 @@ public class UserDashboardDTO {
     private boolean accountNonLocked;
     private List<String> roles;
 
-    public UserDashboardDTO(User user) {
+    public AdminUserDashboardDTO(User user) {
         this.id = user.getId();
         this.username = user.getUsername();
         this.email = user.getEmail();

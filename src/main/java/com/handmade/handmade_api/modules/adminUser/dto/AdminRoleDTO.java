@@ -2,18 +2,18 @@ package com.handmade.handmade_api.modules.adminUser.dto;
 
 import com.handmade.handmade_api.modules.auth.entity.Role;
 
-public class RoleDTO {
+public class AdminRoleDTO {
     private Long id;
     private String name;
     private String displayName;
     private String color;
 
     // 1. CONSTRUCTOR RỖNG: Bắt buộc phải có để Jackson giải mã JSON thành công
-    public RoleDTO() {
+    public AdminRoleDTO() {
     }
 
     // 2. Constructor dùng để map dữ liệu từ Entity sang DTO (Dùng cho API GET)
-    public RoleDTO(Role role) {
+    public AdminRoleDTO(Role role) {
         this.id = role.getId();
         this.name = role.getName();
         this.displayName = role.getDisplayName();

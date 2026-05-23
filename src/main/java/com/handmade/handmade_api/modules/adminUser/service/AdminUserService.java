@@ -1,6 +1,6 @@
 package com.handmade.handmade_api.modules.adminUser.service;
 
-import com.handmade.handmade_api.modules.adminUser.dto.RoleDTO;
+import com.handmade.handmade_api.modules.adminUser.dto.AdminRoleDTO;
 import com.handmade.handmade_api.modules.auth.dto.RegisterRequest;
 import com.handmade.handmade_api.modules.auth.entity.Role;
 import com.handmade.handmade_api.modules.auth.entity.User;
@@ -84,7 +84,7 @@ public class AdminUserService {
     }
     // Thêm hàm tạo mới Role vào AdminUserService.java
     @Transactional
-    public String createNewRole(RoleDTO roleDTO) {
+    public String createNewRole(AdminRoleDTO roleDTO) {
         // 1. Kiểm tra xem mã quyền (Ví dụ: ROLE_STAFF) đã tồn tại chưa
         String roleName = roleDTO.getName().trim().toUpperCase();
 

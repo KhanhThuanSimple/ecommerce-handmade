@@ -1,10 +1,10 @@
 package com.handmade.handmade_api.modules.adminUser.controller;
 
-import com.handmade.handmade_api.modules.adminUser.dto.RoleDTO;
+import com.handmade.handmade_api.modules.adminUser.dto.AdminRoleDTO;
 import com.handmade.handmade_api.modules.auth.dto.RegisterRequest;
 import com.handmade.handmade_api.modules.auth.entity.Role;
 import com.handmade.handmade_api.modules.auth.entity.User;
-import com.handmade.handmade_api.modules.adminUser.dto.UserDashboardDTO;
+import com.handmade.handmade_api.modules.adminUser.dto.AdminUserDashboardDTO;
 import com.handmade.handmade_api.modules.adminUser.service.AdminUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -24,24 +24,24 @@ public class AdminUserController {
 
     // ENDPOINT 1: Lấy danh sách thành viên phân trang
     @GetMapping
-    public ResponseEntity<Page<UserDashboardDTO>> getAllUsers(
+    public ResponseEntity<Page<AdminUserDashboardDTO>> getAllUsers(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "desc") String direction) {
 
         Page<User> usersPage = adminUserService.getAllUsersPaged(page, size, sortBy, direction);
-        Page<UserDashboardDTO> dtoPage = usersPage.map(UserDashboardDTO::new);
+        Page<AdminUserDashboardDTO> dtoPage = usersPage.map(AdminUserDashboardDTO::new);
         return ResponseEntity.ok(dtoPage);
     }
 
     // ĐÃ ĐỔI CHỖ LÊN ĐÂY: Ưu tiên đường dẫn tĩnh cố định để tránh lỗi 405 ngầm
     @GetMapping("/roles")
-    public ResponseEntity<List<RoleDTO>> getAllSystemRoles() {
+    public ResponseEntity<List<AdminRoleDTO>> getAllSystemRoles() {
         List<Role> roles = adminUserService.getAllRoles();
 
-        List<RoleDTO> roleDTOs = roles.stream()
-                .map(RoleDTO::new)
+        List<AdminRoleDTO> roleDTOs = roles.stream()
+                .map(AdminRoleDTO::new)
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(roleDTOs);
@@ -50,7 +50,7 @@ public class AdminUserController {
 // Nên đặt phía dưới hàm GET /roles để giữ tính ngăn nắp cho Static Path
     @PostMapping("/roles")
     public ResponseEntity<String> createRole(
-            @RequestBody RoleDTO roleDTO,
+            @RequestBody AdminRoleDTO roleDTO,
             Principal principal) {
         try {
             // Gọi Service xử lý
