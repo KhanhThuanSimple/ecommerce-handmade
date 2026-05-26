@@ -19,7 +19,7 @@ public class CartService {
 
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
-    private final ProductService productService; // Giao tiếp liên module qua Service sạch
+    private final ProductService productService;
 
     public CartService(CartRepository cartRepository, CartItemRepository cartItemRepository, ProductService productService) {
         this.cartRepository = cartRepository;
@@ -27,18 +27,20 @@ public class CartService {
         this.productService = productService;
     }
 
-    // LUỒNG 1: ĐỌC CHI TIẾT GIỎ HÀNG QUA PROJECTION
+    // LUỒNG 1: ĐỌC CHI TIẾT GIỎ HÀNG
     public List<CartItemProjection> getCartByUserId(Long userId) {
-        getOrCreateCart(userId); // Đảm bảo luôn tồn tại giỏ hàng cho User
+        // PHÒNG VỆ: Trả về danh sách trống ngay nếu khách vãng lai truyền id null/0/âm lên
+        if (userId == null || userId <= 0) {
+            return List.of();
+        }
+        getOrCreateCart(userId);
         return cartItemRepository.findCartDetailsByUserId(userId);
     }
 
-    // LUỒNG 2: THÊM HOẶC CẬP NHẬT SỐ LƯỢNG MÓN HÀNG
+    // LUỒNG 2: THÊM HOẶC CẬP NHẬT SỐ LƯỢNG
     @Transactional
     public void addToCart(CartAddRequest request) {
-        // Kiểm tra xem sản phẩm có tồn tại và đọc tổng kho của nó (Liên module)
         ProductResponse product = productService.getProductById(request.getProductId());
-
         Cart cart = getOrCreateCart(request.getUserId());
         Optional<CartItem> existingItemOpt = cartItemRepository.findByCartIdAndProductId(cart.getId(), product.getId());
 
@@ -46,13 +48,20 @@ public class CartService {
             CartItem item = existingItemOpt.get();
             int newQuantity = item.getQuantity() + request.getQuantity();
 
-            // Chặn đứng hành vi hack số lượng vượt quá kho thực tế
+            if (newQuantity <= 0) {
+                cartItemRepository.delete(item);
+                return;
+            }
+
             if (newQuantity > product.getInventory()) {
                 throw new RuntimeException("Cửa hàng chỉ còn tối đa " + product.getInventory() + " sản phẩm!");
             }
             item.setQuantity(newQuantity);
             cartItemRepository.save(item);
         } else {
+            if (request.getQuantity() <= 0) {
+                throw new RuntimeException("Số lượng đặt hàng không hợp lệ!");
+            }
             if (request.getQuantity() > product.getInventory()) {
                 throw new RuntimeException("Số lượng đặt hàng vượt quá tồn kho hiện tại!");
             }
@@ -79,7 +88,7 @@ public class CartService {
                 if (userItemOpt.isPresent()) {
                     CartItem userItem = userItemOpt.get();
                     int mergedQty = userItem.getQuantity() + guestItem.getQuantity();
-                    userItem.setQuantity(Math.min(mergedQty, product.getInventory())); // Giới hạn tối đa bằng kho hàng
+                    userItem.setQuantity(Math.min(mergedQty, product.getInventory()));
                     cartItemRepository.save(userItem);
                 } else {
                     CartItem newItem = CartItem.builder()
@@ -90,7 +99,6 @@ public class CartService {
                     cartItemRepository.save(newItem);
                 }
             } catch (Exception e) {
-                // Nếu sản phẩm vãng lai cũ bị xóa dưới DB, bỏ qua không làm sập luồng gộp
                 System.err.println("Bỏ qua gộp sản phẩm lỗi: " + guestItem.getProductId());
             }
         }
@@ -104,7 +112,6 @@ public class CartService {
         cartItemRepository.deleteByCartIdAndProductId(cart.getId(), productId);
     }
 
-    // Helper tạo giỏ tự động nếu chưa có
     private Cart getOrCreateCart(Long userId) {
         return cartRepository.findByUserId(userId)
                 .orElseGet(() -> cartRepository.save(Cart.builder().userId(userId).build()));

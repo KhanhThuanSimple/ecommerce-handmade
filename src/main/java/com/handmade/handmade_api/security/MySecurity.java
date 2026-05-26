@@ -20,51 +20,30 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class MySecurity {
 
-    // =========================
-    // PASSWORD ENCODER
-    // =========================
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // =========================
-    // AUTH MANAGER
-    // =========================
     @Bean
-    public AuthenticationManager authenticationManager(
-            AuthenticationConfiguration config) throws Exception {
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 
-    // =========================
-    // USER DETAILS SERVICE
-    // =========================
     @Bean
     public UserDetailsService userDetailsService(UserRepository userRepository) {
         return email -> userRepository.findByEmail(email)
-                .orElseThrow(() ->
-                        new UsernameNotFoundException("User not found: " + email)
-                );
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
     }
 
-    // =========================
-    // AUTH PROVIDER (QUAN TRỌNG NHẤT)
-    // =========================
     @Bean
-    public DaoAuthenticationProvider authenticationProvider(
-            UserDetailsService userDetailsService,
-            PasswordEncoder passwordEncoder) {
-
+    public DaoAuthenticationProvider authenticationProvider(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
         DaoAuthenticationProvider auth = new DaoAuthenticationProvider();
         auth.setUserDetailsService(userDetailsService);
         auth.setPasswordEncoder(passwordEncoder);
         return auth;
     }
 
-    // =========================
-    // CORS
-    // =========================
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
@@ -79,55 +58,37 @@ public class MySecurity {
         };
     }
 
-    // =========================
-    // SECURITY FILTER CHAIN
-    // =========================
-    // =========================
-    // SECURITY FILTER CHAIN
-    // =========================
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http,
-                                           DaoAuthenticationProvider authProvider) throws Exception {
-
+    public SecurityFilterChain filterChain(HttpSecurity http, DaoAuthenticationProvider authProvider) throws Exception {
         http
                 .authenticationProvider(authProvider)
                 .cors(Customizer.withDefaults())
-                .csrf(csrf -> csrf.disable()) // Đã tắt CSRF bảo vệ cho API ngoài gọi vào
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-
-                        // PUBLIC (Mở rộng thêm cổng Callback thanh toán)
+                        // Public APIs
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/product-images/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/reviews/**").permitAll()
-
-                        // CHỈNH SỬA CHUẨN CHỈ: Cho phép VNPAY/MoMo gọi API này tự do mà không cần Auth
                         .requestMatchers("/api/client/checkout/callback-verify").permitAll()
 
-                        // CART GET PUBLIC (optional)
-                        .requestMatchers(HttpMethod.GET, "/api/carts/**").permitAll()
+                        // XOÁ BỎ CHẶN ROLE: Cho phép bất kỳ ai (kể cả khách ẩn danh) thao tác giỏ hàng
+                        .requestMatchers("/api/carts/**").permitAll()
 
-                        // USER
+                        // Quyền truy cập của USER & ADMIN
                         .requestMatchers("/api/users/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/reviews/**").hasAnyRole("USER", "ADMIN")
 
-                        .requestMatchers(HttpMethod.POST, "/api/carts/**").hasAnyRole("USER", "ADMIN")
-                        .requestMatchers(HttpMethod.PATCH, "/api/carts/**").hasAnyRole("USER", "ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/carts/**").hasAnyRole("USER", "ADMIN")
-
-                        // ADMIN
+                        // Quyền truy cập của ADMIN
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
-
                         .requestMatchers(HttpMethod.POST, "/api/products/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/products/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/products/**").hasRole("ADMIN")
-
                         .requestMatchers(HttpMethod.POST, "/api/categories/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/categories/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/categories/**").hasRole("ADMIN")
 
-                        // Tất cả các request còn lại (bao gồm link lấy payment-url) bắt buộc phải đăng nhập
                         .anyRequest().authenticated()
                 )
                 .httpBasic(Customizer.withDefaults());
