@@ -26,7 +26,8 @@ public class MySecurity {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 
@@ -37,7 +38,8 @@ public class MySecurity {
     }
 
     @Bean
-    public DaoAuthenticationProvider authenticationProvider(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
+    public DaoAuthenticationProvider authenticationProvider(
+            UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
         DaoAuthenticationProvider auth = new DaoAuthenticationProvider();
         auth.setUserDetailsService(userDetailsService);
         auth.setPasswordEncoder(passwordEncoder);
@@ -63,32 +65,49 @@ public class MySecurity {
         http
                 .authenticationProvider(authProvider)
                 .cors(Customizer.withDefaults())
-                .csrf(csrf -> csrf.disable())
+                .csrf(csrf -> csrf.disable()) // Tắt CSRF để hỗ trợ gọi API từ bên ngoài (Postman/Bruno/Frontend)
                 .authorizeHttpRequests(auth -> auth
-                        // Public APIs
-                        .requestMatchers("/api/auth/**").permitAll()
+
+                        // ==========================================
+                        // NHÓM 1: ADMIN - QUẢN TRỊ HỆ THỐNG (CHẶN TRÊN CÙNG)
+                        // ==========================================
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+
+                        // Chặn ghi/sửa/xoá Sản phẩm và Danh mục: Chỉ cho phép ADMIN hành động
+                        .requestMatchers(HttpMethod.POST, "/api/products/**", "/api/categories/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/products/**", "/api/categories/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/products/**", "/api/categories/**").hasRole("ADMIN")
+
+
+                        // ==========================================
+                        // NHÓM 2: USER & ADMIN - CHỨC NĂNG CẦN ĐĂNG NHẬP
+                        // ==========================================
+                        .requestMatchers("/api/users/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/reviews/**").hasAnyRole("USER", "ADMIN")
+
+                        // Các chức năng liên quan đến Đặt hàng & Thanh toán (Checkout) phải đăng nhập
+                        .requestMatchers("/api/orders/**", "/api/checkout/**").hasAnyRole("USER", "ADMIN")
+
+
+                        // ==========================================
+                        // NHÓM 3: PUBLIC APIS - AI CŨNG CÓ THỂ TRUY CẬP (XEM CHUNG)
+                        // ==========================================
+                        .requestMatchers("/api/auth/**").permitAll() // Đăng ký, đăng nhập
+                        .requestMatchers("/api/client/checkout/callback-verify").permitAll() // Webhook thanh toán (VNPAY/MoMo)
+
+                        // Mở cổng Giỏ hàng tự do cho cả khách ẩn danh và thành viên thao tác công khai
+                        .requestMatchers("/api/carts/**").permitAll()
+
+                        // Chỉ cho phép tất cả mọi người XEM (GET) thông tin sản phẩm, danh mục, đánh giá
                         .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/product-images/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/reviews/**").permitAll()
-                        .requestMatchers("/api/client/checkout/callback-verify").permitAll()
 
-                        // XOÁ BỎ CHẶN ROLE: Cho phép bất kỳ ai (kể cả khách ẩn danh) thao tác giỏ hàng
-                        .requestMatchers("/api/carts/**").permitAll()
 
-                        // Quyền truy cập của USER & ADMIN
-                        .requestMatchers("/api/users/**").hasAnyRole("USER", "ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/api/reviews/**").hasAnyRole("USER", "ADMIN")
-
-                        // Quyền truy cập của ADMIN
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/api/products/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/products/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/products/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/api/categories/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/categories/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/categories/**").hasRole("ADMIN")
-
+                        // ==========================================
+                        // BẢO VỆ CUỐI CÙNG: Các link phát sinh khác đều phải xác thực
+                        // ==========================================
                         .anyRequest().authenticated()
                 )
                 .httpBasic(Customizer.withDefaults());
