@@ -1,11 +1,11 @@
-package com.handmade.handmade_api.modules.adminUser.controller;
+package com.handmade.handmade_api.modules.admin.adminUser.controller;
 
-import com.handmade.handmade_api.modules.adminUser.dto.AdminRoleDTO;
+import com.handmade.handmade_api.modules.admin.adminUser.dto.AdminRoleDTO;
 import com.handmade.handmade_api.modules.auth.dto.RegisterRequest;
 import com.handmade.handmade_api.modules.auth.entity.Role;
 import com.handmade.handmade_api.modules.auth.entity.User;
-import com.handmade.handmade_api.modules.adminUser.dto.AdminUserDashboardDTO;
-import com.handmade.handmade_api.modules.adminUser.service.AdminUserService;
+import com.handmade.handmade_api.modules.admin.adminUser.dto.AdminUserDashboardDTO;
+import com.handmade.handmade_api.modules.admin.adminUser.service.AdminUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;

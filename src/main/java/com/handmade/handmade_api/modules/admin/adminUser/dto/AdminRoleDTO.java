@@ -1,4 +1,4 @@
-package com.handmade.handmade_api.modules.adminUser.dto;
+package com.handmade.handmade_api.modules.admin.adminUser.dto;
 
 import com.handmade.handmade_api.modules.auth.entity.Role;
 

@@ -1,4 +1,4 @@
-package com.handmade.handmade_api.modules.adminProduct.repository;
+package com.handmade.handmade_api.modules.admin.adminProduct.repository;
 
 
 import com.handmade.handmade_api.modules.products.entity.ProductVariant;
