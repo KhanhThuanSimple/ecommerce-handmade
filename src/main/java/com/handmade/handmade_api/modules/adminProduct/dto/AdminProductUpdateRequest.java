@@ -12,5 +12,5 @@ public class AdminProductUpdateRequest {
     private Double price;
     private Long categoryId;
     private String description;
-    private String status; // 'active' | 'inactive' | 'lowstock'
+    private String status; // 'active' | xx'inactive' | 'lowstock'
 }
