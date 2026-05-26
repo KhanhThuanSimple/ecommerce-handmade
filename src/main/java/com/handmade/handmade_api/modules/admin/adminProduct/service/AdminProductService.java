@@ -1,10 +1,10 @@
-package com.handmade.handmade_api.modules.adminProduct.service;
+package com.handmade.handmade_api.modules.admin.adminProduct.service;
 
 
-import com.handmade.handmade_api.modules.adminProduct.dto.AdminProductUpdateRequest;
-import com.handmade.handmade_api.modules.adminProduct.dto.AdminVariantInventoryUpdateRequest;
-import com.handmade.handmade_api.modules.adminProduct.repository.AdminProductRepository;
-import com.handmade.handmade_api.modules.adminProduct.repository.AdminProductVariantRepository;
+import com.handmade.handmade_api.modules.admin.adminProduct.dto.AdminProductUpdateRequest;
+import com.handmade.handmade_api.modules.admin.adminProduct.dto.AdminVariantInventoryUpdateRequest;
+import com.handmade.handmade_api.modules.admin.adminProduct.repository.AdminProductRepository;
+import com.handmade.handmade_api.modules.admin.adminProduct.repository.AdminProductVariantRepository;
 import com.handmade.handmade_api.modules.products.dto.*;
 import com.handmade.handmade_api.modules.products.entity.Product;
 import com.handmade.handmade_api.modules.products.entity.ProductVariant;

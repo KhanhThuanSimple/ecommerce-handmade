@@ -1,6 +1,6 @@
-package com.handmade.handmade_api.modules.adminUser.service;
+package com.handmade.handmade_api.modules.admin.adminUser.service;
 
-import com.handmade.handmade_api.modules.adminUser.dto.AdminRoleDTO;
+import com.handmade.handmade_api.modules.admin.adminUser.dto.AdminRoleDTO;
 import com.handmade.handmade_api.modules.auth.dto.RegisterRequest;
 import com.handmade.handmade_api.modules.auth.entity.Role;
 import com.handmade.handmade_api.modules.auth.entity.User;

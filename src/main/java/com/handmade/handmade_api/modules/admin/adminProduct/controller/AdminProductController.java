@@ -1,8 +1,8 @@
-package com.handmade.handmade_api.modules.adminProduct.controller;
+package com.handmade.handmade_api.modules.admin.adminProduct.controller;
 
-import com.handmade.handmade_api.modules.adminProduct.dto.AdminProductUpdateRequest;
-import com.handmade.handmade_api.modules.adminProduct.dto.AdminVariantInventoryUpdateRequest;
-import com.handmade.handmade_api.modules.adminProduct.service.AdminProductService;
+import com.handmade.handmade_api.modules.admin.adminProduct.dto.AdminProductUpdateRequest;
+import com.handmade.handmade_api.modules.admin.adminProduct.dto.AdminVariantInventoryUpdateRequest;
+import com.handmade.handmade_api.modules.admin.adminProduct.service.AdminProductService;
 import com.handmade.handmade_api.modules.products.dto.*;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;

@@ -1,4 +1,4 @@
-package com.handmade.handmade_api.modules.adminProduct.dto;
+package com.handmade.handmade_api.modules.admin.adminProduct.dto;
 
 import lombok.*;
 
