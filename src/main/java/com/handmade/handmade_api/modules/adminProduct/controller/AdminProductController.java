@@ -46,7 +46,7 @@ public class AdminProductController {
         return ResponseEntity.ok(adminProductService.getAdminProducts(id, keyword, categoryId, status, inventoryStatus, pageable));
     }
 
-    // --- Các API khác bênxxx dưới giữ nguyên y hệt code cũ của bạn ---
+    // --- Các API khác bên dưới giữ nguyên y hệt code cũ của bạn ---
     @GetMapping("/{id}")
     public ResponseEntity<ProductResponse> getProductById(@PathVariable Long id) {
         return ResponseEntity.ok(adminProductService.getProductById(id));

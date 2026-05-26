@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface AdminProductVariantRepository extends JpaRepository<ProductVariant, Long> {
     List<ProductVariant> findByProductId(Long productId);
+    //a
 }

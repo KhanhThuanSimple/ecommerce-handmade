@@ -32,7 +32,7 @@ public class AdminProductService {
         this.productVariantRepository = productVariantRepository;
     }
 
-    // 1. TÌM KIẾM, LỌC & PHÂN TRANG DANH SÁCH CHO ĐỒNG BỘ UI ADMIN
+    // 1. TÌM KIẾM, LỌC & PHÂN TRANG DANH SÁCH CHO ĐỒNaaaaG BỘ UI ADMIN
     // Thay đổi duy nhất hàm này trong file AdminProductService.java của bạn:
     public Page<ProductResponse> getAdminProducts(
             Long id,

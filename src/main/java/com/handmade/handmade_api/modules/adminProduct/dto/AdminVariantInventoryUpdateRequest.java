@@ -7,6 +7,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AdminVariantInventoryUpdateRequest {
-    private Long variantId; // Nếu truyền null sẽ mặc đxxxịnh cập nhật biến thể đầu tiên
+    private Long variantId; // Nếu truyền null sẽ mặc định cập nhật biến thể đầu tiên
     private Integer inventory;
 }

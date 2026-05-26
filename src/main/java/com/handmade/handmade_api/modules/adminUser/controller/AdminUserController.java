@@ -115,7 +115,7 @@ public class AdminUserController {
             return ResponseEntity.badRequest().body(e.getLocalizedMessage());
         }
     }
-    // Thêm vào AdminUserConxxxtroller.java (Nhóm Static Path phía trên)
+    // Thêm vào AdminUserController.java (Nhóm Static Path phía trên)
     @PostMapping
     public ResponseEntity<String> addUserFromAdmin(
             @RequestBody RegisterRequest registerRequest,
