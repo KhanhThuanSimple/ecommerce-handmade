@@ -22,7 +22,7 @@ public class AdminUserDashboardDTO {
         this.phone = user.getPhone();
         this.enabled = user.isEnabled();
         this.accountNonLocked = user.isAccountNonLocked();
-        // Trích xuất chuỗi tên quyền để Jackson không bị lặp vô hạn
+        // Trích xuất chuỗi tên quyền để Jackson khônag bị lặp vô hạn
         this.roles = user.getRoles().stream()
                 .map(role -> role.getName())
                 .collect(Collectors.toList());

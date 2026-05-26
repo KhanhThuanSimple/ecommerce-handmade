@@ -12,7 +12,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AdminProductRepository extends JpaRepository<Product, Long> {
 
-    // 1. TÌM KIẾM, PHÂN TRANG VÀ LỌC NÂNG CAO CHO ADMIN (TỐI ƯU SIÊU TỐC)
+    // 1. TÌM KIẾM, PHÂN TRANG VÀ LỌC NÂNG CAO CHaaO ADMIN (TỐI ƯU SIÊU TỐC)
     @Query(value = "SELECT " +
             "    p.id AS id, " +
             "    p.name AS name, " +
