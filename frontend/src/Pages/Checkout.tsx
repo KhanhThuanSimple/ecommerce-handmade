@@ -67,16 +67,19 @@
                         setFinalTotal(Number(buyNowItem.price));
                     } else if (selectedIds.length > 0) {
                         const [allProducts, cartRes] = await Promise.all([getProducts(), api.get(`/carts?userId=${currentUser.id}`)]);
-                        const userCart = cartRes.data[0];
-                        if (userCart) {
-                            const itemsToPay = userCart.items
-                                .filter((item: any) => selectedIds.includes(item.productId))
-                                .map((item: any) => ({
-                                    product: allProducts.find((p: any) => p.id === item.productId),
-                                    quantity: item.quantity
-                                })).filter((i: any) => i.product);
+                        const cartItems = cartRes.data || [];
+                        const itemsToPay = cartItems
+                            .filter((item: any) => selectedIds.includes(item.productId))
+                            .map((item: any) => ({
+                                product: allProducts.find((p: any) => p.id === item.productId),
+                                quantity: item.quantity
+                            }))
+                            .filter((i: any) => i.product);
+                        if (itemsToPay.length > 0) {
                             setDisplayItems(itemsToPay);
                             setFinalTotal(itemsToPay.reduce((sum: number, i: any) => sum + (i.product.price * i.quantity), 0));
+                        } else {
+                            navigate('/cart');
                         }
                     } else { navigate('/home'); }
                 } catch (err) { console.error(err); } finally { setLoading(false); }
@@ -128,7 +131,7 @@
             const address = shippingDetails?.isFromOldOrder 
                 ? shippingDetails.address 
                 : `${shippingDetails?.detailAddress}, ${shippingDetails?.ward}, ${shippingDetails?.district}, ${shippingDetails?.province}`;
-    const currentPayable = Math.max(finalTotal - discount, 0);
+            const currentPayable = Math.max(finalTotal - discount, 0);
             return {
                 id: rePayOrder ? rePayOrder.id : 'ORD-' + Date.now(),
                 userId: currentUser?.id,
@@ -136,9 +139,9 @@
                 phone: shippingDetails?.phone || "",
                 address: address,
                 items: displayItems,
-                totalAmount: currentPayable, // Giá gốc
+                totalAmount: finalTotal, // Tổng tiền trước khi giảm giá
                 discountAmount: discount, // Số tiền giảm
-                payableAmount: payableTotal, // Số tiền phải trả
+                payableAmount: currentPayable, // Số tiền phải trả
                 voucherCode: selectedVoucher?.code || null,
                 paymentMethod: paymentMethod.toUpperCase(),
                 status: status,
@@ -184,7 +187,7 @@
         const orderData = prepareOrderData(isVNPay ? 'Chờ thanh toán' : 'Thanh toán khi nhận hàng');
         
         // Tính toán số tiền thực tế để gửi sang cổng thanh toán
-        const actualAmountToPay = orderData.totalAmount; 
+        const actualAmountToPay = orderData.payableAmount; 
 
         try {
             setLoading(true);

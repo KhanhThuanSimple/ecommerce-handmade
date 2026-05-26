@@ -15,5 +15,8 @@ public class ProductVariant {
     @Column(name = "product_id")
     private Long productId;
 
+    @Column(name = "variant_name")
+    private String variantName;
+
     private Integer inventory;
 }
