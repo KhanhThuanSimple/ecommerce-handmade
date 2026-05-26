@@ -82,6 +82,9 @@ public class MySecurity {
     // =========================
     // SECURITY FILTER CHAIN
     // =========================
+    // =========================
+    // SECURITY FILTER CHAIN
+    // =========================
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http,
                                            DaoAuthenticationProvider authProvider) throws Exception {
@@ -89,15 +92,18 @@ public class MySecurity {
         http
                 .authenticationProvider(authProvider)
                 .cors(Customizer.withDefaults())
-                .csrf(csrf -> csrf.disable())
+                .csrf(csrf -> csrf.disable()) // Đã tắt CSRF bảo vệ cho API ngoài gọi vào
                 .authorizeHttpRequests(auth -> auth
 
-                        // PUBLIC
+                        // PUBLIC (Mở rộng thêm cổng Callback thanh toán)
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/product-images/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/reviews/**").permitAll()
+
+                        // CHỈNH SỬA CHUẨN CHỈ: Cho phép VNPAY/MoMo gọi API này tự do mà không cần Auth
+                        .requestMatchers("/api/client/checkout/callback-verify").permitAll()
 
                         // CART GET PUBLIC (optional)
                         .requestMatchers(HttpMethod.GET, "/api/carts/**").permitAll()
@@ -121,6 +127,7 @@ public class MySecurity {
                         .requestMatchers(HttpMethod.PUT, "/api/categories/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/categories/**").hasRole("ADMIN")
 
+                        // Tất cả các request còn lại (bao gồm link lấy payment-url) bắt buộc phải đăng nhập
                         .anyRequest().authenticated()
                 )
                 .httpBasic(Customizer.withDefaults());

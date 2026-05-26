@@ -3,6 +3,7 @@ package com.handmade.handmade_api.modules.products.repository;
 import com.handmade.handmade_api.modules.products.dto.ProductProjection;
 import com.handmade.handmade_api.modules.products.entity.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -11,6 +12,8 @@ import java.util.List;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
+
+
 
     // 1. LẤY DANH SÁCH SẢN PHẨM (Đặt lại toàn bộ AS để khớp với Interface)
     @Query(value = "SELECT " +
