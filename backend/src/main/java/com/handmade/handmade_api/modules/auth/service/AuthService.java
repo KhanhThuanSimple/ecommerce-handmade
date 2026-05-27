@@ -1,6 +1,8 @@
 package com.handmade.handmade_api.modules.auth.service;
 
 import com.handmade.handmade_api.modules.auth.repository.UserRepository;
+import com.handmade.handmade_api.modules.auth.repository.RoleRepository; // 1. Thêm import này
+import com.handmade.handmade_api.modules.auth.entity.Role;               // 2. Thêm import này
 import com.handmade.handmade_api.modules.auth.dto.AuthResponse;
 import com.handmade.handmade_api.modules.auth.dto.LoginRequest;
 import com.handmade.handmade_api.modules.auth.dto.RegisterRequest;
@@ -12,7 +14,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -30,10 +31,13 @@ public class AuthService {
     private UserRepository userRepository;
 
     @Autowired
+    private RoleRepository roleRepository; // 3. Tiêm RoleRepository vào đây
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     public AuthResponse login(LoginRequest loginRequest) {
-
+        // ... (Giữ nguyên code login cũ của bạn, nó hoàn toàn chạy tốt)
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginRequest.getEmail(),
@@ -47,10 +51,7 @@ public class AuthService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         AuthResponse res = new AuthResponse();
-
-        // FIX QUAN TRỌNG
         res.setId(user.getId());
-
         res.setEmail(user.getEmail());
         res.setFullName(user.getFullName());
 
@@ -59,19 +60,22 @@ public class AuthService {
                 .collect(Collectors.toList());
 
         res.setRoles(roles);
-
         return res;
     }
-    @Transactional // Đảm bảo có Transaction
+
+    @Transactional
     public String register(RegisterRequest reg) {
         try {
-            // 1. Kiểm tra email
             System.out.println("Đang kiểm tra email: " + reg.getEmail());
             if (userRepository.existsByEmail(reg.getEmail())) {
                 return "Lỗi: Email đã tồn tại!";
             }
 
-            // 2. Tạo User
+            // 4. Tìm kiếm thực thể Role từ Database
+            Role userRole = roleRepository.findByName("ROLE_USER")
+                    .orElseThrow(() -> new RuntimeException("Lỗi: Không tìm thấy quyền ROLE_USER trong hệ thống!"));
+
+            // 5. Tạo User mới
             User newUser = new User();
             newUser.setEmail(reg.getEmail());
             newUser.setUsername(reg.getUsername());
@@ -79,16 +83,16 @@ public class AuthService {
             newUser.setPhone(reg.getPhone());
             newUser.setPassword(passwordEncoder.encode(reg.getPassword()));
             newUser.setEnabled(true);
-            newUser.setRoles(Collections.singleton("ROLE_USER"));
 
-            // 3. Lưu (Đây là đoạn dễ lỗi nhất)
+            // FIX QUAN TRỌNG: Truyền đúng một Set<Role> chứa đối tượng Role thật từ DB vào
+            newUser.setRoles(Collections.singleton(userRole));
+
             System.out.println("Đang chuẩn bị lưu user...");
             User savedUser = userRepository.save(newUser);
             System.out.println("Lưu thành công ID: " + savedUser.getId());
 
             return "Đăng ký thành công!";
         } catch (Exception e) {
-            // In lỗi chi tiết ra màn hình console của IntelliJ
             e.printStackTrace();
             return "Lỗi hệ thống: " + e.getMessage();
         }
