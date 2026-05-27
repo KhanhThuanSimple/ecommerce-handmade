@@ -7,7 +7,10 @@ import lombok.*;
 @Table(name = "product_variants")
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class ProductVariant {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -18,5 +21,12 @@ public class ProductVariant {
     @Column(name = "variant_name")
     private String variantName;
 
+    private String sku;
+
+    @Column(name = "price_adjustment")
+    private Double priceAdjustment;
+
     private Integer inventory;
+
+    private Integer reserved;
 }

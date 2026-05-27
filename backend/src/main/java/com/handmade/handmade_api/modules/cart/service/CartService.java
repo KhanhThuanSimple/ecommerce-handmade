@@ -2,7 +2,7 @@ package com.handmade.handmade_api.modules.cart.service;
 
 import com.handmade.handmade_api.modules.cart.dto.CartAddRequest;
 import com.handmade.handmade_api.modules.cart.dto.CartItemProjection;
-import com.handmade.handmade_api.modules.cart.dto.CartItemUpdateRequest;
+import com.handmade.handmade_api.modules.cart.dto.CartItemUpdateRequest; // Thêm import mới
 import com.handmade.handmade_api.modules.cart.dto.CartMergeRequest;
 import com.handmade.handmade_api.modules.cart.entity.Cart;
 import com.handmade.handmade_api.modules.cart.entity.CartItem;
@@ -13,16 +13,16 @@ import com.handmade.handmade_api.modules.products.service.ProductService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
-import java.util.Map;
+import java.util.Map; // Thêm import mới
 import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.stream.Collectors; // Thêm import mới
 
 @Service
 public class CartService {
 
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
-    private final ProductService productService; // Giao tiếp liên module qua Service sạch
+    private final ProductService productService;
 
     public CartService(CartRepository cartRepository, CartItemRepository cartItemRepository, ProductService productService) {
         this.cartRepository = cartRepository;
@@ -39,9 +39,7 @@ public class CartService {
     // LUỒNG 2: THÊM HOẶC CẬP NHẬT SỐ LƯỢNG MÓN HÀNG
     @Transactional
     public void addToCart(CartAddRequest request) {
-        // Kiểm tra xem sản phẩm có tồn tại và đọc tổng kho của nó (Liên module)
         ProductResponse product = productService.getProductById(request.getProductId());
-
         Cart cart = getOrCreateCart(request.getUserId());
         Optional<CartItem> existingItemOpt = cartItemRepository.findByCartIdAndProductId(cart.getId(), product.getId());
 
@@ -49,15 +47,14 @@ public class CartService {
             CartItem item = existingItemOpt.get();
             int newQuantity = item.getQuantity() + request.getQuantity();
 
-            // Chặn đứng hành vi hack số lượng vượt quá kho thực tế
             if (newQuantity > product.getInventory()) {
-                throw new RuntimeException("Cửa hàng chỉ còn tối đa " + product.getInventory() + " sản phẩm!");
+                throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.BAD_REQUEST, "Cửa hàng chỉ còn tối đa " + product.getInventory() + " sản phẩm!");
             }
             item.setQuantity(newQuantity);
             cartItemRepository.save(item);
         } else {
             if (request.getQuantity() > product.getInventory()) {
-                throw new RuntimeException("Số lượng đặt hàng vượt quá tồn kho hiện tại!");
+                throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.BAD_REQUEST, "Số lượng đặt hàng vượt quá tồn kho hiện tại!");
             }
             CartItem newItem = CartItem.builder()
                     .cartId(cart.getId())
@@ -82,7 +79,7 @@ public class CartService {
                 if (userItemOpt.isPresent()) {
                     CartItem userItem = userItemOpt.get();
                     int mergedQty = userItem.getQuantity() + guestItem.getQuantity();
-                    userItem.setQuantity(Math.min(mergedQty, product.getInventory())); // Giới hạn tối đa bằng kho hàng
+                    userItem.setQuantity(Math.min(mergedQty, product.getInventory()));
                     cartItemRepository.save(userItem);
                 } else {
                     CartItem newItem = CartItem.builder()
@@ -93,7 +90,6 @@ public class CartService {
                     cartItemRepository.save(newItem);
                 }
             } catch (Exception e) {
-                // Nếu sản phẩm vãng lai cũ bị xóa dưới DB, bỏ qua không làm sập luồng gộp
                 System.err.println("Bỏ qua gộp sản phẩm lỗi: " + guestItem.getProductId());
             }
         }
@@ -107,6 +103,7 @@ public class CartService {
         cartItemRepository.deleteByCartIdAndProductId(cart.getId(), productId);
     }
 
+    // LUỒNG GIẢM/TRỪ BỚT SỐ LƯỢNG KHI MUA HÀNG THÀNH CÔNG
     @Transactional
     public void deductOrderedItems(Long userId, Map<Long, Integer> orderedQuantities) {
         if (orderedQuantities == null || orderedQuantities.isEmpty()) return;
@@ -130,7 +127,7 @@ public class CartService {
         }
     }
 
-    // LUỒNG 5: CẬP NHẬT DANH SÁCH SẢN PHẨM TRONG GIỎ (FE gọi khi thanh toán xong)
+    // LUỒNG 5: CẬP NHẬT DANH SÁCH SẢN PHẨM TRONG GIỎ (Gọi từ Controller @PatchMapping)
     @Transactional
     public void updateCartItems(Long cartId, List<CartItemUpdateRequest> items) {
         Cart cart = cartRepository.findById(cartId)
@@ -167,8 +164,8 @@ public class CartService {
             existingByProduct.remove(itemRequest.getProductId());
         }
 
-        // Nếu có sản phẩm cũ không còn trong payload thì xóa
-        existingByProduct.values().forEach(item -> cartItemRepository.delete(item));
+        // Nếu có sản phẩm cũ không xuất hiện trong payload request gửi lên -> Xóa hẳn khỏi giỏ
+        existingByProduct.values().forEach(cartItemRepository::delete);
     }
 
     // Helper tạo giỏ tự động nếu chưa có

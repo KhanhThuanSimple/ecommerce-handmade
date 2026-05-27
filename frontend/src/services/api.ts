@@ -1,7 +1,8 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: process.env.REACT_APP_API_URL || 'http://localhost:8080/api',
+    // Mặc định /api + setupProxy.js (dev) hoặc http://localhost:8080/api (production build)
+    baseURL: process.env.REACT_APP_API_URL || '/api',
     timeout: 10000,
     headers: {
         'Content-Type': 'application/json',

@@ -3,8 +3,10 @@ package com.handmade.handmade_api.modules.voucher.service;
 import com.handmade.handmade_api.modules.voucher.dto.VoucherRequest;
 import com.handmade.handmade_api.modules.voucher.entity.Voucher;
 import com.handmade.handmade_api.modules.voucher.repository.VoucherRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Map;
@@ -29,19 +31,12 @@ public class VoucherService {
                 .id(request.getId())
                 .code(request.getCode())
                 .title(request.getTitle())
-                .description(request.getDescription())
-                .type(request.getType())
-                .value(request.getValue())
-                .maxDiscount(request.getMaxDiscount())
-                .minOrder(request.getMinOrder())
-                .target(request.getTarget())
-                .userId(request.getUserId())
-                .maxOrderCount(request.getMaxOrderCount())
-                .quantity(request.getQuantity())
-                .used(request.getUsed())
-                .status(request.getStatus())
-                .startDate(request.getStartDate())
-                .expiredAt(request.getExpiredAt())
+                .voucherType(request.getType())
+                .valueAmount(request.getValue())
+                .maxDiscountAmount(request.getMaxDiscount())
+                .minOrderAmount(request.getMinOrder() != null ? request.getMinOrder() : 0.0)
+                .usageLimit(request.getQuantity() != null ? request.getQuantity() : 0)
+                .usedCount(request.getUsed() != null ? request.getUsed() : 0)
                 .build();
         return voucherRepository.save(voucher);
     }
@@ -53,34 +48,28 @@ public class VoucherService {
     @Transactional
     public Voucher applyVoucherCode(String code) {
         Voucher voucher = voucherRepository.findByCode(code)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy voucher: " + code));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Không tìm thấy voucher: " + code));
 
-        if (voucher.getStatus() != null && voucher.getStatus().equalsIgnoreCase("expired")) {
-            throw new RuntimeException("Voucher đã hết hạn hoặc không hợp lệ: " + code);
+        int used = voucher.getUsedCount() == null ? 0 : voucher.getUsedCount();
+        int limit = voucher.getUsageLimit() == null ? 0 : voucher.getUsageLimit();
+        if (limit > 0 && used >= limit) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Voucher không còn lượt sử dụng: " + code);
         }
 
-        int used = voucher.getUsed() == null ? 0 : voucher.getUsed();
-        if (voucher.getQuantity() != null && used >= voucher.getQuantity()) {
-            throw new RuntimeException("Voucher không còn lượt sử dụng: " + code);
-        }
-
-        voucher.setUsed(used + 1);
+        voucher.setUsedCount(used + 1);
         return voucherRepository.save(voucher);
     }
 
     @Transactional
     public Voucher updateVoucher(String id, Map<String, Object> updates) {
         Voucher voucher = voucherRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy voucher: " + id));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy voucher: " + id));
 
         if (updates.containsKey("used")) {
-            voucher.setUsed(((Number) updates.get("used")).intValue());
-        }
-        if (updates.containsKey("status")) {
-            voucher.setStatus((String) updates.get("status"));
+            voucher.setUsedCount(((Number) updates.get("used")).intValue());
         }
         if (updates.containsKey("quantity")) {
-            voucher.setQuantity(((Number) updates.get("quantity")).intValue());
+            voucher.setUsageLimit(((Number) updates.get("quantity")).intValue());
         }
 
         return voucherRepository.save(voucher);
