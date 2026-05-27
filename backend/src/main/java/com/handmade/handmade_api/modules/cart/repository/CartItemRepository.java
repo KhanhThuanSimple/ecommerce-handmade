@@ -13,7 +13,7 @@ public interface CartItemRepository extends JpaRepository<CartItem, Long> {
 
     Optional<CartItem> findByCartIdAndProductId(Long cartId, Long productId);
 
-    List<CartItem> findByCartId(Long cartId);
+    List<CartItem> findByCartId(Long cartId); // Được thêm vào từ đoạn code lẻ phía trên
 
     @Modifying
     void deleteByCartIdAndProductId(Long cartId, Long productId);

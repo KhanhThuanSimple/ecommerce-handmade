@@ -3,7 +3,7 @@ package com.handmade.handmade_api.modules.cart.controller;
 import com.handmade.handmade_api.modules.cart.dto.CartAddRequest;
 import com.handmade.handmade_api.modules.cart.dto.CartItemProjection;
 import com.handmade.handmade_api.modules.cart.dto.CartMergeRequest;
-import com.handmade.handmade_api.modules.cart.dto.CartUpdateRequest;
+import com.handmade.handmade_api.modules.cart.dto.CartUpdateRequest; // Thêm import này
 import com.handmade.handmade_api.modules.cart.service.CartService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +28,7 @@ public class CartController {
         return ResponseEntity.ok(cartService.getCartByUserId(userId));
     }
 
-    @GetMapping("/{userId}")
+    @GetMapping("/{userId}") // Thêm endpoint này từ code trên
     public ResponseEntity<List<CartItemProjection>> getCartByPath(@PathVariable Long userId) {
         return ResponseEntity.ok(cartService.getCartByUserId(userId));
     }
@@ -51,7 +51,7 @@ public class CartController {
         return ResponseEntity.ok("Đã xóa sản phẩm khỏi giỏ hàng.");
     }
 
-    @PatchMapping("/{cartId}")
+    @PatchMapping("/{cartId}") // Thêm API update này từ code trên
     public ResponseEntity<String> updateCart(@PathVariable Long cartId, @Valid @RequestBody CartUpdateRequest request) {
         cartService.updateCartItems(cartId, request.getItems());
         return ResponseEntity.ok("Đã cập nhật giỏ hàng thành công.");
