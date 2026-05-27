@@ -132,10 +132,10 @@
                 ? shippingDetails.address 
                 : `${shippingDetails?.detailAddress}, ${shippingDetails?.ward}, ${shippingDetails?.district}, ${shippingDetails?.province}`;
             const currentPayable = Math.max(finalTotal - discount, 0);
-            return {
-                id: rePayOrder ? rePayOrder.id : 'ORD-' + Date.now(),
+            const data: any = {
                 userId: currentUser?.id,
                 fullName: shippingDetails?.fullName || "",
+                customerEmail: currentUser?.email || "",
                 phone: shippingDetails?.phone || "",
                 address: address,
                 items: displayItems,
@@ -147,72 +147,47 @@
                 status: status,
                 date: rePayOrder ? rePayOrder.date : new Date().toLocaleString('vi-VN')
             };
+            if (rePayOrder) {
+                data.id = rePayOrder.id;
+            }
+            return data;
         };
 
-        const updateInventoryAndVoucher = async () => {
-        try {
-            // 1. Tạo danh sách các yêu cầu cập nhật số lượng sản phẩm
-            const inventoryPromises = displayItems.map(item => {
-                const currentInventory = item.product.inventory || 0;
-                const newInventory = currentInventory - item.quantity;
-
-                // Kiểm tra an toàn: nếu số lượng mới < 0 thì có thể báo lỗi (tùy logic của bạn)
-                return api.patch(`/products/${item.product.id}`, { 
-                    inventory: Math.max(0, newInventory) 
-                });
-            });
-
-            // 2. Nếu có sử dụng voucher, tạo yêu cầu cập nhật số lần đã dùng (used)
-            if (selectedVoucher) {
-                inventoryPromises.push(
-                    api.patch(`/voucher/${selectedVoucher.id}`, { 
-                        used: (selectedVoucher.used || 0) + 1 
-                    })
-                );
-            }
-
-            // 3. Thực thi tất cả các yêu cầu cùng lúc
-            await Promise.all(inventoryPromises);
-            console.log("Cập nhật kho và voucher thành công");
-        } catch (err) {
-            console.error("Lỗi khi cập nhật DB:", err);
-            throw err; // Đẩy lỗi ra ngoài để hàm handleConfirmOrder xử lý
-        }
-    };
         const handleConfirmOrder = async () => {
-        if (!currentUser) return;
-        if (!rePayOrder && !validateCheckout()) return;
+            if (!currentUser) return;
+            if (!rePayOrder && !validateCheckout()) return;
 
-        const isVNPay = paymentMethod === 'vnpay';
-        const orderData = prepareOrderData(isVNPay ? 'Chờ thanh toán' : 'Thanh toán khi nhận hàng');
-        
-        // Tính toán số tiền thực tế để gửi sang cổng thanh toán
-        const actualAmountToPay = orderData.payableAmount; 
+            const isVNPay = paymentMethod === 'vnpay';
+            const orderData = prepareOrderData(isVNPay ? 'Chờ thanh toán' : 'Thanh toán khi nhận hàng');
+            const actualAmountToPay = orderData.payableAmount;
 
-        try {
-            setLoading(true);
+            try {
+                setLoading(true);
 
-            if (rePayOrder) {
-                await api.put(`/orders/${rePayOrder.id}`, orderData);
-            } else {
-                await api.post('/orders', orderData);
+                let orderRes;
+                if (rePayOrder) {
+                    orderRes = await api.put(`/orders/${rePayOrder.id}`, orderData);
+                } else {
+                    orderRes = await api.post('/orders', orderData);
+                }
+
+                const orderId = orderRes.data.id;
+
+                if (isVNPay) {
+                    const paymentUrl = await generateVNPayUrl(actualAmountToPay, orderId);
+                    window.location.href = paymentUrl;
+                } else {
+                    await refreshCart();
+                    notify.success("Đặt hàng thành công!");
+                    navigate('/order-history');
+                }
+            } catch (err) {
+                console.error("Lỗi thanh toán:", err);
+                notify.warning("Lỗi hệ thống! Vui lòng thử lại sau.");
+            } finally {
+                setLoading(false);
             }
-
-            if (isVNPay) {
-                // Chuyển sang VNPay với số tiền ĐÃ GIẢM
-                window.location.href = generateVNPayUrl(actualAmountToPay, orderData.id);
-            } else {
-                await updateInventoryAndVoucher();
-                if (!buyNowItem) await cleanCartLocally();
-                notify.success("Đặt hàng thành công!");
-                navigate('/order-history');
-            }
-        } catch (err) {
-            notify.warning("Lỗi hệ thống!");
-        } finally {
-            setLoading(false);
-        }
-    };
+        };
 
         const cleanCartLocally = async () => {
             try {

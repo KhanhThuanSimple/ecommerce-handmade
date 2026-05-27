@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -19,11 +20,17 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class MySecurity {
 
+    // =========================
+    // PASSWORD ENCODER
+    // =========================
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    // =========================
+    // AUTH MANAGER
+    // =========================
     @Bean
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration config) throws Exception {
@@ -31,7 +38,32 @@ public class MySecurity {
     }
 
     // =========================
-    // CORS CONFIG
+    // USER DETAILS SERVICE
+    // =========================
+    @Bean
+    public UserDetailsService userDetailsService(UserRepository userRepository) {
+        return email -> userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new UsernameNotFoundException("User not found: " + email)
+                );
+    }
+
+    // =========================
+    // AUTH PROVIDER (QUAN TRỌNG NHẤT)
+    // =========================
+    @Bean
+    public DaoAuthenticationProvider authenticationProvider(
+            UserDetailsService userDetailsService,
+            PasswordEncoder passwordEncoder) {
+
+        DaoAuthenticationProvider auth = new DaoAuthenticationProvider();
+        auth.setUserDetailsService(userDetailsService);
+        auth.setPasswordEncoder(passwordEncoder);
+        return auth;
+    }
+
+    // =========================
+    // CORS
     // =========================
     @Bean
     public WebMvcConfigurer corsConfigurer() {
@@ -40,7 +72,7 @@ public class MySecurity {
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
                         .allowedOrigins("http://localhost:3000")
-                        .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS") // Thêm PATCH cho luồng gộp cart của FE
+                        .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
                         .allowCredentials(true);
             }
@@ -48,62 +80,50 @@ public class MySecurity {
     }
 
     // =========================
-    // USER DETAILS
+    // SECURITY FILTER CHAIN
     // =========================
     @Bean
-    public UserDetailsService userDetailsService(UserRepository userRepository) {
-        return email -> userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
-    }
-
-    // =========================
-    // SECURITY FILTER
-    // =========================
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http,
+                                           DaoAuthenticationProvider authProvider) throws Exception {
 
         http
+                .authenticationProvider(authProvider)
                 .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
 
-                        // =========================
-                        // PUBLIC API (Mọi người đều truy cập được)
-                        // =========================
+                        // PUBLIC
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/product-images/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/reviews/**").permitAll()
-                        
-                        // 🟢 CHO PHÉP GUEST GỌI GET CART: Bọc lót chuỗi userId=null không bị chặn chặn 401/403
+
+                        // VNPay return & IPN (VNPay server / redirect không gửi Basic Auth)
+                        .requestMatchers("/api/vnpay/return", "/api/vnpay/ipn").permitAll()
+
+                        // CART GET PUBLIC (optional)
                         .requestMatchers(HttpMethod.GET, "/api/carts/**").permitAll()
 
-                        // =========================
-                        // USER API (Cần quyền USER hoặc ADMIN)
-                        // =========================
+                        // USER
                         .requestMatchers("/api/users/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/reviews/**").hasAnyRole("USER", "ADMIN")
-                        
-                        // 🟢 CÁC THAO TÁC THAY ĐỔI GIỎ HÀNG: Phải đăng nhập mới cho xử lý dữ liệu
+
                         .requestMatchers(HttpMethod.POST, "/api/carts/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.PATCH, "/api/carts/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/carts/**").hasAnyRole("USER", "ADMIN")
 
-                        // =========================
-                        // ADMIN API
-                        // =========================
+                        // ADMIN
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+
                         .requestMatchers(HttpMethod.POST, "/api/products/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/products/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/products/**").hasRole("ADMIN")
-                        
+
                         .requestMatchers(HttpMethod.POST, "/api/categories/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/categories/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/categories/**").hasRole("ADMIN")
 
-                        // =========================
-                        // OTHER REQUEST
-                        // =========================
                         .anyRequest().authenticated()
                 )
                 .httpBasic(Customizer.withDefaults());
