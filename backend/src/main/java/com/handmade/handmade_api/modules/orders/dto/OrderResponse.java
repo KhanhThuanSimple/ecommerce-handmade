@@ -11,6 +11,7 @@ public class OrderResponse {
     private String id;
     private Long userId;
     private String fullName;
+    private String customerEmail;
     private String phone;
     private String address;
     private List<OrderItemResponse> items;
