@@ -3,12 +3,13 @@ package com.handmade.handmade_api.modules.products.service;
 import com.handmade.handmade_api.modules.products.dto.ProductCreateRequest;
 import com.handmade.handmade_api.modules.products.dto.ProductProjection;
 import com.handmade.handmade_api.modules.products.dto.ProductResponse;
-import com.handmade.handmade_api.modules.products.dto.ProductUpdateRequest;
 import com.handmade.handmade_api.modules.products.entity.Product;
 import com.handmade.handmade_api.modules.products.entity.ProductVariant;
 import com.handmade.handmade_api.modules.products.repository.ProductRepository;
 import com.handmade.handmade_api.modules.products.repository.ProductVariantRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -35,7 +36,7 @@ public class ProductService {
     public ProductResponse getProductById(Long id) {
         ProductProjection projection = productRepository.findProductDetailRawById(id);
         if (projection == null) {
-            throw new RuntimeException("Không tìm thấy sản phẩm với ID: " + id);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Không tìm thấy sản phẩm với ID: " + id);
         }
         return convertToResponse(projection);
     }
@@ -73,48 +74,43 @@ public class ProductService {
                 .soldCount(saved.getSoldCount())
                 .build();
     }
+    public Long getDefaultVariantId(Long productId) {
+        return productVariantRepository.findFirstByProductIdOrderByIdAsc(productId)
+                .map(ProductVariant::getId)
+                .orElse(null);
+    }
 
-    @Transactional
-    public ProductResponse updateInventory(Long id, ProductUpdateRequest request) {
-        Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm với ID: " + id));
-
-        if (request.getInventory() != null) {
-            int inventoryValue = Math.max(0, request.getInventory());
-            List<ProductVariant> variants = productVariantRepository.findByProductId(id);
-            if (variants.isEmpty()) {
-                ProductVariant defaultVariant = new ProductVariant();
-                defaultVariant.setProductId(id);
-                defaultVariant.setInventory(inventoryValue);
-                productVariantRepository.save(defaultVariant);
-            } else {
-                ProductVariant defaultVariant = variants.stream()
-                        .filter(v -> "Default".equalsIgnoreCase(v.getVariantName()))
-                        .findFirst()
-                        .orElse(variants.get(0));
-                defaultVariant.setInventory(inventoryValue);
-                productVariantRepository.save(defaultVariant);
-            }
+    public void assertSufficientInventory(Long productId, Integer quantity) {
+        int available = getProductById(productId).getInventory();
+        if (quantity == null || quantity <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Số lượng đặt hàng không hợp lệ");
         }
-
-        return getProductById(id);
+        if (available < quantity) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Sản phẩm ID " + productId + " chỉ còn " + available + " trong kho");
+        }
     }
 
     @Transactional
-    public ProductResponse decreaseInventory(Long id, int reduceBy) {
-        if (reduceBy <= 0) {
-            return getProductById(id);
+    public void decreaseInventory(Long productId, Integer quantity) {
+        ProductVariant variant = productVariantRepository.findFirstByProductIdOrderByIdAsc(productId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "Không tìm thấy biến thể kho cho sản phẩm ID: " + productId));
+
+        int currentInventory = variant.getInventory() == null ? 0 : variant.getInventory();
+        if (currentInventory < quantity) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Số lượng tồn kho của sản phẩm ID " + productId + " không đủ!");
         }
 
-        ProductResponse product = getProductById(id);
-        if (reduceBy > product.getInventory()) {
-            throw new RuntimeException("Số lượng đặt hàng vượt quá tồn kho cho sản phẩm: " + product.getName());
-        }
+        variant.setInventory(currentInventory - quantity);
+        productVariantRepository.save(variant);
 
-        int newInventory = Math.max(0, product.getInventory() - reduceBy);
-        ProductUpdateRequest updateRequest = new ProductUpdateRequest();
-        updateRequest.setInventory(newInventory);
-        return updateInventory(id, updateRequest);
+        productRepository.findById(productId).ifPresent(product -> {
+            int sold = product.getSoldCount() == null ? 0 : product.getSoldCount();
+            product.setSoldCount(sold + quantity);
+            productRepository.save(product);
+        });
     }
 
     /**

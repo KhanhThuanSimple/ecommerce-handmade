@@ -2,6 +2,8 @@ package com.handmade.handmade_api.modules.products.dto;
 
 import lombok.*;
 
+import java.util.List;
+
 @Getter
 @Setter
 
@@ -13,7 +15,7 @@ public class ProductCreateRequest {
     private String description;
     private Integer inventory;
     private String status;      // Nhận chuỗi 'active' | 'inactive' | 'lowstock'
-
+    private List<String> images;
     public ProductCreateRequest() {
     }
 
