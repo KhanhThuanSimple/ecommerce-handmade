@@ -139,7 +139,6 @@ public class AdminUserService {
         return "Đã xóa vai trò '" + role.getDisplayName() + "' và hủy quyền này khỏi tất cả tài khoản liên quan thành công!";
     }
 
-    // CHỨC NĂNG 4: Xóa vĩnh viễn tài khoản
     @Transactional
     public void deleteUserById(Long id, String adminEmail) {
         User user = userRepository.findById(id)

@@ -12,7 +12,7 @@ public class AdminRoleDTO {
     public AdminRoleDTO() {
     }
 
-    // 2. Constructor dùng để map dữ liệu từ Entity sang DTO (Dùng cho API GET)
+    // 2. Constructoxr dùng để map dữ liệu từ Entity sang DTO (Dùng cho API GET)
     public AdminRoleDTO(Role role) {
         this.id = role.getId();
         this.name = role.getName();

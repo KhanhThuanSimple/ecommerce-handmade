@@ -8,10 +8,17 @@ import org.springframework.web.socket.config.annotation.*;
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
+    private final AppProperties appProperties;
+
+    public WebSocketConfig(AppProperties appProperties) {
+        this.appProperties = appProperties;
+    }
+
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
+        String[] origins = appProperties.getCorsAllowedOrigins().toArray(new String[0]);
         registry.addEndpoint("/ws")
-                .setAllowedOrigins("http://localhost:3000") // URL của React
+                .setAllowedOrigins(origins)
                 .withSockJS();
     }
 

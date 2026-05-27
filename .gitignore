@@ -22,6 +22,10 @@ frontend/.env.development.local
 frontend/.env.test.local
 frontend/.env.production.local
 
+# --- Legacy root (sau khi chuyển sang backend/) — chỉ thư mục ở gốc repo ---
+/target/
+/src/
+
 # --- BACKEND (Spring Boot) ---
 # Chặn các file đã biên dịch của Maven/Gradle
 backend/target/
