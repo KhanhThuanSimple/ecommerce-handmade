@@ -1,0 +1,473 @@
+/* ========================================
+   ORDERS MANAGEMENT STYLES
+   Order Tracking & Management
+   ======================================== */
+
+@import './variables.css';
+
+.orders-container {
+    animation: fadeInUp 0.5s ease-out;
+}
+
+/* Orders Header */
+.orders-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    margin-bottom: var(--space-8);
+}
+
+.orders-title h1 {
+    font-size: 1.875rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--gray-800), var(--primary-red));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.orders-title p {
+    color: var(--gray-500);
+    font-size: 0.875rem;
+    margin-top: var(--space-2);
+}
+
+/* Filter Bar */
+.filter-bar {
+    background: white;
+    border-radius: var(--radius-xl);
+    padding: var(--space-4) var(--space-6);
+    margin-bottom: var(--space-6);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-4);
+    border: 1px solid var(--gray-200);
+    box-shadow: var(--shadow-sm);
+}
+
+.filter-group {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex: 1;
+    min-width: 200px;
+}
+
+.filter-label {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--gray-700);
+    white-space: nowrap;
+}
+
+.filter-select {
+    flex: 1;
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    background: white;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.filter-select:focus {
+    outline: none;
+    border-color: var(--primary-red);
+    box-shadow: 0 0 0 3px rgba(196, 30, 58, 0.1);
+}
+
+.filter-input {
+    flex: 1;
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    transition: all var(--transition-fast);
+}
+
+.filter-input:focus {
+    outline: none;
+    border-color: var(--primary-red);
+    box-shadow: 0 0 0 3px rgba(196, 30, 58, 0.1);
+}
+
+.filter-date-range {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.filter-date-input {
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    font-size: 0.8125rem;
+}
+
+.search-button {
+    background: var(--primary-red);
+    color: white;
+    border: none;
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-weight: 600;
+    transition: all var(--transition-fast);
+}
+
+.search-button:hover {
+    background: var(--primary-red-dark);
+    transform: translateY(-1px);
+}
+
+.reset-button {
+    background: var(--gray-200);
+    color: var(--gray-700);
+    border: none;
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-weight: 600;
+    transition: all var(--transition-fast);
+}
+
+.reset-button:hover {
+    background: var(--gray-300);
+}
+
+/* Stats Row */
+.orders-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--space-4);
+    margin-bottom: var(--space-8);
+}
+
+.order-stat-card {
+    background: white;
+    border-radius: var(--radius-lg);
+    padding: var(--space-4);
+    text-align: center;
+    border: 1px solid var(--gray-200);
+    transition: all var(--transition-fast);
+}
+
+.order-stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.order-stat-value {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--gray-800);
+}
+
+.order-stat-label {
+    font-size: 0.75rem;
+    color: var(--gray-500);
+    margin-top: var(--space-1);
+}
+
+/* Order Status Badges */
+.order-status {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-full);
+    font-size: 0.6875rem;
+    font-weight: 600;
+}
+
+.order-status.pending {
+    background: var(--warning-light);
+    color: var(--warning);
+}
+
+.order-status.processing {
+    background: var(--info-light);
+    color: var(--info);
+}
+
+.order-status.shipped {
+    background: var(--primary-purple-light);
+    color: var(--primary-purple);
+}
+
+.order-status.delivered {
+    background: var(--success-light);
+    color: var(--success);
+}
+
+.order-status.cancelled {
+    background: var(--error-light);
+    color: var(--error);
+}
+
+/* Order Table */
+.orders-table-container {
+    background: white;
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--gray-200);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+}
+
+.orders-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.orders-table thead {
+    background: var(--gray-50);
+    border-bottom: 2px solid var(--gray-200);
+}
+
+.orders-table th {
+    padding: var(--space-4) var(--space-6);
+    text-align: left;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--gray-600);
+}
+
+.orders-table td {
+    padding: var(--space-4) var(--space-6);
+    border-bottom: 1px solid var(--gray-100);
+    font-size: 0.875rem;
+    vertical-align: middle;
+}
+
+.orders-table tbody tr {
+    transition: background var(--transition-fast);
+    cursor: pointer;
+}
+
+.orders-table tbody tr:hover {
+    background: rgba(196, 30, 58, 0.02);
+}
+
+/* Order ID */
+.order-id {
+    font-weight: 700;
+    color: var(--primary-red);
+    font-family: monospace;
+    font-size: 0.875rem;
+}
+
+/* Customer Info */
+.customer-info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+}
+
+.customer-name {
+    font-weight: 600;
+    color: var(--gray-800);
+}
+
+.customer-phone {
+    font-size: 0.75rem;
+    color: var(--gray-500);
+}
+
+/* Order Amount */
+.order-amount {
+    font-weight: 700;
+    color: var(--gray-800);
+}
+
+.order-amount .original {
+    font-size: 0.75rem;
+    color: var(--gray-400);
+    text-decoration: line-through;
+    margin-left: var(--space-1);
+}
+
+/* Action Buttons */
+.order-actions {
+    display: flex;
+    gap: var(--space-2);
+}
+
+.order-action-btn {
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-md);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    border: none;
+}
+
+.order-action-btn.view {
+    background: var(--info-light);
+    color: var(--info);
+}
+
+.order-action-btn.view:hover {
+    background: var(--info);
+    color: white;
+}
+
+.order-action-btn.update {
+    background: var(--primary-purple-light);
+    color: var(--primary-purple);
+}
+
+.order-action-btn.update:hover {
+    background: var(--primary-purple);
+    color: white;
+}
+
+/* Order Detail Modal */
+.order-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: var(--z-modal);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.order-modal {
+    background: white;
+    border-radius: var(--radius-2xl);
+    width: 90%;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: slideInUp 0.3s ease-out;
+}
+
+.order-modal-header {
+    padding: var(--space-6);
+    border-bottom: 1px solid var(--gray-200);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.order-modal-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--gray-800);
+}
+
+.order-modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--gray-400);
+    transition: color var(--transition-fast);
+}
+
+.order-modal-close:hover {
+    color: var(--gray-600);
+}
+
+.order-modal-body {
+    padding: var(--space-6);
+}
+
+.order-info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-4);
+    margin-bottom: var(--space-6);
+}
+
+.order-info-item {
+    background: var(--gray-50);
+    padding: var(--space-3);
+    border-radius: var(--radius-lg);
+}
+
+.order-info-label {
+    font-size: 0.6875rem;
+    color: var(--gray-500);
+    text-transform: uppercase;
+}
+
+.order-info-value {
+    font-weight: 600;
+    color: var(--gray-800);
+    margin-top: var(--space-1);
+}
+
+.order-items-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: var(--space-4);
+}
+
+.order-items-table th {
+    text-align: left;
+    padding: var(--space-2);
+    background: var(--gray-50);
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.order-items-table td {
+    padding: var(--space-2);
+    border-bottom: 1px solid var(--gray-100);
+    font-size: 0.8125rem;
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .filter-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .filter-group {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .filter-date-range {
+        flex-direction: column;
+    }
+    
+    .orders-table-container {
+        overflow-x: auto;
+    }
+    
+    .orders-table {
+        min-width: 800px;
+    }
+    
+    .order-info-grid {
+        grid-template-columns: 1fr;
+    }
+}

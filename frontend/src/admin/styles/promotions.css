@@ -1,0 +1,420 @@
+/* ========================================
+   PROMOTIONS MANAGEMENT STYLES
+   Campaigns, Coupons & Discounts
+   ======================================== */
+
+@import './variables.css';
+
+.promotions-container {
+    animation: fadeInUp 0.5s ease-out;
+}
+
+/* Header with Action Button */
+.promotions-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    margin-bottom: var(--space-8);
+}
+
+.promotions-title h1 {
+    font-size: 1.875rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--gray-800), var(--primary-red));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.promotions-subtitle {
+    color: var(--gray-500);
+    font-size: 0.875rem;
+    margin-top: var(--space-2);
+}
+
+.create-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-6);
+    background: linear-gradient(135deg, var(--primary-red), var(--primary-gold));
+    color: white;
+    border: none;
+    border-radius: var(--radius-lg);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.create-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Stats Cards */
+.promotion-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--space-4);
+    margin-bottom: var(--space-8);
+}
+
+.promo-stat-card {
+    background: white;
+    border-radius: var(--radius-lg);
+    padding: var(--space-4);
+    text-align: center;
+    border: 1px solid var(--gray-200);
+}
+
+.promo-stat-value {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--gray-800);
+}
+
+.promo-stat-label {
+    font-size: 0.75rem;
+    color: var(--gray-500);
+    margin-top: var(--space-1);
+}
+
+/* Promotion Cards Grid */
+.promotions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+    gap: var(--space-6);
+}
+
+.promotion-card {
+    background: white;
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--gray-200);
+    overflow: hidden;
+    transition: all var(--transition-base);
+    position: relative;
+}
+
+.promotion-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-xl);
+}
+
+.promotion-card.active {
+    border-left: 4px solid var(--success);
+}
+
+.promotion-card.expired {
+    opacity: 0.6;
+}
+
+.promotion-card-header {
+    padding: var(--space-6);
+    background: linear-gradient(135deg, var(--gray-50), white);
+    border-bottom: 1px solid var(--gray-200);
+    position: relative;
+}
+
+.promotion-type-badge {
+    position: absolute;
+    top: var(--space-4);
+    right: var(--space-4);
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-md);
+    font-size: 0.625rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.promotion-type-badge.coupon {
+    background: var(--primary-purple-light);
+    color: var(--primary-purple);
+}
+
+.promotion-type-badge.flash-sale {
+    background: var(--error-light);
+    color: var(--error);
+}
+
+.promotion-type-badge.bundle {
+    background: var(--success-light);
+    color: var(--success);
+}
+
+.promotion-icon {
+    font-size: 2.5rem;
+    margin-bottom: var(--space-3);
+}
+
+.promotion-name {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--gray-800);
+    margin-bottom: var(--space-2);
+}
+
+.promotion-description {
+    font-size: 0.75rem;
+    color: var(--gray-500);
+    line-height: 1.4;
+}
+
+.promotion-card-body {
+    padding: var(--space-6);
+}
+
+.promotion-detail {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: var(--space-3);
+    font-size: 0.8125rem;
+}
+
+.promotion-detail-label {
+    color: var(--gray-500);
+}
+
+.promotion-detail-value {
+    font-weight: 600;
+    color: var(--gray-800);
+}
+
+.promotion-code {
+    background: var(--gray-100);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-md);
+    font-family: monospace;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--primary-red);
+    text-align: center;
+    margin: var(--space-4) 0;
+}
+
+.progress-bar {
+    height: 6px;
+    background: var(--gray-200);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+    margin: var(--space-4) 0;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-red), var(--primary-gold));
+    border-radius: var(--radius-full);
+    transition: width var(--transition-base);
+}
+
+.usage-stats {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.6875rem;
+    color: var(--gray-500);
+    margin-top: var(--space-2);
+}
+
+.promotion-card-footer {
+    padding: var(--space-4) var(--space-6);
+    background: var(--gray-50);
+    border-top: 1px solid var(--gray-200);
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-2);
+}
+
+.card-btn {
+    flex: 1;
+    padding: var(--space-2);
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.card-btn.edit {
+    background: white;
+    border: 1px solid var(--gray-300);
+    color: var(--gray-700);
+}
+
+.card-btn.edit:hover {
+    border-color: var(--primary-red);
+    color: var(--primary-red);
+}
+
+.card-btn.activate {
+    background: var(--success);
+    color: white;
+}
+
+.card-btn.activate:hover {
+    background: var(--success-dark);
+}
+
+.card-btn.deactivate {
+    background: var(--warning);
+    color: white;
+}
+
+.card-btn.deactivate:hover {
+    background: var(--warning-dark);
+}
+
+.card-btn.delete {
+    background: var(--error);
+    color: white;
+}
+
+.card-btn.delete:hover {
+    background: var(--error-dark);
+}
+
+/* Create/Edit Modal */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: var(--z-modal);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.promo-modal {
+    background: white;
+    border-radius: var(--radius-2xl);
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: slideInUp 0.3s ease-out;
+}
+
+.promo-modal-header {
+    padding: var(--space-6);
+    border-bottom: 1px solid var(--gray-200);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.promo-modal-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.promo-modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--gray-400);
+}
+
+.promo-modal-body {
+    padding: var(--space-6);
+}
+
+.form-group {
+    margin-bottom: var(--space-4);
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    margin-bottom: var(--space-2);
+    color: var(--gray-700);
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--primary-red);
+    box-shadow: 0 0 0 3px rgba(196, 30, 58, 0.1);
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+}
+
+.modal-actions {
+    display: flex;
+    gap: var(--space-3);
+    margin-top: var(--space-6);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--gray-200);
+}
+
+.btn-submit {
+    flex: 1;
+    padding: var(--space-3);
+    background: var(--primary-red);
+    color: white;
+    border: none;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-cancel {
+    flex: 1;
+    padding: var(--space-3);
+    background: var(--gray-200);
+    color: var(--gray-700);
+    border: none;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .promotions-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .create-btn {
+        justify-content: center;
+    }
+    
+    .promotions-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-4);
+    }
+    
+    .promotion-card-footer {
+        flex-direction: column;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: var(--space-4);
+    }
+}
