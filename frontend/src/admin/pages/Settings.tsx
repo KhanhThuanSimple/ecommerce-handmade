@@ -1,381 +1,432 @@
-import React, { useState, ChangeEvent, FormEvent } from 'react';
-import '../styles/admin.css';
-
+import React, { useState } from 'react';
 import {
-    Cog6ToothIcon,
-    BellIcon,
+    BuildingStorefrontIcon,
+    CreditCardIcon,
+    EnvelopeIcon,
     ShieldCheckIcon,
-    SwatchIcon,
-    GlobeAltIcon
+    BellIcon,
+    LanguageIcon,
+    PaintBrushIcon,
+    KeyIcon,
+    UserCircleIcon,
 } from '@heroicons/react/24/outline';
+import { useNotify } from '../../components/NotificationContext';
 
-interface SettingsData {
-    siteName: string;
-    siteEmail: string;
-    sitePhone: string;
-    address: string;
-    facebook: string;
-    instagram: string;
-    shippingFee: number;
-    freeShippingMin: number;
-    tetPromotion: boolean;
-    promotionValue: number;
-    maintenanceMode: boolean;
+interface SettingsSection {
+    id: string;
+    name: string;
+    icon: React.ElementType;
 }
 
-type TabType =
-    | 'general'
-    | 'social'
-    | 'shipping'
-    | 'promotion'
-    | 'security';
+const Settings: React.FC = () => {
+    const [activeSection, setActiveSection] = useState('general');
+    const [saving, setSaving] = useState(false);
+    const notify = useNotify();
 
-const Settings = () => {
-    const [settings, setSettings] = useState<SettingsData>({
-        siteName: 'Handmade Ceramics',
-        siteEmail: 'contact@handmade.com',
-        sitePhone: '1900 1234',
-        address: '123 Đường Gốm Sứ, Quận Hoàn Kiếm, Hà Nội',
-        facebook: 'https://facebook.com/handmade',
-        instagram: 'https://instagram.com/handmade',
-        shippingFee: 30000,
-        freeShippingMin: 1500000,
-        tetPromotion: true,
-        promotionValue: 15,
-        maintenanceMode: false
+    // General Settings
+    const [generalSettings, setGeneralSettings] = useState({
+        storeName: 'Handmade Vietnam',
+        storeEmail: 'contact@handmade.vn',
+        storePhone: '1900 1234',
+        storeAddress: '123 Đường Láng, Đống Đa, Hà Nội',
+        taxRate: 10,
+        currency: 'VND',
+        timezone: 'Asia/Ho_Chi_Minh',
     });
 
-    const [activeTab, setActiveTab] = useState<TabType>('general');
+    // Payment Settings
+    const [paymentSettings, setPaymentSettings] = useState({
+        codEnabled: true,
+        bankingEnabled: true,
+        momoEnabled: false,
+        bankName: 'Vietcombank',
+        bankAccount: '1234567890',
+        bankHolder: 'Handmade Vietnam',
+    });
 
-    const handleChange = (
-        e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-    ) => {
-        const { name, value, type } = e.target;
+    // Email Settings
+    const [emailSettings, setEmailSettings] = useState({
+        smtpHost: 'smtp.gmail.com',
+        smtpPort: 587,
+        smtpUser: 'noreply@handmade.vn',
+        smtpPassword: '********',
+        orderConfirmation: true,
+        paymentConfirmation: true,
+        shippingUpdate: true,
+        newsletterEnabled: true,
+    });
 
-        const checked =
-            e.target instanceof HTMLInputElement
-                ? e.target.checked
-                : false;
+    // Security Settings
+    const [securitySettings, setSecuritySettings] = useState({
+        twoFactorAuth: false,
+        sessionTimeout: 30,
+        passwordExpiry: 90,
+        maxLoginAttempts: 5,
+        ipWhitelist: '',
+    });
 
-        setSettings((prev) => ({
-            ...prev,
-            [name]:
-                type === 'checkbox'
-                    ? checked
-                    : type === 'number'
-                    ? Number(value)
-                    : value
-        }));
-    };
+    // Notification Settings
+    const [notificationSettings, setNotificationSettings] = useState({
+        emailNotifications: true,
+        smsNotifications: false,
+        orderCreated: true,
+        orderCancelled: true,
+        lowStock: true,
+        newUser: false,
+    });
 
-    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-
-        localStorage.setItem(
-            'adminSettings',
-            JSON.stringify(settings)
-        );
-
-        alert('Đã lưu cài đặt thành công!');
-    };
-
-    const tabs: {
-        id: TabType;
-        name: string;
-        icon: React.ElementType;
-    }[] = [
-        { id: 'general', name: 'Thông tin chung', icon: Cog6ToothIcon },
-        { id: 'social', name: 'Mạng xã hội', icon: GlobeAltIcon },
-        { id: 'shipping', name: 'Vận chuyển', icon: BellIcon },
-        { id: 'promotion', name: 'Khuyến mãi Tết', icon: SwatchIcon },
-        { id: 'security', name: 'Bảo mật', icon: ShieldCheckIcon }
+    const sections: SettingsSection[] = [
+        { id: 'general', name: 'Thông tin chung', icon: BuildingStorefrontIcon },
+        { id: 'payment', name: 'Thanh toán', icon: CreditCardIcon },
+        { id: 'email', name: 'Email', icon: EnvelopeIcon },
+        { id: 'security', name: 'Bảo mật', icon: ShieldCheckIcon },
+        { id: 'notification', name: 'Thông báo', icon: BellIcon },
+        { id: 'appearance', name: 'Giao diện', icon: PaintBrushIcon },
+        { id: 'api', name: 'API Keys', icon: KeyIcon },
+        { id: 'profile', name: 'Hồ sơ', icon: UserCircleIcon },
     ];
 
-    return (
-        <div>
-            <div className="mb-6">
-                <h1 className="text-2xl font-bold flex items-center gap-2">
-                    <span>Cài Đặt Hệ Thống</span>
-                    <span className="text-2xl">⚙️</span>
-                </h1>
+    const handleSave = async () => {
+        setSaving(true);
+        try {
+            // API calls to save settings
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            notify.success('Đã lưu cài đặt thành công');
+        } catch (error) {
+            notify.error('Lưu cài đặt thất bại');
+        } finally {
+            setSaving(false);
+        }
+    };
 
-                <p className="text-gray-500 mt-1">
-                    Cấu hình thông tin cửa hàng và các chương trình khuyến mãi
+    const renderSection = () => {
+        switch (activeSection) {
+            case 'general':
+                return (
+                    <div className="settings-section">
+                        <div className="section-header">
+                            <h3>Thông tin cửa hàng</h3>
+                            <p>Cấu hình thông tin cơ bản của cửa hàng</p>
+                        </div>
+                        <div className="section-body">
+                            <div className="setting-field">
+                                <label className="setting-label">Tên cửa hàng</label>
+                                <input 
+                                    type="text" 
+                                    className="setting-input"
+                                    value={generalSettings.storeName}
+                                    onChange={(e) => setGeneralSettings({ ...generalSettings, storeName: e.target.value })}
+                                />
+                            </div>
+                            
+                            <div className="setting-field">
+                                <label className="setting-label">Email liên hệ</label>
+                                <input 
+                                    type="email" 
+                                    className="setting-input"
+                                    value={generalSettings.storeEmail}
+                                    onChange={(e) => setGeneralSettings({ ...generalSettings, storeEmail: e.target.value })}
+                                />
+                            </div>
+                            
+                            <div className="setting-field">
+                                <label className="setting-label">Số điện thoại</label>
+                                <input 
+                                    type="tel" 
+                                    className="setting-input"
+                                    value={generalSettings.storePhone}
+                                    onChange={(e) => setGeneralSettings({ ...generalSettings, storePhone: e.target.value })}
+                                />
+                            </div>
+                            
+                            <div className="setting-field">
+                                <label className="setting-label">Địa chỉ</label>
+                                <textarea 
+                                    className="setting-input"
+                                    rows={3}
+                                    value={generalSettings.storeAddress}
+                                    onChange={(e) => setGeneralSettings({ ...generalSettings, storeAddress: e.target.value })}
+                                />
+                            </div>
+                            
+                            <div className="form-row">
+                                <div className="setting-field">
+                                    <label className="setting-label">Thuế suất (%)</label>
+                                    <input 
+                                        type="number" 
+                                        className="setting-input"
+                                        value={generalSettings.taxRate}
+                                        onChange={(e) => setGeneralSettings({ ...generalSettings, taxRate: Number(e.target.value) })}
+                                    />
+                                </div>
+                                
+                                <div className="setting-field">
+                                    <label className="setting-label">Đơn vị tiền tệ</label>
+                                    <select 
+                                        className="setting-select"
+                                        value={generalSettings.currency}
+                                        onChange={(e) => setGeneralSettings({ ...generalSettings, currency: e.target.value })}
+                                    >
+                                        <option value="VND">VND - Việt Nam Đồng</option>
+                                        <option value="USD">USD - US Dollar</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                );
+                
+            case 'payment':
+                return (
+                    <div className="settings-section">
+                        <div className="section-header">
+                            <h3>Cổng thanh toán</h3>
+                            <p>Cấu hình phương thức thanh toán</p>
+                        </div>
+                        <div className="section-body">
+                            <div className="setting-field">
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <div>
+                                        <label className="setting-label">Thanh toán khi nhận hàng (COD)</label>
+                                        <p className="setting-description">Cho phép khách hàng thanh toán khi nhận hàng</p>
+                                    </div>
+                                    <label className="toggle-switch">
+                                        <input 
+                                            type="checkbox" 
+                                            checked={paymentSettings.codEnabled}
+                                            onChange={(e) => setPaymentSettings({ ...paymentSettings, codEnabled: e.target.checked })}
+                                        />
+                                        <span className="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div className="setting-field">
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <div>
+                                        <label className="setting-label">Chuyển khoản ngân hàng</label>
+                                        <p className="setting-description">Cho phép thanh toán qua chuyển khoản ngân hàng</p>
+                                    </div>
+                                    <label className="toggle-switch">
+                                        <input 
+                                            type="checkbox" 
+                                            checked={paymentSettings.bankingEnabled}
+                                            onChange={(e) => setPaymentSettings({ ...paymentSettings, bankingEnabled: e.target.checked })}
+                                        />
+                                        <span className="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            {paymentSettings.bankingEnabled && (
+                                <>
+                                    <div className="setting-field">
+                                        <label className="setting-label">Ngân hàng</label>
+                                        <input 
+                                            type="text" 
+                                            className="setting-input"
+                                            value={paymentSettings.bankName}
+                                            onChange={(e) => setPaymentSettings({ ...paymentSettings, bankName: e.target.value })}
+                                        />
+                                    </div>
+                                    
+                                    <div className="setting-field">
+                                        <label className="setting-label">Số tài khoản</label>
+                                        <input 
+                                            type="text" 
+                                            className="setting-input"
+                                            value={paymentSettings.bankAccount}
+                                            onChange={(e) => setPaymentSettings({ ...paymentSettings, bankAccount: e.target.value })}
+                                        />
+                                    </div>
+                                    
+                                    <div className="setting-field">
+                                        <label className="setting-label">Chủ tài khoản</label>
+                                        <input 
+                                            type="text" 
+                                            className="setting-input"
+                                            value={paymentSettings.bankHolder}
+                                            onChange={(e) => setPaymentSettings({ ...paymentSettings, bankHolder: e.target.value })}
+                                        />
+                                    </div>
+                                </>
+                            )}
+                            
+                            <div className="setting-field">
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <div>
+                                        <label className="setting-label">Ví Momo</label>
+                                        <p className="setting-description">Thanh toán qua ví điện tử Momo</p>
+                                    </div>
+                                    <label className="toggle-switch">
+                                        <input 
+                                            type="checkbox" 
+                                            checked={paymentSettings.momoEnabled}
+                                            onChange={(e) => setPaymentSettings({ ...paymentSettings, momoEnabled: e.target.checked })}
+                                        />
+                                        <span className="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                );
+                
+            case 'security':
+                return (
+                    <div className="settings-section">
+                        <div className="section-header">
+                            <h3>Cài đặt bảo mật</h3>
+                            <p>Cấu hình bảo mật cho hệ thống</p>
+                        </div>
+                        <div className="section-body">
+                            <div className="setting-field">
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <div>
+                                        <label className="setting-label">Xác thực 2 yếu tố (2FA)</label>
+                                        <p className="setting-description">Tăng cường bảo mật cho tài khoản admin</p>
+                                    </div>
+                                    <label className="toggle-switch">
+                                        <input 
+                                            type="checkbox" 
+                                            checked={securitySettings.twoFactorAuth}
+                                            onChange={(e) => setSecuritySettings({ ...securitySettings, twoFactorAuth: e.target.checked })}
+                                        />
+                                        <span className="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div className="form-row">
+                                <div className="setting-field">
+                                    <label className="setting-label">Thời gian session (phút)</label>
+                                    <input 
+                                        type="number" 
+                                        className="setting-input"
+                                        value={securitySettings.sessionTimeout}
+                                        onChange={(e) => setSecuritySettings({ ...securitySettings, sessionTimeout: Number(e.target.value) })}
+                                    />
+                                </div>
+                                
+                                <div className="setting-field">
+                                    <label className="setting-label">Thời hạn mật khẩu (ngày)</label>
+                                    <input 
+                                        type="number" 
+                                        className="setting-input"
+                                        value={securitySettings.passwordExpiry}
+                                        onChange={(e) => setSecuritySettings({ ...securitySettings, passwordExpiry: Number(e.target.value) })}
+                                    />
+                                </div>
+                            </div>
+                            
+                            <div className="setting-field">
+                                <label className="setting-label">Số lần đăng nhập sai tối đa</label>
+                                <input 
+                                    type="number" 
+                                    className="setting-input"
+                                    value={securitySettings.maxLoginAttempts}
+                                    onChange={(e) => setSecuritySettings({ ...securitySettings, maxLoginAttempts: Number(e.target.value) })}
+                                />
+                                <p className="setting-description">Khóa tài khoản sau số lần đăng nhập sai này</p>
+                            </div>
+                            
+                            <div className="setting-field">
+                                <label className="setting-label">IP Whitelist</label>
+                                <textarea 
+                                    className="setting-input"
+                                    rows={3}
+                                    placeholder="Nhập các IP được phép, mỗi IP trên một dòng"
+                                    value={securitySettings.ipWhitelist}
+                                    onChange={(e) => setSecuritySettings({ ...securitySettings, ipWhitelist: e.target.value })}
+                                />
+                                <p className="setting-description">Chỉ cho phép truy cập từ các IP này (để trống để cho phép tất cả)</p>
+                            </div>
+                        </div>
+                        
+                        <div className="danger-zone">
+                            <div className="danger-header">
+                                <h3>⚠️ Vùng nguy hiểm</h3>
+                            </div>
+                            <div className="danger-body">
+                                <p>Reset tất cả cài đặt về mặc định. Hành động này không thể hoàn tác.</p>
+                                <button 
+                                    className="danger-btn"
+                                    onClick={() => {
+                                        if (window.confirm('Bạn có chắc chắn muốn reset tất cả cài đặt?')) {
+                                            notify.warning('Đã reset cài đặt về mặc định');
+                                        }
+                                    }}
+                                >
+                                    Reset cài đặt
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                );
+                
+            default:
+                return (
+                    <div className="settings-section">
+                        <div className="section-header">
+                            <h3>Đang phát triển</h3>
+                            <p>Tính năng đang được cập nhật</p>
+                        </div>
+                        <div className="section-body">
+                            <div className="empty-state" style={{ padding: 'var(--space-12)' }}>
+                                <div className="empty-state-icon">🚧</div>
+                                <div className="empty-state-title">Đang xây dựng</div>
+                                <div className="empty-state-description">Tính năng này sẽ sớm được cập nhật</div>
+                            </div>
+                        </div>
+                    </div>
+                );
+        }
+    };
+
+    return (
+        <div className="settings-container">
+            {/* Header */}
+            <div className="settings-header">
+                <h1 className="settings-title">
+                    ⚙️ Cài Đặt Hệ Thống
+                </h1>
+                <p className="settings-subtitle">
+                    Cấu hình thông tin cửa hàng, thanh toán, bảo mật và các tùy chỉnh khác
                 </p>
             </div>
 
-            <div className="flex gap-6">
-                {/* Sidebar */}
-                <div className="w-64 flex-shrink-0">
-                    <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-                        {tabs.map((tab) => (
+            {/* Settings Layout */}
+            <div className="settings-layout">
+                {/* Sidebar Navigation */}
+                <div className="settings-sidebar">
+                    <div className="settings-nav">
+                        {sections.map((section) => (
                             <button
-                                key={tab.id}
-                                type="button"
-                                onClick={() => setActiveTab(tab.id)}
-                                className={`w-full flex items-center gap-3 px-4 py-3 text-left transition ${
-                                    activeTab === tab.id
-                                        ? 'bg-red-50 text-red-700 border-r-4 border-red-600'
-                                        : 'hover:bg-gray-50 text-gray-700'
-                                }`}
+                                key={section.id}
+                                className={`settings-nav-item ${activeSection === section.id ? 'active' : ''}`}
+                                onClick={() => setActiveSection(section.id)}
                             >
-                                <tab.icon className="h-5 w-5" />
-
-                                <span className="text-sm font-medium">
-                                    {tab.name}
-                                </span>
+                                <section.icon className="settings-nav-icon" />
+                                <span className="settings-nav-text">{section.name}</span>
                             </button>
                         ))}
                     </div>
                 </div>
 
                 {/* Content */}
-                <div className="flex-1">
-                    <form
-                        onSubmit={handleSubmit}
-                        className="bg-white rounded-2xl shadow-sm p-6"
-                    >
-                        {/* General */}
-                        {activeTab === 'general' && (
-                            <div className="space-y-4">
-                                <h3 className="font-semibold text-lg mb-4">
-                                    Thông tin cửa hàng
-                                </h3>
-
-                                <div>
-                                    <label className="block text-sm font-medium mb-1">
-                                        Tên cửa hàng
-                                    </label>
-
-                                    <input
-                                        type="text"
-                                        name="siteName"
-                                        value={settings.siteName}
-                                        onChange={handleChange}
-                                        className="admin-input w-full px-4 py-2"
-                                    />
-                                </div>
-
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="block text-sm font-medium mb-1">
-                                            Email liên hệ
-                                        </label>
-
-                                        <input
-                                            type="email"
-                                            name="siteEmail"
-                                            value={settings.siteEmail}
-                                            onChange={handleChange}
-                                            className="admin-input w-full px-4 py-2"
-                                        />
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-sm font-medium mb-1">
-                                            Số điện thoại
-                                        </label>
-
-                                        <input
-                                            type="text"
-                                            name="sitePhone"
-                                            value={settings.sitePhone}
-                                            onChange={handleChange}
-                                            className="admin-input w-full px-4 py-2"
-                                        />
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium mb-1">
-                                        Địa chỉ
-                                    </label>
-
-                                    <textarea
-                                        name="address"
-                                        value={settings.address}
-                                        onChange={handleChange}
-                                        rows={3}
-                                        className="admin-input w-full px-4 py-2"
-                                    />
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Social */}
-                        {activeTab === 'social' && (
-                            <div className="space-y-4">
-                                <h3 className="font-semibold text-lg mb-4">
-                                    Mạng xã hội
-                                </h3>
-
-                                <div>
-                                    <label className="block text-sm font-medium mb-1">
-                                        Facebook
-                                    </label>
-
-                                    <input
-                                        type="url"
-                                        name="facebook"
-                                        value={settings.facebook}
-                                        onChange={handleChange}
-                                        className="admin-input w-full px-4 py-2"
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium mb-1">
-                                        Instagram
-                                    </label>
-
-                                    <input
-                                        type="url"
-                                        name="instagram"
-                                        value={settings.instagram}
-                                        onChange={handleChange}
-                                        className="admin-input w-full px-4 py-2"
-                                    />
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Shipping */}
-                        {activeTab === 'shipping' && (
-                            <div className="space-y-4">
-                                <h3 className="font-semibold text-lg mb-4">
-                                    Cài đặt vận chuyển
-                                </h3>
-
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="block text-sm font-medium mb-1">
-                                            Phí vận chuyển (VNĐ)
-                                        </label>
-
-                                        <input
-                                            type="number"
-                                            name="shippingFee"
-                                            value={settings.shippingFee}
-                                            onChange={handleChange}
-                                            className="admin-input w-full px-4 py-2"
-                                        />
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-sm font-medium mb-1">
-                                            Miễn phí ship (VNĐ)
-                                        </label>
-
-                                        <input
-                                            type="number"
-                                            name="freeShippingMin"
-                                            value={settings.freeShippingMin}
-                                            onChange={handleChange}
-                                            className="admin-input w-full px-4 py-2"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Promotion */}
-                        {activeTab === 'promotion' && (
-                            <div className="space-y-4">
-                                <h3 className="font-semibold text-lg mb-4">
-                                    Khuyến mãi Tết Bính Ngọ 2026
-                                </h3>
-
-                                <div className="flex items-center gap-3">
-                                    <input
-                                        type="checkbox"
-                                        name="tetPromotion"
-                                        checked={settings.tetPromotion}
-                                        onChange={handleChange}
-                                        className="w-5 h-5"
-                                    />
-
-                                    <label className="text-sm font-medium">
-                                        Kích hoạt chương trình khuyến mãi Tết
-                                    </label>
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium mb-1">
-                                        Giá trị giảm giá (%)
-                                    </label>
-
-                                    <input
-                                        type="number"
-                                        name="promotionValue"
-                                        value={settings.promotionValue}
-                                        onChange={handleChange}
-                                        className="admin-input w-48 px-4 py-2"
-                                    />
-                                </div>
-
-                                <div className="bg-yellow-50 p-4 rounded-xl">
-                                    <p className="text-sm text-yellow-800">
-                                        🧧 Chương trình khuyến mãi Tết sẽ tự động
-                                        áp dụng cho đơn hàng từ 500.000đ
-                                    </p>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Security */}
-                        {activeTab === 'security' && (
-                            <div className="space-y-4">
-                                <h3 className="font-semibold text-lg mb-4">
-                                    Bảo mật hệ thống
-                                </h3>
-
-                                <div className="flex items-center gap-3">
-                                    <input
-                                        type="checkbox"
-                                        name="maintenanceMode"
-                                        checked={settings.maintenanceMode}
-                                        onChange={handleChange}
-                                        className="w-5 h-5"
-                                    />
-
-                                    <label className="text-sm font-medium">
-                                        Chế độ bảo trì (chỉ Admin mới truy cập
-                                        được)
-                                    </label>
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium mb-1">
-                                        Đổi mật khẩu Admin
-                                    </label>
-
-                                    <div className="flex gap-3">
-                                        <input
-                                            type="password"
-                                            placeholder="Mật khẩu mới"
-                                            className="admin-input flex-1 px-4 py-2"
-                                        />
-
-                                        <button
-                                            type="button"
-                                            className="admin-btn-primary px-4 py-2"
-                                        >
-                                            Cập nhật
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-
-                        <div className="mt-6 pt-4 border-t border-gray-200">
-                            <button
-                                type="submit"
-                                className="admin-btn-primary px-6 py-2"
-                            >
-                                Lưu cài đặt
-                            </button>
-                        </div>
-                    </form>
+                <div className="settings-content">
+                    {renderSection()}
+                    
+                    {/* Save Button */}
+                    <div className="save-settings">
+                        <button 
+                            className="save-btn"
+                            onClick={handleSave}
+                            disabled={saving}
+                        >
+                            {saving ? 'Đang lưu...' : 'Lưu cài đặt'}
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

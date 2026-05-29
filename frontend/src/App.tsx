@@ -2,7 +2,14 @@
 // 1. IMPORT LIBRARIES
 // =======================
 import React, { useState, useEffect } from 'react';
-import { Routes, Route, useNavigate, useLocation, Navigate, BrowserRouter } from 'react-router-dom';
+import {
+    Routes,
+    Route,
+    useNavigate,
+    useLocation,
+    Navigate,
+} from 'react-router-dom';
+
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
 // =======================
@@ -11,7 +18,6 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import ScrollToTop from './components/ScrollToTop';
-import Wishlist from './Pages/Wishlist';
 
 // =======================
 // 3. IMPORT PAGES (CLIENT)
@@ -31,295 +37,517 @@ import About from './Pages/About';
 import Chatbox from './Pages/Chatbox';
 import ChatWidget from './Pages/ChatWidget';
 import OrderDetail from './Pages/OrderDetail';
+import Wishlist from './Pages/Wishlist';
 import LuckyWheel from './Pages/LuckyWheel';
 
 // =======================
-// 4. IMPORT ADMIN COMPONENTS
+// 4. IMPORT ADMIN PAGES
 // =======================
-import AdminLayout from './admin/components/AdminLayout';
+import AdminLayout from './admin/layouts/AdminLayout';
+
 import Dashboard from './admin/pages/Dashboard';
-import AdminProducts from './admin/pages/Products';
-import AdminOrders from './admin/pages/Orders';
-import AdminUsers from './admin/pages/Users';
-import AdminGames from './admin/pages/Games';
-import AdminSettings from './admin/pages/Settings';
+import Products from './admin/pages/Products';
+import Users from './admin/pages/Users';
+import Games from './admin/pages/Games';
+import Orders from './admin/pages/Orders';
+import Analytics from './admin/pages/Analytics';
+import Promotions from './admin/pages/Promotions';
+import Settings from './admin/pages/Settings';
 
 // =======================
 // 5. CONTEXT / TYPES / STYLES
 // =======================
 import { CartProvider } from './context/CartContext';
 import { User } from './types/model';
+
 import './Styles/global.css';
-import './admin/styles/admin.css';
+import './admin/styles/index.css';
 
 // =======================
-// 6. PROTECTED ROUTE COMPONENT
+// 6. PROTECTED ROUTE
 // =======================
-const ProtectedRoute = ({
-    children,
-}: {
+interface ProtectedRouteProps {
     children: React.ReactNode;
-}) => {
+    currentUser: User | null;
+}
 
-    const userStr = localStorage.getItem('user');
-
-    if (!userStr) {
-        return <Navigate to="/login" replace />;
-    }
-
-    try {
-        const user: User = JSON.parse(userStr);
-
-        const roles = user.roles || [];
-
-        // Chấp nhận cả ADMIN và ROLE_ADMIN
-        const isAdmin =
-            roles.includes('ROLE_ADMIN') ||
-            roles.includes('ADMIN');
-
-        if (!isAdmin) {
-            return <Navigate to="/" replace />;
-        }
-
-        return <>{children}</>;
-
-    } catch (error) {
-        return <Navigate to="/login" replace />;
-    }
-};
-// =======================
-// 7. MAIN LAYOUT (CLIENT)
-// =======================
-const MainLayout = ({
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     children,
     currentUser,
-    onLogout,
-}: {
+}) => {
+    // Chưa login
+    if (!currentUser) {
+        return <Navigate to="/login" replace />;
+    }
+
+    // Kiểm tra role admin
+    const roles = currentUser.roles || [];
+
+    const isAdmin =
+        roles.includes('ROLE_ADMIN') ||
+        roles.includes('ADMIN');
+
+    // Không phải admin
+    if (!isAdmin) {
+        return <Navigate to="/" replace />;
+    }
+
+    return <>{children}</>;
+};
+
+// =======================
+// 7. MAIN LAYOUT
+// =======================
+interface MainLayoutProps {
     children: React.ReactNode;
     currentUser: User | null;
     onLogout: () => void;
+}
+
+const MainLayout: React.FC<MainLayoutProps> = ({
+    children,
+    currentUser,
+    onLogout,
 }) => {
     return (
         <>
-            <Header currentUser={currentUser} onLogout={onLogout} />
-            <main style={{ minHeight: '80vh', paddingTop: '20px' }}>
+            <Header
+                currentUser={currentUser}
+                onLogout={onLogout}
+            />
+
+            <main
+                style={{
+                    minHeight: '80vh',
+                    paddingTop: '20px',
+                }}
+            >
                 {children}
             </main>
+
             <Footer />
-            <ScrollToTop />  
+
+            <ScrollToTop />
+
             <ChatWidget currentUser={currentUser} />
         </>
     );
 };
 
 // =======================
-// 8. ADMIN ROUTES COMPONENT
-// =======================
-const AdminRoutes = ({ currentUser }: { currentUser: User | null }) => {
-    return (
-        <Routes>
-         <Route path="" element={   
-                <ProtectedRoute >
-                    <AdminLayout>
-                        <Dashboard />
-                    </AdminLayout>
-                </ProtectedRoute>
-            } />
-            <Route path="products" element={
-                <ProtectedRoute >
-                    <AdminLayout>
-                        <AdminProducts />
-                    </AdminLayout>
-                </ProtectedRoute>
-            } />
-            <Route path="orders" element={
-                <ProtectedRoute >
-                    <AdminLayout>
-                        <AdminOrders />
-                    </AdminLayout>
-                </ProtectedRoute>
-            } />
-            <Route path="users" element={
-                <ProtectedRoute >
-                    <AdminLayout>
-                        <AdminUsers />
-                    </AdminLayout>
-                </ProtectedRoute>
-            } />
-            <Route path="games" element={
-                <ProtectedRoute >
-                    <AdminLayout>
-                        <AdminGames />
-                    </AdminLayout>
-                </ProtectedRoute>
-            } />
-            <Route path="settings" element={
-                <ProtectedRoute>
-                    <AdminLayout>
-                        <AdminSettings />
-                    </AdminLayout>
-                </ProtectedRoute>
-            } />
-            <Route path="*" element={<Navigate to="/admin" replace />} />
-        </Routes>
-    );
-};
-
-// =======================
-// 9. APP COMPONENT
+// 8. APP COMPONENT
 // =======================
 function App() {
     const navigate = useNavigate();
     const location = useLocation();
 
-    // ----- USER STATE -----
-    const [currentUser, setCurrentUser] = useState<User | null>(() => {
-        const storedUser = localStorage.getItem('user');
-        try {
-            return storedUser ? JSON.parse(storedUser) : null;
-        } catch (e) {
-            return null;
-        }
-    });
+    // =======================
+    // USER STATE
+    // =======================
+    const [currentUser, setCurrentUser] =
+        useState<User | null>(() => {
+            const storedUser =
+                localStorage.getItem('user');
 
-    // ----- AUTH HANDLERS -----
+            try {
+                return storedUser
+                    ? JSON.parse(storedUser)
+                    : null;
+            } catch (error) {
+                console.error(
+                    'Parse user error:',
+                    error
+                );
+                return null;
+            }
+        });
+
+    // =======================
+    // LOGIN SUCCESS
+    // =======================
     const handleLoginSuccess = (user: User) => {
         setCurrentUser(user);
-        localStorage.setItem('user', JSON.stringify(user));
-        const redirectPath = location.state?.from || '/';
+
+        localStorage.setItem(
+            'user',
+            JSON.stringify(user)
+        );
+
+        const redirectPath =
+            (location.state as any)?.from || '/';
+
         navigate(redirectPath);
     };
 
+    // =======================
+    // LOGOUT
+    // =======================
     const handleLogout = () => {
         localStorage.removeItem('user');
+
         setCurrentUser(null);
+
         navigate('/login');
     };
 
-    // ----- SCROLL TO TOP -----
+    // =======================
+    // SCROLL TO TOP
+    // =======================
     useEffect(() => {
         window.scrollTo(0, 0);
     }, [location.pathname]);
-
-    // Kiểm tra nếu đang ở route admin thì không dùng MainLayout
-    const isAdminRoute = location.pathname.startsWith('/admin');
 
     return (
         <CartProvider currentUser={currentUser}>
             <div className="App">
                 <Routes>
-                    {/* ===== ADMIN ROUTES (Không dùng MainLayout) ===== */}
-                    <Route path="/admin/*" element={<AdminRoutes currentUser={currentUser} />} />
 
-                    {/* ===== AUTH ROUTES ===== */}
-                    <Route path="/login" element={
-                        currentUser ? <Navigate to="/" /> : (
+                    {/* =======================
+                        ADMIN ROUTES
+                    ======================= */}
+                    <Route
+                        path="/admin"
+                        element={
+                            <ProtectedRoute
+                                currentUser={currentUser}
+                            >
+                                <AdminLayout />
+                            </ProtectedRoute>
+                        }
+                    >
+                        <Route
+                            index
+                            element={<Dashboard />}
+                        />
+
+                        <Route
+                            path="products"
+                            element={<Products />}
+                        />
+
+                        <Route
+                            path="users"
+                            element={<Users />}
+                        />
+
+                        <Route
+                            path="games"
+                            element={<Games />}
+                        />
+
+                        <Route
+                            path="orders"
+                            element={<Orders />}
+                        />
+
+                        <Route
+                            path="analytics"
+                            element={<Analytics />}
+                        />
+
+                        <Route
+                            path="promotions"
+                            element={<Promotions />}
+                        />
+
+                        <Route
+                            path="settings"
+                            element={<Settings />}
+                        />
+                    </Route>
+
+                    {/* =======================
+                        LOGIN
+                    ======================= */}
+                    <Route
+                        path="/login"
+                        element={
+                            currentUser ? (
+                                <Navigate to="/" />
+                            ) : (
+                                <div className="auth-page-wrapper">
+                                    <Login
+                                        onLoginSuccess={
+                                            handleLoginSuccess
+                                        }
+                                        onSwitchToRegister={() =>
+                                            navigate('/register')
+                                        }
+                                        onSwitchToForgot={() =>
+                                            navigate(
+                                                '/forgot-password'
+                                            )
+                                        }
+                                        onClose={() =>
+                                            navigate('/')
+                                        }
+                                    />
+                                </div>
+                            )
+                        }
+                    />
+
+                    {/* =======================
+                        REGISTER
+                    ======================= */}
+                    <Route
+                        path="/register"
+                        element={
                             <div className="auth-page-wrapper">
-                                <Login
-                                    onLoginSuccess={handleLoginSuccess}
-                                    onSwitchToRegister={() => navigate('/register')}
-                                    onSwitchToForgot={() => navigate('/forgot-password')}
-                                    onClose={() => navigate('/')}
+                                <Register
+                                    onSwitchToLogin={() =>
+                                        navigate('/login')
+                                    }
+                                    onClose={() =>
+                                        navigate('/')
+                                    }
                                 />
                             </div>
-                        )
-                    } />
+                        }
+                    />
 
-                    <Route path="/register" element={
-                        <div className="auth-page-wrapper">
-                            <Register
-                                onSwitchToLogin={() => navigate('/login')}
-                                onClose={() => navigate('/')}
+                    {/* =======================
+                        FORGOT PASSWORD
+                    ======================= */}
+                    <Route
+                        path="/forgot-password"
+                        element={
+                            <div className="auth-page-wrapper">
+                                <ForgotPassword
+                                    onSwitchToLogin={() =>
+                                        navigate('/login')
+                                    }
+                                    onClose={() =>
+                                        navigate('/')
+                                    }
+                                />
+                            </div>
+                        }
+                    />
+
+                    {/* =======================
+                        HOME
+                    ======================= */}
+                    <Route
+                        path="/"
+                        element={
+                            <MainLayout
+                                currentUser={currentUser}
+                                onLogout={handleLogout}
+                            >
+                                <Home
+                                    currentUser={currentUser}
+                                />
+                            </MainLayout>
+                        }
+                    />
+
+                    {/* =======================
+                        PRODUCTS
+                    ======================= */}
+                    <Route
+                        path="/products"
+                        element={
+                            <MainLayout
+                                currentUser={currentUser}
+                                onLogout={handleLogout}
+                            >
+                                <Product
+                                    currentUser={currentUser}
+                                />
+                            </MainLayout>
+                        }
+                    />
+
+                    {/* =======================
+                        PRODUCT DETAIL
+                    ======================= */}
+                    <Route
+                        path="/products/:id"
+                        element={
+                            <MainLayout
+                                currentUser={currentUser}
+                                onLogout={handleLogout}
+                            >
+                                <ProductDetail
+                                    currentUser={currentUser}
+                                    onLogout={handleLogout}
+                                />
+                            </MainLayout>
+                        }
+                    />
+
+                    {/* =======================
+                        PROFILE
+                    ======================= */}
+                    <Route
+                        path="/profile"
+                        element={
+                            <MainLayout
+                                currentUser={currentUser}
+                                onLogout={handleLogout}
+                            >
+                                <Profile
+                                    currentUser={currentUser}
+                                    onLogout={handleLogout}
+                                />
+                            </MainLayout>
+                        }
+                    />
+
+                    {/* =======================
+                        CHAT
+                    ======================= */}
+                    <Route
+                        path="/chat"
+                        element={
+                            <MainLayout
+                                currentUser={currentUser}
+                                onLogout={handleLogout}
+                            >
+                                <Chatbox
+                                    currentUser={currentUser}
+                                />
+                            </MainLayout>
+                        }
+                    />
+
+                    {/* =======================
+                        ABOUT
+                    ======================= */}
+                    <Route
+                        path="/about"
+                        element={
+                            <MainLayout
+                                currentUser={currentUser}
+                                onLogout={handleLogout}
+                            >
+                                <About
+                                    currentUser={currentUser}
+                                />
+                            </MainLayout>
+                        }
+                    />
+
+                    {/* =======================
+                        CHECKOUT
+                    ======================= */}
+                    <Route
+                        path="/checkout"
+                        element={
+                            <MainLayout
+                                currentUser={currentUser}
+                                onLogout={handleLogout}
+                            >
+                                <Checkout
+                                    currentUser={currentUser}
+                                />
+                            </MainLayout>
+                        }
+                    />
+
+                    {/* =======================
+                        CART
+                    ======================= */}
+                    <Route
+                        path="/cart"
+                        element={
+                            <MainLayout
+                                currentUser={currentUser}
+                                onLogout={handleLogout}
+                            >
+                                <Cart
+                                    currentUser={currentUser}
+                                />
+                            </MainLayout>
+                        }
+                    />
+
+                    {/* =======================
+                        ORDERS
+                    ======================= */}
+                    <Route
+                        path="/orders"
+                        element={
+                            <MainLayout
+                                currentUser={currentUser}
+                                onLogout={handleLogout}
+                            >
+                                <OrderHistory
+                                    currentUser={currentUser}
+                                />
+                            </MainLayout>
+                        }
+                    />
+
+                    {/* =======================
+                        ORDER DETAIL
+                    ======================= */}
+                    <Route
+                        path="/order-detail/:id"
+                        element={
+                            <MainLayout
+                                currentUser={currentUser}
+                                onLogout={handleLogout}
+                            >
+                                <OrderDetail />
+                            </MainLayout>
+                        }
+                    />
+
+                    {/* =======================
+                        WISHLIST
+                    ======================= */}
+                    <Route
+                        path="/wishlist"
+                        element={
+                            <MainLayout
+                                currentUser={currentUser}
+                                onLogout={handleLogout}
+                            >
+                                <Wishlist />
+                            </MainLayout>
+                        }
+                    />
+
+                    {/* =======================
+                        GAMES
+                    ======================= */}
+                    <Route
+                        path="/games"
+                        element={
+                            <MainLayout
+                                currentUser={currentUser}
+                                onLogout={handleLogout}
+                            >
+                                <LuckyWheel
+                                    currentUser={currentUser}
+                                    onLogout={handleLogout}
+                                />
+                            </MainLayout>
+                        }
+                    />
+
+                    {/* =======================
+                        VNPAY
+                    ======================= */}
+                    <Route
+                        path="/vnpay-return"
+                        element={<VNPayReturn />}
+                    />
+
+                    {/* =======================
+                        404
+                    ======================= */}
+                    <Route
+                        path="*"
+                        element={
+                            <Navigate
+                                to="/"
+                                replace
                             />
-                        </div>
-                    } />
-
-                    <Route path="/forgot-password" element={
-                        <div className="auth-page-wrapper">
-                            <ForgotPassword
-                                onSwitchToLogin={() => navigate('/login')}
-                                onClose={() => navigate('/')}
-                            />
-                        </div>
-                    } />
-
-                    {/* ===== MAIN CLIENT ROUTES (Sử dụng MainLayout) ===== */}
-                    <Route path="/" element={
-                        <MainLayout currentUser={currentUser} onLogout={handleLogout}>
-                            <Home currentUser={currentUser} />
-                        </MainLayout>
-                    } />
-
-                    <Route path="/products" element={
-                        <MainLayout currentUser={currentUser} onLogout={handleLogout}>
-                            <Product currentUser={currentUser} />
-                        </MainLayout>
-                    } />
-
-                    <Route path="/profile" element={
-                        <MainLayout currentUser={currentUser} onLogout={handleLogout}>
-                            <Profile currentUser={currentUser} onLogout={handleLogout} />
-                        </MainLayout>
-                    } />
-
-                    <Route path="/chat" element={
-                        <MainLayout currentUser={currentUser} onLogout={handleLogout}>
-                            <Chatbox currentUser={currentUser} />
-                        </MainLayout>
-                    } />
-
-                    <Route path="/about" element={
-                        <MainLayout currentUser={currentUser} onLogout={handleLogout}>
-                            <About currentUser={currentUser} />
-                        </MainLayout>
-                    } />
-
-                    <Route path="/products/:id" element={
-                        <MainLayout currentUser={currentUser} onLogout={handleLogout}>
-                            <ProductDetail currentUser={currentUser} onLogout={handleLogout} />
-                        </MainLayout>
-                    } />
-
-                    <Route path="/checkout" element={
-                        <MainLayout currentUser={currentUser} onLogout={handleLogout}>
-                            <Checkout currentUser={currentUser} />
-                        </MainLayout>
-                    } />
-
-                    <Route path="/cart" element={
-                        <MainLayout currentUser={currentUser} onLogout={handleLogout}>
-                            <Cart currentUser={currentUser} />
-                        </MainLayout>
-                    } />
-
-                    <Route path="/orders" element={
-                        <MainLayout currentUser={currentUser} onLogout={handleLogout}>
-                            <OrderHistory currentUser={currentUser} />
-                        </MainLayout>
-                    } />
-
-                    <Route path="/wishlist" element={
-                        <MainLayout currentUser={currentUser} onLogout={handleLogout}>
-                            <Wishlist />
-                        </MainLayout>
-                    } />
-
-                    <Route path="/games" element={
-                        <MainLayout currentUser={currentUser} onLogout={handleLogout}>
-                            <LuckyWheel currentUser={currentUser} onLogout={handleLogout} />
-                        </MainLayout>
-                    } />
-
-                    <Route path="/vnpay-return" element={<VNPayReturn />} />
-                    
-                    <Route path="/order-detail/:id" element={
-                        <MainLayout currentUser={currentUser} onLogout={handleLogout}>
-                            <OrderDetail />
-                        </MainLayout>
-                    } />
-
-                    {/* Route 404 */}
-                    <Route path="*" element={<Navigate to="/" replace />} />
+                        }
+                    />
                 </Routes>
             </div>
         </CartProvider>
