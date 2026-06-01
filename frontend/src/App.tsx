@@ -62,6 +62,7 @@ import { User } from './types/model';
 
 import './Styles/global.css';
 import './admin/styles/index.css';
+import PaymentSuccess from './Pages/PaymentSuccess';
 
 // =======================
 // 6. PROTECTED ROUTE
@@ -445,6 +446,7 @@ function App() {
                             </MainLayout>
                         }
                     />
+                    <Route path="/payment-success" element={<PaymentSuccess />} />
 
                     {/* =======================
                         CART
