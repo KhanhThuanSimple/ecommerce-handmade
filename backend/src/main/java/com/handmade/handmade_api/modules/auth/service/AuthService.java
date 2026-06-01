@@ -1,7 +1,9 @@
 package com.handmade.handmade_api.modules.auth.service;
 
 import com.handmade.handmade_api.modules.auth.repository.UserRepository;
-import com.handmade.handmade_api.modules.auth.repository.RoleRepository; // 1. Thêm import này
+import com.handmade.handmade_api.modules.auth.repository.RoleRepository;
+import com.handmade.handmade_api.modules.users.dto.UserProfileResponse;
+import com.handmade.handmade_api.modules.users.service.UserService; // 1. Thêm import này
 import com.handmade.handmade_api.modules.auth.entity.Role;               // 2. Thêm import này
 import com.handmade.handmade_api.modules.auth.dto.AuthResponse;
 import com.handmade.handmade_api.modules.auth.dto.LoginRequest;
@@ -36,6 +38,9 @@ public class AuthService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private UserService userService;
+
     public AuthResponse login(LoginRequest loginRequest) {
         // ... (Giữ nguyên code login cũ của bạn, nó hoàn toàn chạy tốt)
         Authentication authentication = authenticationManager.authenticate(
@@ -50,16 +55,17 @@ public class AuthService {
         User user = userRepository.findByEmail(loginRequest.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
+        UserProfileResponse profile = userService.getProfile(user.getId());
+
         AuthResponse res = new AuthResponse();
-        res.setId(user.getId());
-        res.setEmail(user.getEmail());
-        res.setFullName(user.getFullName());
-
-        List<String> roles = user.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toList());
-
-        res.setRoles(roles);
+        res.setId(profile.getId());
+        res.setEmail(profile.getEmail());
+        res.setUsername(profile.getUsername());
+        res.setFullName(profile.getFullName());
+        res.setRoles(profile.getRoles());
+        res.setWishlist(profile.getWishlist());
+        res.setPoints(profile.getPoints());
+        res.setLastSpinDate(profile.getLastSpinDate());
         return res;
     }
 

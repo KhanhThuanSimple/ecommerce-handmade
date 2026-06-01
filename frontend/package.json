@@ -2,6 +2,7 @@
   "name": "untitled",
   "version": "0.1.0",
   "private": true,
+  "proxy": "http://localhost:8080",
   "dependencies": {
     "@babel/core": "^7.16.0",
     "@fortawesome/fontawesome-free": "^7.1.0",

@@ -1,6 +1,5 @@
 package com.handmade.handmade_api.modules.reviews.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,8 +16,19 @@ import java.util.List;
 @CrossOrigin(originPatterns = "*", allowCredentials = "true")
 public class ReviewController {
 
-    @Autowired
-    private ReviewService reviewService;
+    private final ReviewService reviewService;
+
+    public ReviewController(ReviewService reviewService) {
+        this.reviewService = reviewService;
+    }
+
+    @GetMapping("/can-review")
+    public ResponseEntity<java.util.Map<String, Boolean>> canReview(
+            @RequestParam Long userId,
+            @RequestParam Long productId) {
+        boolean allowed = reviewService.canUserReview(userId, productId);
+        return ResponseEntity.ok(java.util.Map.of("canReview", allowed));
+    }
 
     // 1. API Lấy danh sách Review theo Product ID
     // Khớp URL FE gọi: /reviews/products/{productId}
