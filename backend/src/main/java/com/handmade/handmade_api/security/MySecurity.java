@@ -14,6 +14,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfigurationSource;
 
 @Configuration
@@ -83,6 +84,9 @@ public class MySecurity {
                         .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/product-images/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/reviews/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/reviews/can-review").permitAll()
+                        // Allow public access to prizes endpoint
+                        .requestMatchers("/api/prizes", "/api/prizes/**").permitAll()
 
                         // VNPay return & IPN (VNPay server / redirect không gửi Basic Auth)
                         .requestMatchers("/api/vnpay/return", "/api/vnpay/ipn").permitAll()

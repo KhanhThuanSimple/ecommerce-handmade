@@ -1,5 +1,7 @@
 package com.handmade.handmade_api.modules.auth.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.handmade.handmade_api.modules.luckywheel.entity.UserSpinProfile;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -41,7 +43,6 @@ public class User implements UserDetails {
     @Column(name = "account_non_locked")
     private boolean accountNonLocked = true;
 
-    // QUAN TRỌNG: Map quan hệ Nhiều-Nhiều với bảng roles thông qua bảng trung gian user_roles
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_roles",
@@ -50,23 +51,19 @@ public class User implements UserDetails {
     )
     private Set<Role> roles;
 
-    // Chuyển đổi từ dữ liệu Set<Role> trong DB sang danh sách Authority mà Spring Security hiểu
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private UserSpinProfile spinProfile;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles.stream()
-                .map(role -> new SimpleGrantedAuthority(role.getName())) // role.getName() trả về "ROLE_ADMIN"...
+                .map(role -> new SimpleGrantedAuthority(role.getName()))
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public boolean isAccountNonExpired() { return true; }
-
-    @Override
-    public boolean isAccountNonLocked() { return this.accountNonLocked; }
-
-    @Override
-    public boolean isCredentialsNonExpired() { return true; }
-
-    @Override
-    public boolean isEnabled() { return this.enabled; }
+    @Override public boolean isAccountNonExpired() { return true; }
+    @Override public boolean isAccountNonLocked() { return this.accountNonLocked; }
+    @Override public boolean isCredentialsNonExpired() { return true; }
+    @Override public boolean isEnabled() { return this.enabled; }
 }
