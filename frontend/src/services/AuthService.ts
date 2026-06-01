@@ -26,9 +26,9 @@ export const loginUser = async (email: string, password: string): Promise<any> =
         { headers: { Authorization: '' } } 
     );
 
-    if (response.status === 200) {
+   if (response.status === 200) {
         const user = response.data;
-        const authHeader = 'Basic ' + btoa(`${email}:${password}`);
+        const authHeader = 'Bearer ' + user.token;
         
         // Lưu thông tin quan trọng
         localStorage.setItem('authHeader', authHeader);

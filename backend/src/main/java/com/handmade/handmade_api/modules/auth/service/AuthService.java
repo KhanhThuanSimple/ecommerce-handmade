@@ -7,6 +7,10 @@ import com.handmade.handmade_api.modules.auth.dto.AuthResponse;
 import com.handmade.handmade_api.modules.auth.dto.LoginRequest;
 import com.handmade.handmade_api.modules.auth.dto.RegisterRequest;
 import com.handmade.handmade_api.modules.auth.entity.User;
+import com.handmade.handmade_api.security.JwtService;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,10 +18,12 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,30 +42,23 @@ public class AuthService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired private JwtService jwtService; // Đã thêm
+
     public AuthResponse login(LoginRequest loginRequest) {
-        // ... (Giữ nguyên code login cũ của bạn, nó hoàn toàn chạy tốt)
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        loginRequest.getEmail(),
-                        loginRequest.getPassword()
-                )
+                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
         );
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        User user = userRepository.findByEmail(loginRequest.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = (User) authentication.getPrincipal();
+        String jwtToken = jwtService.generateToken(user);
 
         AuthResponse res = new AuthResponse();
         res.setId(user.getId());
         res.setEmail(user.getEmail());
         res.setFullName(user.getFullName());
-
-        List<String> roles = user.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toList());
-
-        res.setRoles(roles);
+        res.setToken(jwtToken);
+        res.setRoles(user.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority).collect(Collectors.toList()));
         return res;
     }
 
