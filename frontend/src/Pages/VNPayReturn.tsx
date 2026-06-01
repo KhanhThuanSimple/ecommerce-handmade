@@ -26,21 +26,21 @@ const VNPayReturn: React.FC = () => {
             }
 
             try {
-                // Backend xác thực chữ ký VNPay + cập nhật đơn + trừ kho/giỏ
-                const res = await api.get(`/vnpay/return?${queryString}`);
+                // ĐÃ SỬA: Sửa lại đường dẫn chuẩn khớp với @RequestMapping("/api/payment") của Backend
+                const res = await api.get(`/payment/vnpay/return?${queryString}`);
                 const result = res.data;
 
                 if (result.success && result.signatureValid) {
                     await refreshCart();
                     notify.success("Thanh toán VNPay thành công!");
                 } else if (!result.signatureValid) {
-                    notify.error("Giao dịch không hợp lệ (chữ ký VNPay sai).");
+                    notify.error("Giao dịch không hợp lệ (Chữ ký xác thực thất bại).");
                 } else {
-                    notify.error("Thanh toán không thành công. Bạn có thể thử lại.");
+                    notify.error("Thanh toán không thành công hoặc đã bị hủy.");
                 }
             } catch (error) {
-                console.error("Lỗi xử lý VNPay:", error);
-                notify.error("Có lỗi xảy ra khi xác nhận thanh toán");
+                console.error("Lỗi kết nối API VNPay:", error);
+                notify.error("Có lỗi xảy ra khi xác nhận thanh toán với máy chủ");
             } finally {
                 setTimeout(() => {
                     navigate('/profile');
@@ -49,12 +49,12 @@ const VNPayReturn: React.FC = () => {
         };
 
         void handleResult();
-    }, []);
+    }, [searchParams, navigate, refreshCart, notify]);
 
     return (
         <div className="loading" style={{ textAlign: 'center', padding: '40px' }}>
-            <h3>Đang xác nhận giao dịch...</h3>
-            <p>Vui lòng không tắt trình duyệt</p>
+            <h3>Đang xác nhận giao dịch với hệ thống...</h3>
+            <p>Vui lòng không đóng hoặc làm mới trình duyệt</p>
         </div>
     );
 };

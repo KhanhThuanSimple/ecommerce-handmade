@@ -1,10 +1,16 @@
 import api from './api';
 
+export interface PaymentPayload {
+    orderId: string;
+    amount: number;
+    paymentMethod: string; // Sẽ truyền vào chữ hoa: 'VNPAY', 'MOMO'...
+}
+
 /**
- * Tạo URL thanh toán VNPay qua backend (HMAC SHA512 chuẩn VNPay).
- * Không ký phía FE — tránh lỗi checksum khi sang trang VNPay.
+ * Hàm gọi cổng thanh toán tích hợp động kết nối với Spring Boot Strategy.
+ * Trỏ thẳng về endpoint /api/payment/process đã dựng ở Backend.
  */
-export const generateVNPayUrl = async (amount: number, orderId: string): Promise<string> => {
-    const res = await api.post('/vnpay/create-url', { orderId, amount });
-    return res.data.paymentUrl;
+export const processOnlinePayment = async (payload: PaymentPayload): Promise<string> => {
+    const res = await api.post('/payment/process', payload);
+    return res.data.paymentUrl; // Trả về chuỗi URL từ Backend để thực hiện redirect
 };
