@@ -22,4 +22,6 @@ public interface ReviewRepository extends JpaRepository<ReviewEntity, Long> {
            "FROM ReviewEntity r JOIN User u ON r.userId = u.id " +
            "WHERE r.id = :reviewId")
     ReviewResponse findReviewResponseById(@Param("reviewId") Long reviewId);
+
+    boolean existsByUserIdAndProductId(Long userId, Long productId);
 }

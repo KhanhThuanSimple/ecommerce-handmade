@@ -39,9 +39,19 @@ public class CartService {
     // LUỒNG 2: THÊM HOẶC CẬP NHẬT SỐ LƯỢNG MÓN HÀNG
     @Transactional
     public void addToCart(CartAddRequest request) {
+        if (request.getQuantity() == null || request.getQuantity() == 0) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                    org.springframework.http.HttpStatus.BAD_REQUEST, "Số lượng không hợp lệ");
+        }
+
         ProductResponse product = productService.getProductById(request.getProductId());
         Cart cart = getOrCreateCart(request.getUserId());
         Optional<CartItem> existingItemOpt = cartItemRepository.findByCartIdAndProductId(cart.getId(), product.getId());
+
+        if (request.getQuantity() < 0) {
+            decreaseCartQuantity(cart, product, existingItemOpt, Math.abs(request.getQuantity()));
+            return;
+        }
 
         if (existingItemOpt.isPresent()) {
             CartItem item = existingItemOpt.get();
@@ -166,6 +176,24 @@ public class CartService {
 
         // Nếu có sản phẩm cũ không xuất hiện trong payload request gửi lên -> Xóa hẳn khỏi giỏ
         existingByProduct.values().forEach(cartItemRepository::delete);
+    }
+
+    private void decreaseCartQuantity(Cart cart, ProductResponse product, Optional<CartItem> existingItemOpt, int decreaseBy) {
+        if (existingItemOpt.isEmpty()) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                    org.springframework.http.HttpStatus.BAD_REQUEST, "Sản phẩm không có trong giỏ hàng");
+        }
+
+        CartItem item = existingItemOpt.get();
+        int newQuantity = item.getQuantity() - decreaseBy;
+
+        if (newQuantity <= 0) {
+            cartItemRepository.delete(item);
+            return;
+        }
+
+        item.setQuantity(newQuantity);
+        cartItemRepository.save(item);
     }
 
     // Helper tạo giỏ tự động nếu chưa có

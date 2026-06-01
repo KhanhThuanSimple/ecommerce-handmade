@@ -1,6 +1,5 @@
 package com.handmade.handmade_api.modules.cart.dto;
 
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -13,6 +12,5 @@ public class CartAddRequest {
     private Long productId;
 
     @NotNull(message = "Số lượng không được trống")
-    @Min(value = 1, message = "Số lượng thêm vào giỏ thấp nhất phải bằng 1")
     private Integer quantity;
 }

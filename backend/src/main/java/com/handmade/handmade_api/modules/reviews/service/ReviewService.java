@@ -1,44 +1,68 @@
 package com.handmade.handmade_api.modules.reviews.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
+import com.handmade.handmade_api.modules.orders.repository.OrderItemRepository;
 import com.handmade.handmade_api.modules.reviews.dto.ReviewRequest;
 import com.handmade.handmade_api.modules.reviews.dto.ReviewResponse;
 import com.handmade.handmade_api.modules.reviews.entity.ReviewEntity;
 import com.handmade.handmade_api.modules.reviews.repository.ReviewRepository;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
 @Service
 public class ReviewService {
 
-    @Autowired
-    private ReviewRepository reviewRepository;
+    private final ReviewRepository reviewRepository;
+    private final OrderItemRepository orderItemRepository;
 
-    // Đã đổi tên hàm thành getReviewsByProductId để khớp 100% với cách gọi ở ReviewController
+    public ReviewService(ReviewRepository reviewRepository, OrderItemRepository orderItemRepository) {
+        this.reviewRepository = reviewRepository;
+        this.orderItemRepository = orderItemRepository;
+    }
+
     public List<ReviewResponse> getReviewsByProductId(Long productId) {
-        List<ReviewResponse> reviews = reviewRepository.findReviewsByProductId(productId);
-        
-        // FE có dòng code: if (reviewErr.response?.status === 404) để catch mảng rỗng
-        // Nếu muốn chuẩn chỉnh, khi danh sách rỗng ta có thể ném ngoại lệ 404 hoặc trả về danh sách trống tùy cấu hình.
-        // Tuy nhiên trả về danh sách trống (mảng rỗng) thường an toàn hơn.
-        return reviews;
+        return reviewRepository.findReviewsByProductId(productId);
+    }
+
+    public boolean canUserReview(Long userId, Long productId) {
+        if (userId == null || productId == null) {
+            return false;
+        }
+        if (reviewRepository.existsByUserIdAndProductId(userId, productId)) {
+            return false;
+        }
+        return orderItemRepository.existsPurchasedProduct(userId, productId);
     }
 
     @Transactional
     public ReviewResponse createReview(ReviewRequest request) {
+        if (request.getUserId() == null || request.getProductId() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Thiếu userId hoặc productId");
+        }
+
+        if (request.getRating() == null || request.getRating() < 1 || request.getRating() > 5) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Đánh giá phải từ 1 đến 5 sao");
+        }
+
+        if (!orderItemRepository.existsPurchasedProduct(request.getUserId(), request.getProductId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "Bạn cần mua sản phẩm này trước khi đánh giá");
+        }
+
+        if (reviewRepository.existsByUserIdAndProductId(request.getUserId(), request.getProductId())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Bạn đã đánh giá sản phẩm này rồi");
+        }
+
         ReviewEntity entity = new ReviewEntity();
         entity.setProductId(request.getProductId());
         entity.setUserId(request.getUserId());
         entity.setRating(request.getRating());
         entity.setComment(request.getComment());
-        
-        // Lưu xuống DB
+
         ReviewEntity saved = reviewRepository.save(entity);
-        
-        // Lấy ngược thông tin kèm theo userName để FE push trực tiếp vào state reviews ở Client
         return reviewRepository.findReviewResponseById(saved.getId());
     }
 }
