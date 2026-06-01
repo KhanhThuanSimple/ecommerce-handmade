@@ -87,7 +87,6 @@ const Header: React.FC<HeaderProps> = ({ currentUser, onLogout }) => {
           <>
             <Link to="/profile" className="user-info">
               <i className="fas fa-user-circle"></i>
-              <span>{currentUser.username}</span>
             </Link>
             {/* <button className="logout-btn" onClick={onLogout}>
               Đăng xuất
