@@ -27,8 +27,10 @@ public class ProductService {
     }
 
     // LUỒNG 1: LẤY DANH SÁCH SẢN PHẨM
+    // LUỒNG 1: LẤY DANH SÁCH SẢN PHẨM (ĐÃ SỬA TÊN HÀM)
     public List<ProductResponse> getAllProducts() {
-        List<ProductProjection> projections = productRepository.findAllProductsRaw();
+        // Gọi đúng tên phương thức mới đã được lọc status = 'active'
+        List<ProductProjection> projections = productRepository.findAllActiveProducts();
         return projections.stream().map(this::convertToResponse).collect(Collectors.toList());
     }
 

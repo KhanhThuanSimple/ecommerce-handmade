@@ -8,7 +8,6 @@ import com.handmade.handmade_api.modules.orders.entity.Order;
 import com.handmade.handmade_api.modules.orders.entity.OrderItem;
 import com.handmade.handmade_api.modules.orders.repository.OrderRepository;
 import com.handmade.handmade_api.modules.products.service.ProductService;
-import com.handmade.handmade_api.modules.vnpay.service.VnPayService;
 import com.handmade.handmade_api.modules.voucher.service.VoucherService;
 import org.springframework.http.HttpStatus;
 import org.slf4j.Logger;
@@ -30,15 +29,14 @@ public class OrderService {
     private final ProductService productService;
     private final CartService cartService;
     private final VoucherService voucherService;
-    private final VnPayService vnPayService;
 
+    // Đã loại bỏ VnPayService để giải quyết triệt để lỗi kết nối lỏng (coupling)
     public OrderService(OrderRepository orderRepository, ProductService productService, CartService cartService,
-                        VoucherService voucherService, VnPayService vnPayService) {
+                        VoucherService voucherService) {
         this.orderRepository = orderRepository;
         this.productService = productService;
         this.cartService = cartService;
         this.voucherService = voucherService;
-        this.vnPayService = vnPayService;
     }
 
     @Transactional
@@ -201,6 +199,15 @@ public class OrderService {
                 || normalized.contains("THANH TOÁN KHI NHẬN HÀNG");
     }
 
+    // Tự xử lý nhận diện chuỗi VNPay nội bộ để tránh import phụ thuộc
+    private boolean isVnPayPayment(String paymentMethod) {
+        if (paymentMethod == null) {
+            return false;
+        }
+        String normalized = paymentMethod.trim().toUpperCase();
+        return normalized.equals("VNPAY") || normalized.contains("VNPAY") || normalized.contains("VN PAY");
+    }
+
     private String normalizePaymentMethod(String paymentMethod) {
         if (paymentMethod == null) {
             return null;
@@ -211,7 +218,7 @@ public class OrderService {
                 || normalized.contains("NHẬN HÀNG")) {
             return "COD";
         }
-        if (normalized.contains("VNPAY") || normalized.contains("VN PAY")) {
+        if (isVnPayPayment(paymentMethod)) {
             return "VNPAY";
         }
         return normalized;
@@ -265,7 +272,7 @@ public class OrderService {
         if (isCodPayment(paymentMethod)) {
             return "Thanh toán khi nhận hàng";
         }
-        if (vnPayService.isVnPayPayment(paymentMethod)) {
+        if (isVnPayPayment(paymentMethod)) {
             return "Chờ thanh toán";
         }
         return "Chờ thanh toán";
