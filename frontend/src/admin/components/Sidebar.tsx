@@ -25,7 +25,7 @@ const navigation = [
     { name: 'Người Dùng', href: '/admin/users', icon: UsersIcon },
     { name: 'Mini Game', href: '/admin/games', icon: PuzzlePieceIcon },
     { name: 'Thống Kê', href: '/admin/analytics', icon: ChartBarIcon },
-    { name: 'Khuyến Mãi', href: '/admin/promotions', icon: TagIcon },
+    { name: 'Quản lý ChatBox', href: '/admin/promotions', icon: TagIcon },
     { name: 'Cài Đặt', href: '/admin/settings', icon: CogIcon },
 ];
 

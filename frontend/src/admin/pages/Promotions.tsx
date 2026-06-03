@@ -5,495 +5,537 @@ import {
     TrashIcon,
     PlayIcon,
     StopIcon,
+    CogIcon,
+    ChatBubbleLeftRightIcon,
+    DocumentTextIcon,
+    KeyIcon,
+    GlobeAltIcon,
+    ServerIcon,
     TagIcon,
-    GiftIcon,
-    FireIcon,
-    CubeIcon,
+    CheckCircleIcon,
+    XCircleIcon,
 } from '@heroicons/react/24/outline';
 import { useNotify } from '../../components/NotificationContext';
+import api from '../../services/api';
 
-interface Promotion {
+// Types
+interface AiConfig {
     id: number;
-    name: string;
+    configKey: string;
+    configValue: string;
     description: string;
-    type: 'coupon' | 'flash_sale' | 'bundle';
-    code?: string;
-    discountType: 'percentage' | 'fixed';
-    discountValue: number;
-    minOrderValue: number;
-    maxDiscount?: number;
-    startDate: string;
-    endDate: string;
-    usageLimit: number;
-    usedCount: number;
-    status: 'active' | 'inactive' | 'expired';
-    products?: number[];
-    categories?: number[];
+    updatedAt: string;
+}
+
+interface ChatFaq {
+    id: number;
+    keywords: string;
+    responseText: string;
+    isActive: boolean;
+    createdAt: string;
 }
 
 const Promotions: React.FC = () => {
-    const [promotions, setPromotions] = useState<Promotion[]>([]);
+    const [activeTab, setActiveTab] = useState<'config' | 'faq'>('config');
+    const [configs, setConfigs] = useState<AiConfig[]>([]);
+    const [faqs, setFaqs] = useState<ChatFaq[]>([]);
     const [loading, setLoading] = useState(true);
-    const [showModal, setShowModal] = useState(false);
-    const [editingPromotion, setEditingPromotion] = useState<Promotion | null>(null);
-    const [formData, setFormData] = useState<Partial<Promotion>>({
-        type: 'coupon',
-        discountType: 'percentage',
-        discountValue: 10,
-        minOrderValue: 0,
-        usageLimit: 100,
-        status: 'active',
+    const [showConfigModal, setShowConfigModal] = useState(false);
+    const [showFaqModal, setShowFaqModal] = useState(false);
+    const [editingConfig, setEditingConfig] = useState<AiConfig | null>(null);
+    const [editingFaq, setEditingFaq] = useState<ChatFaq | null>(null);
+    const [configForm, setConfigForm] = useState({
+        configKey: '',
+        configValue: '',
+        description: ''
     });
+    const [faqForm, setFaqForm] = useState({
+        keywords: '',
+        responseText: '',
+        isActive: true
+    });
+    const [testResult, setTestResult] = useState<string>('');
+    const [testing, setTesting] = useState(false);
     
     const notify = useNotify();
 
+    // Fetch data
     useEffect(() => {
-        // Mock data - replace with API call
-        const mockPromotions: Promotion[] = [
-            {
-                id: 1,
-                name: 'Giảm giá Tết Bính Ngọ',
-                description: 'Giảm 20% cho tất cả sản phẩm handmade',
-                type: 'coupon',
-                code: 'TET2026',
-                discountType: 'percentage',
-                discountValue: 20,
-                minOrderValue: 500000,
-                maxDiscount: 200000,
-                startDate: '2026-01-20',
-                endDate: '2026-02-10',
-                usageLimit: 500,
-                usedCount: 234,
-                status: 'active',
-            },
-            {
-                id: 2,
-                name: 'Flash Sale Tối Thứ 6',
-                description: 'Siêu giảm giá 50% các sản phẩm chọn lọc',
-                type: 'flash_sale',
-                discountType: 'percentage',
-                discountValue: 50,
-                minOrderValue: 0,
-                startDate: '2026-01-17',
-                endDate: '2026-01-17',
-                usageLimit: 100,
-                usedCount: 89,
-                status: 'active',
-                products: [1, 2, 3],
-            },
-            {
-                id: 3,
-                name: 'Mua 2 tặng 1',
-                description: 'Mua 2 sản phẩm bất kỳ tặng 1 sản phẩm cùng loại',
-                type: 'bundle',
-                discountType: 'percentage',
-                discountValue: 33,
-                minOrderValue: 0,
-                startDate: '2026-01-10',
-                endDate: '2026-01-25',
-                usageLimit: 200,
-                usedCount: 200,
-                status: 'expired',
-            },
-            {
-                id: 4,
-                name: 'Miễn phí vận chuyển',
-                description: 'Miễn phí vận chuyển cho đơn hàng từ 300.000đ',
-                type: 'coupon',
-                code: 'FREESHIP',
-                discountType: 'fixed',
-                discountValue: 50000,
-                minOrderValue: 300000,
-                startDate: '2026-01-01',
-                endDate: '2026-02-28',
-                usageLimit: 1000,
-                usedCount: 567,
-                status: 'active',
-            },
-        ];
-        setPromotions(mockPromotions);
-        setLoading(false);
+        fetchConfigs();
+        fetchFaqs();
     }, []);
 
-    const getTypeIcon = (type: Promotion['type']) => {
-        const icons = {
-            coupon: <TagIcon className="w-5 h-5" />,
-            flash_sale: <FireIcon className="w-5 h-5" />,
-            bundle: <CubeIcon className="w-5 h-5" />,
-        };
-        return icons[type];
-    };
-
-    const getTypeBadgeClass = (type: Promotion['type']) => {
-        const classes = {
-            coupon: 'promotion-type-badge coupon',
-            flash_sale: 'promotion-type-badge flash-sale',
-            bundle: 'promotion-type-badge bundle',
-        };
-        return classes[type];
-    };
-
-    const getTypeText = (type: Promotion['type']) => {
-        const texts = {
-            coupon: 'Mã giảm giá',
-            flash_sale: 'Flash Sale',
-            bundle: 'Combo',
-        };
-        return texts[type];
-    };
-
-    const getStatusText = (status: Promotion['status']) => {
-        const texts = {
-            active: 'Đang hoạt động',
-            inactive: 'Tạm dừng',
-            expired: 'Hết hạn',
-        };
-        return texts[status];
-    };
-
-    const formatCurrency = (amount: number) => {
-        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
-    };
-
-    const formatDiscount = (promotion: Promotion) => {
-        if (promotion.discountType === 'percentage') {
-            return `${promotion.discountValue}%`;
-        }
-        return formatCurrency(promotion.discountValue);
-    };
-
-    const getDiscountText = (promotion: Promotion) => {
-        if (promotion.type === 'coupon') {
-            return `Giảm ${formatDiscount(promotion)} ${promotion.minOrderValue > 0 ? `cho đơn từ ${formatCurrency(promotion.minOrderValue)}` : ''}`;
-        }
-        if (promotion.type === 'flash_sale') {
-            return `Giảm ${formatDiscount(promotion)}`;
-        }
-        return `Mua 2 tặng 1`;
-    };
-
-    const handleSave = async () => {
+    const fetchConfigs = async () => {
         try {
-            if (editingPromotion) {
-                // Update API call
-                notify.success('Cập nhật chương trình thành công');
-            } else {
-                // Create API call
-                notify.success('Thêm chương trình thành công');
-            }
-            setShowModal(false);
-            setEditingPromotion(null);
-            setFormData({});
+            const res = await api.get('/admin/chat-config/all');
+            setConfigs(res.data);
         } catch (error) {
-            notify.error('Lưu thất bại');
+            console.error('Error fetching configs:', error);
+            notify.error('Không thể tải cấu hình');
+        } finally {
+            setLoading(false);
         }
     };
 
-    const handleDelete = async (id: number) => {
-        if (window.confirm('Bạn có chắc chắn muốn xóa chương trình này?')) {
+    const fetchFaqs = async () => {
+        try {
+            const res = await api.get('/admin/chat-faq/all');
+            setFaqs(res.data);
+        } catch (error) {
+            console.error('Error fetching FAQs:', error);
+            notify.error('Không thể tải FAQ');
+        }
+    };
+
+    const testConnection = async () => {
+        setTesting(true);
+        try {
+            const res = await api.get('/admin/chat-config/test-connection');
+            setTestResult(res.data.result);
+            if (res.data.result.includes('thành công')) {
+                notify.success('Kết nối AI thành công!');
+            } else {
+                notify.warning(res.data.result);
+            }
+        } catch (error) {
+            setTestResult('Kết nối thất bại');
+            notify.error('Không thể kết nối đến AI');
+        } finally {
+            setTesting(false);
+            setTimeout(() => setTestResult(''), 5000);
+        }
+    };
+
+    // Config CRUD
+    const handleSaveConfig = async () => {
+        if (!configForm.configKey || !configForm.configValue) {
+            notify.warning('Vui lòng nhập đầy đủ thông tin');
+            return;
+        }
+
+        try {
+            if (editingConfig) {
+                const res = await api.post('/admin/chat-config/update', configForm);
+                notify.success('Cập nhật cấu hình thành công');
+                setConfigs(configs.map(c => c.id === editingConfig.id ? res.data.config : c));
+            } else {
+                const res = await api.post('/admin/chat-config/create', configForm);
+                notify.success('Tạo cấu hình thành công');
+                setConfigs([...configs, res.data.config]);
+            }
+            setShowConfigModal(false);
+            resetConfigForm();
+        } catch (error: any) {
+            notify.error(error.response?.data?.error || 'Lưu thất bại');
+        }
+    };
+
+    const handleDeleteConfig = async (key: string) => {
+        if (window.confirm(`Bạn có chắc chắn muốn xóa cấu hình "${key}"?`)) {
             try {
-                // Delete API call
-                setPromotions(promotions.filter(p => p.id !== id));
-                notify.success('Xóa chương trình thành công');
+                await api.delete(`/admin/chat-config/delete/${key}`);
+                setConfigs(configs.filter(c => c.configKey !== key));
+                notify.success('Xóa cấu hình thành công');
             } catch (error) {
                 notify.error('Xóa thất bại');
             }
         }
     };
 
-    const handleToggleStatus = async (promotion: Promotion) => {
-        const newStatus = promotion.status === 'active' ? 'inactive' : 'active';
+    // FAQ CRUD
+    const handleSaveFaq = async () => {
+        if (!faqForm.keywords || !faqForm.responseText) {
+            notify.warning('Vui lòng nhập đầy đủ thông tin');
+            return;
+        }
+
         try {
-            // API call to update status
-            setPromotions(promotions.map(p => 
-                p.id === promotion.id ? { ...p, status: newStatus } : p
+            if (editingFaq) {
+                const res = await api.put(`/admin/chat-faq/update/${editingFaq.id}`, faqForm);
+                notify.success('Cập nhật FAQ thành công');
+                setFaqs(faqs.map(f => f.id === editingFaq.id ? res.data.faq : f));
+            } else {
+                const res = await api.post('/admin/chat-faq/create', faqForm);
+                notify.success('Tạo FAQ thành công');
+                setFaqs([...faqs, res.data.faq]);
+            }
+            setShowFaqModal(false);
+            resetFaqForm();
+        } catch (error: any) {
+            notify.error(error.response?.data?.error || 'Lưu thất bại');
+        }
+    };
+
+    const handleDeleteFaq = async (id: number) => {
+        if (window.confirm('Bạn có chắc chắn muốn xóa FAQ này?')) {
+            try {
+                await api.delete(`/admin/chat-faq/delete/${id}`);
+                setFaqs(faqs.filter(f => f.id !== id));
+                notify.success('Xóa FAQ thành công');
+            } catch (error) {
+                notify.error('Xóa thất bại');
+            }
+        }
+    };
+
+    const handleToggleFaqStatus = async (faq: ChatFaq) => {
+        try {
+            const res = await api.patch(`/admin/chat-faq/toggle/${faq.id}`);
+            setFaqs(faqs.map(f => 
+                f.id === faq.id ? { ...f, isActive: !f.isActive } : f
             ));
-            notify.success(`Đã ${newStatus === 'active' ? 'kích hoạt' : 'tạm dừng'} chương trình`);
+            notify.success(res.data.message);
         } catch (error) {
             notify.error('Thao tác thất bại');
         }
+    };
+
+    // Reset forms
+    const resetConfigForm = () => {
+        setConfigForm({ configKey: '', configValue: '', description: '' });
+        setEditingConfig(null);
+    };
+
+    const resetFaqForm = () => {
+        setFaqForm({ keywords: '', responseText: '', isActive: true });
+        setEditingFaq(null);
+    };
+
+    // Helper functions
+    const getConfigIcon = (key: string) => {
+        if (key.includes('API_KEY')) return <KeyIcon className="w-5 h-5" />;
+        if (key.includes('URL')) return <GlobeAltIcon className="w-5 h-5" />;
+        if (key.includes('PROMPT')) return <DocumentTextIcon className="w-5 h-5" />;
+        if (key.includes('MODEL')) return <ServerIcon className="w-5 h-5" />;
+        return <CogIcon className="w-5 h-5" />;
+    };
+
+    const getConfigCategory = (key: string) => {
+        if (key.includes('GROQ')) return 'Groq API';
+        if (key.includes('PROMPT')) return 'Prompt';
+        if (key.includes('POLICY')) return 'Chính sách';
+        if (key.includes('ADDRESS')) return 'Thông tin shop';
+        return 'Khác';
     };
 
     if (loading) {
         return (
             <div className="loading-container">
                 <div className="loading-spinner"></div>
-                <p className="loading-text">Đang tải danh sách khuyến mãi...</p>
+                <p className="loading-text">Đang tải dữ liệu...</p>
             </div>
         );
     }
 
     return (
-        <div className="promotions-container">
+        <div className="admin-chat-container">
             {/* Header */}
-            <div className="promotions-header">
-                <div className="promotions-title">
-                    <h1>
-                        🎁 Quản Lý Khuyến Mãi
-                    </h1>
-                    <p className="promotions-subtitle">
-                        Tạo và quản lý các chương trình giảm giá, mã voucher, flash sale
-                    </p>
+            <div className="admin-chat-header">
+                <div className="header-title">
+                    <ChatBubbleLeftRightIcon className="w-8 h-8" />
+                    <div>
+                        <h1>Quản Lý Chatbot AI</h1>
+                        <p className="header-subtitle">
+                            Cấu hình AI và quản lý câu hỏi thường gặp (FAQ)
+                        </p>
+                    </div>
                 </div>
                 <button 
-                    className="create-btn"
-                    onClick={() => {
-                        setEditingPromotion(null);
-                        setFormData({});
-                        setShowModal(true);
-                    }}
+                    className="test-connection-btn"
+                    onClick={testConnection}
+                    disabled={testing}
                 >
-                    <PlusIcon className="w-5 h-5" />
-                    Tạo chương trình mới
+                    {testing ? 'Đang kiểm tra...' : '🔌 Kiểm tra kết nối AI'}
                 </button>
             </div>
 
-            {/* Stats Cards */}
-            <div className="promotion-stats">
-                <div className="promo-stat-card">
-                    <div className="promo-stat-value">{promotions.length}</div>
-                    <div className="promo-stat-label">Tổng chương trình</div>
+            {/* Test Result */}
+            {testResult && (
+                <div className={`test-result ${testResult.includes('thành công') ? 'success' : 'error'}`}>
+                    {testResult}
                 </div>
-                <div className="promo-stat-card">
-                    <div className="promo-stat-value">{promotions.filter(p => p.status === 'active').length}</div>
-                    <div className="promo-stat-label">Đang hoạt động</div>
-                </div>
-                <div className="promo-stat-card">
-                    <div className="promo-stat-value">{promotions.reduce((sum, p) => sum + p.usedCount, 0)}</div>
-                    <div className="promo-stat-label">Lượt sử dụng</div>
-                </div>
+            )}
+
+            {/* Tabs */}
+            <div className="admin-tabs">
+                <button 
+                    className={`tab-btn ${activeTab === 'config' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('config')}
+                >
+                    <CogIcon className="w-5 h-5" />
+                    Cấu hình AI
+                </button>
+                <button 
+                    className={`tab-btn ${activeTab === 'faq' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('faq')}
+                >
+                    <DocumentTextIcon className="w-5 h-5" />
+                    Quản lý FAQ
+                </button>
             </div>
 
-            {/* Promotions Grid */}
-            <div className="promotions-grid">
-                {promotions.map((promotion) => (
-                    <div key={promotion.id} className={`promotion-card ${promotion.status}`}>
-                        <div className="promotion-card-header">
-                            <div className={getTypeBadgeClass(promotion.type)}>
-                                {getTypeText(promotion.type)}
-                            </div>
-                            <div className="promotion-icon">
-                                {getTypeIcon(promotion.type)}
-                            </div>
-                            <h3 className="promotion-name">{promotion.name}</h3>
-                            <p className="promotion-description">{promotion.description}</p>
-                        </div>
-                        
-                        <div className="promotion-card-body">
-                            {promotion.code && (
-                                <div className="promotion-code">
-                                    Mã: {promotion.code}
-                                </div>
-                            )}
-                            
-                            <div className="promotion-detail">
-                                <span className="promotion-detail-label">Giá trị:</span>
-                                <span className="promotion-detail-value">{getDiscountText(promotion)}</span>
-                            </div>
-                            
-                            <div className="promotion-detail">
-                                <span className="promotion-detail-label">Thời gian:</span>
-                                <span className="promotion-detail-value">
-                                    {promotion.startDate} → {promotion.endDate}
-                                </span>
-                            </div>
-                            
-                            <div className="progress-bar">
-                                <div 
-                                    className="progress-fill" 
-                                    style={{ width: `${(promotion.usedCount / promotion.usageLimit) * 100}%` }}
-                                ></div>
-                            </div>
-                            <div className="usage-stats">
-                                <span>Đã dùng: {promotion.usedCount}</span>
-                                <span>Giới hạn: {promotion.usageLimit}</span>
-                            </div>
-                        </div>
-                        
-                        <div className="promotion-card-footer">
-                            <button 
-                                className="card-btn edit"
-                                onClick={() => {
-                                    setEditingPromotion(promotion);
-                                    setFormData(promotion);
-                                    setShowModal(true);
-                                }}
-                            >
-                                <PencilIcon className="w-4 h-4" />
-                                Sửa
-                            </button>
-                            
-                            {promotion.status === 'active' ? (
-                                <button 
-                                    className="card-btn deactivate"
-                                    onClick={() => handleToggleStatus(promotion)}
-                                >
-                                    <StopIcon className="w-4 h-4" />
-                                    Tạm dừng
-                                </button>
-                            ) : promotion.status === 'inactive' && (
-                                <button 
-                                    className="card-btn activate"
-                                    onClick={() => handleToggleStatus(promotion)}
-                                >
-                                    <PlayIcon className="w-4 h-4" />
-                                    Kích hoạt
-                                </button>
-                            )}
-                            
-                            <button 
-                                className="card-btn delete"
-                                onClick={() => handleDelete(promotion.id)}
-                            >
-                                <TrashIcon className="w-4 h-4" />
-                                Xóa
-                            </button>
-                        </div>
+            {/* Config Tab */}
+            {activeTab === 'config' && (
+                <div className="config-tab">
+                    <div className="tab-header">
+                        <h2>Cấu hình hệ thống AI</h2>
+                        <button 
+                            className="create-btn"
+                            onClick={() => {
+                                resetConfigForm();
+                                setShowConfigModal(true);
+                            }}
+                        >
+                            <PlusIcon className="w-5 h-5" />
+                            Thêm cấu hình
+                        </button>
                     </div>
-                ))}
-            </div>
 
-            {/* Create/Edit Modal */}
-            {showModal && (
-                <div className="modal-overlay" onClick={() => setShowModal(false)}>
-                    <div className="promo-modal" onClick={(e) => e.stopPropagation()}>
-                        <div className="promo-modal-header">
-                            <h3 className="promo-modal-title">
-                                {editingPromotion ? 'Chỉnh sửa chương trình' : 'Tạo chương trình mới'}
-                            </h3>
-                            <button className="promo-modal-close" onClick={() => setShowModal(false)}>×</button>
+                    <div className="configs-grid">
+                        {configs.map((config) => (
+                            <div key={config.id} className="config-card">
+                                <div className="config-card-header">
+                                    <div className="config-icon">
+                                        {getConfigIcon(config.configKey)}
+                                    </div>
+                                    <div className="config-info">
+                                        <h3>{config.configKey}</h3>
+                                        <span className="config-category">{getConfigCategory(config.configKey)}</span>
+                                    </div>
+                                </div>
+                                <div className="config-card-body">
+                                    <div className="config-value">
+                                        <strong>Giá trị:</strong>
+                                        <code>{config.configValue}</code>
+                                    </div>
+                                    {config.description && (
+                                        <div className="config-description">
+                                            <strong>Mô tả:</strong>
+                                            <p>{config.description}</p>
+                                        </div>
+                                    )}
+                                    <div className="config-updated">
+                                        Cập nhật: {new Date(config.updatedAt).toLocaleString('vi-VN')}
+                                    </div>
+                                </div>
+                                <div className="config-card-footer">
+                                    <button 
+                                        className="card-btn edit"
+                                        onClick={() => {
+                                            setEditingConfig(config);
+                                            setConfigForm({
+                                                configKey: config.configKey,
+                                                configValue: config.configValue,
+                                                description: config.description || ''
+                                            });
+                                            setShowConfigModal(true);
+                                        }}
+                                    >
+                                        <PencilIcon className="w-4 h-4" />
+                                        Sửa
+                                    </button>
+                                    <button 
+                                        className="card-btn delete"
+                                        onClick={() => handleDeleteConfig(config.configKey)}
+                                    >
+                                        <TrashIcon className="w-4 h-4" />
+                                        Xóa
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {/* FAQ Tab */}
+            {activeTab === 'faq' && (
+                <div className="faq-tab">
+                    <div className="tab-header">
+                        <h2>Câu hỏi thường gặp (FAQ)</h2>
+                        <button 
+                            className="create-btn"
+                            onClick={() => {
+                                resetFaqForm();
+                                setShowFaqModal(true);
+                            }}
+                        >
+                            <PlusIcon className="w-5 h-5" />
+                            Thêm FAQ
+                        </button>
+                    </div>
+
+                    <div className="faqs-grid">
+                        {faqs.map((faq) => (
+                            <div key={faq.id} className={`faq-card ${!faq.isActive ? 'inactive' : ''}`}>
+                                <div className="faq-card-header">
+                                    <div className="faq-keywords">
+                                        <TagIcon className="w-4 h-4" />
+                                        {faq.keywords.split(',').map((kw, i) => (
+                                            <span key={i} className="keyword-tag">{kw.trim()}</span>
+                                        ))}
+                                    </div>
+                                    <div className="faq-status">
+                                        {faq.isActive ? (
+                                            <span className="status-badge active">
+                                                <CheckCircleIcon className="w-4 h-4" />
+                                                Hoạt động
+                                            </span>
+                                        ) : (
+                                            <span className="status-badge inactive">
+                                                <XCircleIcon className="w-4 h-4" />
+                                                Tạm dừng
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
+                                <div className="faq-card-body">
+                                    <div className="faq-response">
+                                        {faq.responseText}
+                                    </div>
+                                    <div className="faq-date">
+                                        Tạo: {new Date(faq.createdAt).toLocaleDateString('vi-VN')}
+                                    </div>
+                                </div>
+                                <div className="faq-card-footer">
+                                    <button 
+                                        className="card-btn edit"
+                                        onClick={() => {
+                                            setEditingFaq(faq);
+                                            setFaqForm({
+                                                keywords: faq.keywords,
+                                                responseText: faq.responseText,
+                                                isActive: faq.isActive
+                                            });
+                                            setShowFaqModal(true);
+                                        }}
+                                    >
+                                        <PencilIcon className="w-4 h-4" />
+                                        Sửa
+                                    </button>
+                                    <button 
+                                        className={`card-btn ${faq.isActive ? 'deactivate' : 'activate'}`}
+                                        onClick={() => handleToggleFaqStatus(faq)}
+                                    >
+                                        {faq.isActive ? (
+                                            <>
+                                                <StopIcon className="w-4 h-4" />
+                                                Tạm dừng
+                                            </>
+                                        ) : (
+                                            <>
+                                                <PlayIcon className="w-4 h-4" />
+                                                Kích hoạt
+                                            </>
+                                        )}
+                                    </button>
+                                    <button 
+                                        className="card-btn delete"
+                                        onClick={() => handleDeleteFaq(faq.id)}
+                                    >
+                                        <TrashIcon className="w-4 h-4" />
+                                        Xóa
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {/* Config Modal */}
+            {showConfigModal && (
+                <div className="modal-overlay" onClick={() => setShowConfigModal(false)}>
+                    <div className="config-modal" onClick={(e) => e.stopPropagation()}>
+                        <div className="modal-header">
+                            <h3>{editingConfig ? 'Chỉnh sửa cấu hình' : 'Thêm cấu hình mới'}</h3>
+                            <button className="modal-close" onClick={() => setShowConfigModal(false)}>×</button>
                         </div>
-                        <div className="promo-modal-body">
+                        <div className="modal-body">
                             <div className="form-group">
-                                <label>Tên chương trình</label>
+                                <label>Key <span className="required">*</span></label>
                                 <input 
                                     type="text" 
-                                    placeholder="VD: Giảm giá Tết Nguyên Đán"
-                                    value={formData.name || ''}
-                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                    placeholder="VD: SYSTEM_PROMPT"
+                                    value={configForm.configKey}
+                                    onChange={(e) => setConfigForm({ ...configForm, configKey: e.target.value.toUpperCase() })}
+                                    disabled={!!editingConfig}
+                                />
+                                <small>Tên cấu hình, viết hoa và dùng dấu gạch dưới</small>
+                            </div>
+                            
+                            <div className="form-group">
+                                <label>Value <span className="required">*</span></label>
+                                <textarea 
+                                    rows={4}
+                                    placeholder="Giá trị cấu hình..."
+                                    value={configForm.configValue}
+                                    onChange={(e) => setConfigForm({ ...configForm, configValue: e.target.value })}
                                 />
                             </div>
                             
                             <div className="form-group">
                                 <label>Mô tả</label>
                                 <textarea 
-                                    rows={3}
-                                    placeholder="Mô tả chi tiết về chương trình..."
-                                    value={formData.description || ''}
-                                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                    rows={2}
+                                    placeholder="Mô tả ngắn về cấu hình này..."
+                                    value={configForm.description}
+                                    onChange={(e) => setConfigForm({ ...configForm, description: e.target.value })}
                                 />
                             </div>
-                            
-                            <div className="form-row">
-                                <div className="form-group">
-                                    <label>Loại khuyến mãi</label>
-                                    <select 
-                                        value={formData.type || 'coupon'}
-                                        onChange={(e) => setFormData({ ...formData, type: e.target.value as Promotion['type'] })}
-                                    >
-                                        <option value="coupon">Mã giảm giá</option>
-                                        <option value="flash_sale">Flash Sale</option>
-                                        <option value="bundle">Mua kèm/Combo</option>
-                                    </select>
-                                </div>
-                                
-                                {formData.type === 'coupon' && (
-                                    <div className="form-group">
-                                        <label>Mã giảm giá</label>
-                                        <input 
-                                            type="text" 
-                                            placeholder="VD: SALE20"
-                                            value={formData.code || ''}
-                                            onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
-                                        />
-                                    </div>
-                                )}
-                            </div>
-                            
-                            <div className="form-row">
-                                <div className="form-group">
-                                    <label>Hình thức giảm</label>
-                                    <select 
-                                        value={formData.discountType || 'percentage'}
-                                        onChange={(e) => setFormData({ ...formData, discountType: e.target.value as 'percentage' | 'fixed' })}
-                                    >
-                                        <option value="percentage">Phần trăm (%)</option>
-                                        <option value="fixed">Số tiền cố định</option>
-                                    </select>
-                                </div>
-                                
-                                <div className="form-group">
-                                    <label>Giá trị giảm</label>
-                                    <input 
-                                        type="number" 
-                                        placeholder={formData.discountType === 'percentage' ? 'VD: 20' : 'VD: 50000'}
-                                        value={formData.discountValue || ''}
-                                        onChange={(e) => setFormData({ ...formData, discountValue: Number(e.target.value) })}
-                                    />
-                                </div>
+                        </div>
+                        <div className="modal-footer">
+                            <button className="btn-cancel" onClick={() => setShowConfigModal(false)}>Hủy</button>
+                            <button className="btn-submit" onClick={handleSaveConfig}>Lưu</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* FAQ Modal */}
+            {showFaqModal && (
+                <div className="modal-overlay" onClick={() => setShowFaqModal(false)}>
+                    <div className="faq-modal" onClick={(e) => e.stopPropagation()}>
+                        <div className="modal-header">
+                            <h3>{editingFaq ? 'Chỉnh sửa FAQ' : 'Thêm câu hỏi mới'}</h3>
+                            <button className="modal-close" onClick={() => setShowFaqModal(false)}>×</button>
+                        </div>
+                        <div className="modal-body">
+                            <div className="form-group">
+                                <label>Từ khóa <span className="required">*</span></label>
+                                <input 
+                                    type="text" 
+                                    placeholder="VD: giá, báo giá, bao nhiêu tiền"
+                                    value={faqForm.keywords}
+                                    onChange={(e) => setFaqForm({ ...faqForm, keywords: e.target.value })}
+                                />
+                                <small>Các từ khóa cách nhau bằng dấu phẩy</small>
                             </div>
                             
                             <div className="form-group">
-                                <label>Đơn hàng tối thiểu</label>
-                                <input 
-                                    type="number" 
-                                    placeholder="0 - Không yêu cầu"
-                                    value={formData.minOrderValue || 0}
-                                    onChange={(e) => setFormData({ ...formData, minOrderValue: Number(e.target.value) })}
+                                <label>Câu trả lời <span className="required">*</span></label>
+                                <textarea 
+                                    rows={5}
+                                    placeholder="Nội dung câu trả lời..."
+                                    value={faqForm.responseText}
+                                    onChange={(e) => setFaqForm({ ...faqForm, responseText: e.target.value })}
                                 />
                             </div>
                             
-                            <div className="form-row">
-                                <div className="form-group">
-                                    <label>Ngày bắt đầu</label>
+                            <div className="form-group">
+                                <label className="checkbox-label">
                                     <input 
-                                        type="date" 
-                                        value={formData.startDate || ''}
-                                        onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
+                                        type="checkbox"
+                                        checked={faqForm.isActive}
+                                        onChange={(e) => setFaqForm({ ...faqForm, isActive: e.target.checked })}
                                     />
-                                </div>
-                                
-                                <div className="form-group">
-                                    <label>Ngày kết thúc</label>
-                                    <input 
-                                        type="date" 
-                                        value={formData.endDate || ''}
-                                        onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                                    />
-                                </div>
-                            </div>
-                            
-                            <div className="form-row">
-                                <div className="form-group">
-                                    <label>Giới hạn lượt sử dụng</label>
-                                    <input 
-                                        type="number" 
-                                        placeholder="VD: 100"
-                                        value={formData.usageLimit || 100}
-                                        onChange={(e) => setFormData({ ...formData, usageLimit: Number(e.target.value) })}
-                                    />
-                                </div>
-                                
-                                <div className="form-group">
-                                    <label>Trạng thái</label>
-                                    <select 
-                                        value={formData.status || 'active'}
-                                        onChange={(e) => setFormData({ ...formData, status: e.target.value as Promotion['status'] })}
-                                    >
-                                        <option value="active">Kích hoạt</option>
-                                        <option value="inactive">Tạm dừng</option>
-                                    </select>
-                                </div>
+                                    Kích hoạt ngay
+                                </label>
                             </div>
                         </div>
-                        
-                        <div className="modal-actions">
-                            <button className="btn-cancel" onClick={() => setShowModal(false)}>
-                                Hủy
-                            </button>
-                            <button className="btn-submit" onClick={handleSave}>
-                                {editingPromotion ? 'Cập nhật' : 'Tạo mới'}
-                            </button>
+                        <div className="modal-footer">
+                            <button className="btn-cancel" onClick={() => setShowFaqModal(false)}>Hủy</button>
+                            <button className="btn-submit" onClick={handleSaveFaq}>Lưu</button>
                         </div>
                     </div>
                 </div>
