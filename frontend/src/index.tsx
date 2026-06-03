@@ -5,6 +5,7 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter } from 'react-router-dom';
 import { NotificationProvider } from './components/NotificationContext';
+import { CacheProvider } from './providers/CacheProvider'; // Import CacheProvider mới tạo
 
 
 const root = ReactDOM.createRoot(
@@ -12,11 +13,13 @@ const root = ReactDOM.createRoot(
 );
 root.render(
   <React.StrictMode>
+     <CacheProvider>
       <NotificationProvider>
     <BrowserRouter>
         <App />
     </BrowserRouter>
       </NotificationProvider>
+      </CacheProvider>
   </React.StrictMode>
 );
 

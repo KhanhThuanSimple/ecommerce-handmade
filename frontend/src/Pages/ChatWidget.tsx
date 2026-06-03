@@ -1,10 +1,9 @@
+// src/Pages/ChatWidget.tsx
 import React, { useState } from "react";
 import ChatBox from "./Chatbox";
 import { User } from "../types/model";
 import "../Styles/chatWidget.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
-import '../Styles/chatWidget.css';
-import '../Styles/chatbox.css';
 
 interface ChatWidgetProps {
   currentUser: User | null;
@@ -15,25 +14,19 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({ currentUser }) => {
 
   return (
     <>
-      {/* 🔵 Bông bóng chat */}
+      {/* Chat button */}
       <div
         className="chat-float-btn"
         onClick={() => setOpen((prev) => !prev)}
         title="Chat với AI hỗ trợ"
       >
-
-        <span className="chat-pulse">
-          <i className="fa-regular fa-message"></i>
-        </span>
-
-        💬
-        <span className="chat-pulse"></span>
+        <i className={`fa-regular ${open ? 'fa-times' : 'fa-message'}`}></i>
       </div>
 
-      {/* 🟢 Hộp chat */}
+      {/* Chat box */}
       {open && (
         <div className="chat-widget-container">
-          <ChatBox currentUser={currentUser} />
+          <ChatBox currentUser={currentUser} onClose={() => setOpen(false)} />
         </div>
       )}
     </>
@@ -41,4 +34,3 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({ currentUser }) => {
 };
 
 export default ChatWidget;
-

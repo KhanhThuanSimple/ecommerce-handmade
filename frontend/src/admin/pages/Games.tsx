@@ -7,478 +7,333 @@ import {
     PlusIcon,
     PencilIcon,
     TrashIcon,
-    PlayIcon,
-    StopIcon,
     ChartBarIcon,
-    SparklesIcon,
     ArrowPathIcon,
-    EyeIcon,
-    EyeSlashIcon,
+    StarIcon,
+    TicketIcon,
+    XMarkIcon,
+    CheckCircleIcon,
+    ExclamationTriangleIcon,
+    ShieldCheckIcon,
 } from '@heroicons/react/24/outline';
 import { useNotify } from '../../components/NotificationContext';
-
-// ===== INTERFACES =====
-interface Winner {
-    id: number;
-    userId?: number;
-    name: string;
-    email?: string;
-    phone?: string;
-    prize: string;
-    prizeId: number;
-    date: string;
-    spinCount: number;
-    claimed: boolean;
-    claimedDate?: string;
-}
-
-interface GameStats {
-    totalSpins: number;
-    totalWinners: number;
-    totalGifts: number;
-    activePlayers: number;
-    todaySpins: number;
-    conversionRate: number;
-}
-
-interface GamePrize {
-    id: number;
-    name: string;
-    type: 'voucher' | 'product' | 'discount' | 'none';
-    value?: number;
-    color: string;
-    textColor: string;
-    icon: string;
-    description: string;
-    quantity: number;
-    remaining: number;
-    probability: number;
-    claimed: number;
-}
-
-interface GameConfig {
-    id: number;
-    name: string;
-    description: string;
-    status: 'active' | 'inactive';
-    startDate: string;
-    endDate: string;
-    spinLimit: number;
-    spinCost: number;
-    freeSpinPerDay: number;
-    requireLogin: boolean;
-    allowMultipleSpin: boolean;
-    theme: {
-        primaryColor: string;
-        secondaryColor: string;
-        backgroundColor: string;
-        wheelImage?: string;
-    };
-}
+import gameService, { Prize, UserSpinProfile, GameStatistics } from '../../services/gameService';
+import '../styles/games.css';
 
 const Games: React.FC = () => {
     const [loading, setLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState<'prizes' | 'winners' | 'config' | 'analytics'>('prizes');
+    const [activeTab, setActiveTab] = useState<'prizes' | 'users' | 'stats'>('prizes');
     const [showPrizeModal, setShowPrizeModal] = useState(false);
-    const [showConfigModal, setShowConfigModal] = useState(false);
-    const [editingPrize, setEditingPrize] = useState<GamePrize | null>(null);
-    const [selectedWinner, setSelectedWinner] = useState<Winner | null>(null);
+    const [showPointsModal, setShowPointsModal] = useState(false);
+    const [editingPrize, setEditingPrize] = useState<Prize | null>(null);
+    const [selectedUser, setSelectedUser] = useState<UserSpinProfile | null>(null);
+    const [pointsToAdd, setPointsToAdd] = useState(0);
+    const [isAdmin, setIsAdmin] = useState(false);
+    const [currentUser, setCurrentUser] = useState<any>(null);
+    
+    // State data
+    const [prizes, setPrizes] = useState<Prize[]>([]);
+    const [spinProfiles, setSpinProfiles] = useState<UserSpinProfile[]>([]);
+    const [statistics, setStatistics] = useState<GameStatistics>({
+        totalUsers: 0,
+        totalPoints: 0,
+        usersSpunToday: 0,
+        averagePoints: 0,
+    });
+    
+    // Form state
+    const [prizeForm, setPrizeForm] = useState<Partial<Prize>>({
+        name: '',
+        type: 'points',
+        value: 0,
+        icon: '🎁',
+        color: '#c41e3a',
+        textColor: '#ffffff',
+        description: '',
+        active: true,
+        probability: 0.1,
+    });
     
     const notify = useNotify();
 
-    // State data
-    const [gameStats, setGameStats] = useState<GameStats>({
-        totalSpins: 1250,
-        totalWinners: 342,
-        totalGifts: 156,
-        activePlayers: 89,
-        todaySpins: 45,
-        conversionRate: 27.36,
-    });
+    // Check admin access
+    useEffect(() => {
+        const checkAdminAccess = async () => {
+            const user = gameService.getCurrentUser();
+            const admin = gameService.isAdmin();
+            
+            setCurrentUser(user);
+            setIsAdmin(admin);
+            
+            if (!admin) {
+                notify.error('Bạn không có quyền truy cập trang này');
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 2000);
+            }
+        };
+        
+        checkAdminAccess();
+    }, [notify]);
 
-    const [gameConfig, setGameConfig] = useState<GameConfig>({
-        id: 1,
-        name: 'Vòng quay may mắn Tết Bính Ngọ 2026',
-        description: 'Quay số trúng thưởng nhận quà Tết cực chất',
-        status: 'active',
-        startDate: '2026-01-01',
-        endDate: '2026-02-28',
-        spinLimit: 10,
-        spinCost: 0,
-        freeSpinPerDay: 3,
-        requireLogin: true,
-        allowMultipleSpin: true,
-        theme: {
-            primaryColor: '#c41e3a',
-            secondaryColor: '#f59e0b',
-            backgroundColor: '#fff5f5',
-        },
-    });
-
-    const [prizes, setPrizes] = useState<GamePrize[]>([
-        {
-            id: 1,
-            name: 'Voucher 100.000đ',
-            type: 'voucher',
-            value: 100000,
-            color: '#F59E0B',
-            textColor: '#FFFFFF',
-            icon: '🎁',
-            description: 'Voucher giảm giá 100.000đ cho đơn hàng từ 300.000đ',
-            quantity: 50,
-            remaining: 32,
-            probability: 15,
-            claimed: 18,
-        },
-        {
-            id: 2,
-            name: 'Voucher 50.000đ',
-            type: 'voucher',
-            value: 50000,
-            color: '#EF4444',
-            textColor: '#FFFFFF',
-            icon: '🎟️',
-            description: 'Voucher giảm giá 50.000đ cho đơn hàng từ 150.000đ',
-            quantity: 100,
-            remaining: 78,
-            probability: 25,
-            claimed: 22,
-        },
-        {
-            id: 3,
-            name: 'Miễn phí vận chuyển',
-            type: 'discount',
-            value: 100,
-            color: '#10B981',
-            textColor: '#FFFFFF',
-            icon: '🚚',
-            description: 'Miễn phí vận chuyển toàn quốc',
-            quantity: 200,
-            remaining: 156,
-            probability: 35,
-            claimed: 44,
-        },
-        {
-            id: 4,
-            name: 'Bộ ấm trà',
-            type: 'product',
-            color: '#8B5CF6',
-            textColor: '#FFFFFF',
-            icon: '🍵',
-            description: 'Bộ ấm trà handmade cao cấp',
-            quantity: 10,
-            remaining: 4,
-            probability: 5,
-            claimed: 6,
-        },
-        {
-            id: 5,
-            name: 'Tượng Ngựa Phong Thủy',
-            type: 'product',
-            color: '#F97316',
-            textColor: '#FFFFFF',
-            icon: '🐎',
-            description: 'Tượng phong thủy may mắn năm Bính Ngọ',
-            quantity: 5,
-            remaining: 2,
-            probability: 2,
-            claimed: 3,
-        },
-        {
-            id: 6,
-            name: 'Cảm ơn',
-            type: 'none',
-            color: '#9CA3AF',
-            textColor: '#FFFFFF',
-            icon: '❤️',
-            description: 'Chúc bạn may mắn lần sau',
-            quantity: 999,
-            remaining: 888,
-            probability: 18,
-            claimed: 111,
-        },
-    ]);
-
-    const [winners, setWinners] = useState<Winner[]>([
-        {
-            id: 1,
-            userId: 101,
-            name: 'Nguyễn Thị Hoa',
-            email: 'hoa.nguyen@email.com',
-            phone: '0987654321',
-            prize: 'Voucher 100.000đ',
-            prizeId: 1,
-            date: '2026-01-15 10:30:00',
-            spinCount: 3,
-            claimed: true,
-            claimedDate: '2026-01-16',
-        },
-        {
-            id: 2,
-            name: 'Trần Văn Lộc',
-            email: 'loc.tran@email.com',
-            phone: '0978123456',
-            prize: 'Bộ ấm trà',
-            prizeId: 4,
-            date: '2026-01-15 14:20:00',
-            spinCount: 5,
-            claimed: false,
-        },
-        {
-            id: 3,
-            name: 'Lê Thị Xuân',
-            email: 'xuan.le@email.com',
-            phone: '0965234789',
-            prize: 'Miễn phí vận chuyển',
-            prizeId: 3,
-            date: '2026-01-15 09:15:00',
-            spinCount: 2,
-            claimed: true,
-            claimedDate: '2026-01-15',
-        },
-        {
-            id: 4,
-            name: 'Phạm Văn Thành',
-            email: 'thanh.pham@email.com',
-            phone: '0945678901',
-            prize: 'Voucher 50.000đ',
-            prizeId: 2,
-            date: '2026-01-14 16:45:00',
-            spinCount: 4,
-            claimed: false,
-        },
-        {
-            id: 5,
-            name: 'Đỗ Thị Mai',
-            email: 'mai.do@email.com',
-            phone: '0978123490',
-            prize: 'Tượng Ngựa Phong Thủy',
-            prizeId: 5,
-            date: '2026-01-14 11:00:00',
-            spinCount: 7,
-            claimed: true,
-            claimedDate: '2026-01-14',
-        },
-        {
-            id: 6,
-            name: 'Hoàng Văn Nam',
-            email: 'nam.hoang@email.com',
-            phone: '0965111222',
-            prize: 'Cảm ơn',
-            prizeId: 6,
-            date: '2026-01-14 08:30:00',
-            spinCount: 1,
-            claimed: false,
-        },
-    ]);
-
-    // Spin data for analytics
-    const [spinData] = useState({
-        labels: ['Ngày 1', 'Ngày 2', 'Ngày 3', 'Ngày 4', 'Ngày 5', 'Ngày 6', 'Ngày 7'],
-        spins: [45, 52, 48, 61, 55, 58, 62],
-        winners: [12, 15, 13, 18, 16, 17, 19],
-    });
+    // Fetch data
+    const fetchData = async () => {
+        if (!isAdmin) return;
+        
+        setLoading(true);
+        try {
+            // Fetch prizes
+            const prizesData = await gameService.getPrizes();
+            setPrizes(prizesData);
+            
+            // Fetch statistics
+            const statsData = await gameService.getStatistics();
+            setStatistics(statsData);
+            
+            // Fetch user spin profiles - SỬA LẠI CÁCH GỌI
+            try {
+                const profilesData = await gameService.getUserSpinProfiles();
+                setSpinProfiles(profilesData);
+            } catch (profileError) {
+                console.error('Error fetching profiles:', profileError);
+                // Nếu chưa có endpoint /profiles, tạo dữ liệu mẫu từ users
+                setSpinProfiles([]);
+            }
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            notify.error('Không thể tải dữ liệu');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        // Simulate loading
-        setTimeout(() => setLoading(false), 500);
-    }, []);
+        if (isAdmin) {
+            fetchData();
+        }
+    }, [isAdmin]);
 
-    // ===== HANDLERS =====
+    // Prize handlers
     const handleAddPrize = () => {
         setEditingPrize(null);
+        setPrizeForm({
+            name: '',
+            type: 'points',
+            value: 0,
+            icon: '🎁',
+            color: '#c41e3a',
+            textColor: '#ffffff',
+            description: '',
+            active: true,
+            probability: 0.1,
+        });
         setShowPrizeModal(true);
     };
 
-    const handleEditPrize = (prize: GamePrize) => {
+    const handleEditPrize = (prize: Prize) => {
         setEditingPrize(prize);
+        setPrizeForm(prize);
         setShowPrizeModal(true);
     };
 
-    const handleDeletePrize = async (prizeId: number) => {
-        if (window.confirm('Bạn có chắc chắn muốn xóa giải thưởng này?')) {
-            try {
-                setPrizes(prizes.filter(p => p.id !== prizeId));
-                notify.success('Đã xóa giải thưởng');
-            } catch (error) {
-                notify.error('Xóa thất bại');
-            }
+    const handleSavePrize = async () => {
+        if (!prizeForm.name || prizeForm.value === undefined) {
+            notify.warning('Vui lòng nhập đầy đủ thông tin');
+            return;
         }
-    };
 
-    const handleSavePrize = async (formData: Partial<GamePrize>) => {
         try {
             if (editingPrize) {
-                // Update
-                setPrizes(prizes.map(p => 
-                    p.id === editingPrize.id ? { ...p, ...formData } as GamePrize : p
-                ));
+                await gameService.updatePrize(editingPrize.id, prizeForm);
                 notify.success('Cập nhật giải thưởng thành công');
             } else {
-                // Create
-                const newPrize: GamePrize = {
-                    id: Math.max(...prizes.map(p => p.id)) + 1,
-                    name: formData.name || '',
-                    type: formData.type || 'none',
-                    value: formData.value,
-                    color: formData.color || '#6B7280',
-                    textColor: '#FFFFFF',
-                    icon: formData.icon || '🎁',
-                    description: formData.description || '',
-                    quantity: formData.quantity || 0,
-                    remaining: formData.quantity || 0,
-                    probability: formData.probability || 0,
-                    claimed: 0,
-                };
-                setPrizes([...prizes, newPrize]);
+                await gameService.createPrize(prizeForm as Omit<Prize, 'id'>);
                 notify.success('Thêm giải thưởng thành công');
             }
+            await fetchData();
             setShowPrizeModal(false);
-            setEditingPrize(null);
-        } catch (error) {
-            notify.error('Lưu thất bại');
+        } catch (error: any) {
+            console.error('Save error:', error);
+            notify.error(error.response?.data?.message || 'Lưu thất bại');
         }
     };
 
-    const handleToggleGameStatus = async () => {
-        const newStatus = gameConfig.status === 'active' ? 'inactive' : 'active';
+   const handleDeletePrize = async (id: number) => {
+    // Thêm confirm để tránh xóa nhầm
+    if (!window.confirm('Bạn có chắc chắn muốn xóa giải thưởng này? Hành động này không thể hoàn tác!')) {
+        return;
+    }
+    
+    try {
+        // Log để debug
+        console.log('Deleting prize with ID:', id);
+        
+        const response = await gameService.deletePrize(id);
+        console.log('Delete response:', response);
+        
+        notify.success('Xóa giải thưởng thành công');
+        await fetchData(); // Refresh danh sách
+    } catch (error: any) {
+        console.error('Delete error details:', error);
+        
+        // Xử lý các lỗi cụ thể
+        if (error.response?.status === 409) {
+            notify.error('Không thể xóa vì giải thưởng đã được sử dụng trong lịch sử quay');
+        } else if (error.response?.status === 404) {
+            notify.error('Không tìm thấy giải thưởng');
+        } else {
+            notify.error(error.response?.data?.message || 'Xóa thất bại');
+        }
+    }
+};
+    // User points handlers
+    const handleAddPoints = async () => {
+        if (!selectedUser || pointsToAdd <= 0) {
+            notify.warning('Vui lòng nhập số điểm hợp lệ');
+            return;
+        }
+
         try {
-            setGameConfig({ ...gameConfig, status: newStatus });
-            notify.success(`Đã ${newStatus === 'active' ? 'bật' : 'tắt'} vòng quay`);
-        } catch (error) {
-            notify.error('Thao tác thất bại');
+            await gameService.addPoints(selectedUser.userId, pointsToAdd);
+            notify.success(`Đã thêm ${pointsToAdd} điểm cho ${selectedUser.user?.fullName || selectedUser.user?.email}`);
+            await fetchData();
+            setShowPointsModal(false);
+            setPointsToAdd(0);
+            setSelectedUser(null);
+        } catch (error: any) {
+            console.error('Add points error:', error);
+            notify.error(error.response?.data?.message || 'Thêm điểm thất bại');
         }
     };
 
-    const handleResetStats = async () => {
-        if (window.confirm('Bạn có chắc chắn muốn reset toàn bộ thống kê? Hành động này không thể hoàn tác!')) {
+    const handleResetSpinLimit = async (userId: number, userName: string) => {
+        if (window.confirm(`Xác nhận reset giới hạn quay cho ${userName}?`)) {
             try {
-                setGameStats({
-                    totalSpins: 0,
-                    totalWinners: 0,
-                    totalGifts: 0,
-                    activePlayers: 0,
-                    todaySpins: 0,
-                    conversionRate: 0,
-                });
-                notify.success('Đã reset thống kê');
-            } catch (error) {
-                notify.error('Reset thất bại');
+                await gameService.resetSpinLimit(userId);
+                notify.success('Reset giới hạn quay thành công');
+                await fetchData();
+            } catch (error: any) {
+                console.error('Reset error:', error);
+                notify.error(error.response?.data?.message || 'Reset thất bại');
             }
         }
     };
 
-    const handleClaimPrize = async (winnerId: number) => {
-        try {
-            setWinners(winners.map(w => 
-                w.id === winnerId 
-                    ? { ...w, claimed: true, claimedDate: new Date().toISOString().split('T')[0] }
-                    : w
-            ));
-            notify.success('Đã xác nhận trao thưởng');
-        } catch (error) {
-            notify.error('Xác nhận thất bại');
-        }
-    };
-
+    // Helper functions
     const formatCurrency = (amount?: number) => {
         if (!amount) return '';
         return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
     };
 
-    const getTypeText = (type: GamePrize['type']) => {
-        const texts = {
-            voucher: 'Voucher giảm giá',
-            product: 'Sản phẩm',
-            discount: 'Giảm giá',
-            none: 'Cảm ơn',
+    const getTypeText = (type: string) => {
+        const texts: Record<string, string> = {
+            points: 'Điểm thưởng',
+            discount: 'Giảm giá (%)',
+            voucher: 'Voucher',
+            empty: 'Cảm ơn',
         };
-        return texts[type];
+        return texts[type] || type;
     };
 
-    const getProbabilityColor = (probability: number) => {
-        if (probability >= 30) return 'var(--success)';
-        if (probability >= 15) return 'var(--warning)';
-        return 'var(--error)';
+    const formatDate = (dateString: string | null) => {
+        if (!dateString) return 'Chưa quay lần nào';
+        return new Date(dateString).toLocaleString('vi-VN');
     };
+
+    // Check if user has admin access
+    if (!isAdmin && !loading) {
+        return (
+            <div className="access-denied">
+                <div className="access-denied-content">
+                    <ShieldCheckIcon className="access-denied-icon" />
+                    <h2>Access Denied</h2>
+                    <p>Bạn không có quyền truy cập trang quản trị</p>
+                    <button onClick={() => window.location.href = '/'}>
+                        Quay lại trang chủ
+                    </button>
+                </div>
+            </div>
+        );
+    }
 
     if (loading) {
         return (
             <div className="loading-container">
                 <div className="loading-spinner"></div>
-                <p className="loading-text">Đang tải dữ liệu game...</p>
+                <p className="loading-text">Đang tải dữ liệu...</p>
             </div>
         );
     }
 
     return (
-        <div className="games-container">
+        <div className="admin-luckywheel">
+            {/* Admin Badge */}
+            {currentUser && (
+                <div className="admin-badge">
+                    <ShieldCheckIcon className="admin-badge-icon" />
+                    <span>Quản trị viên: {currentUser.email}</span>
+                </div>
+            )}
+
             {/* Header */}
-            <div className="games-header">
-                <div className="games-title-wrapper">
-                    <h1 className="games-title">
-                        🎡 Quản Lý Mini Game
+            <div className="admin-luckywheel-header">
+                <div className="header-content">
+                    <h1>
+                        <TrophyIcon className="header-icon" />
+                        Quản Lý Vòng Quay May Mắn
                     </h1>
-                    <div className={`game-status-badge ${gameConfig.status === 'active' ? 'active' : 'inactive'}`}>
-                        {gameConfig.status === 'active' ? (
-                            <>
-                                <PlayIcon className="w-3 h-3" />
-                                Đang hoạt động
-                            </>
-                        ) : (
-                            <>
-                                <StopIcon className="w-3 h-3" />
-                                Tạm dừng
-                            </>
-                        )}
-                    </div>
+                    <p className="header-subtitle">Quản lý giải thưởng, điểm thưởng và người chơi</p>
                 </div>
-                <p className="games-subtitle">
-                    Quản lý vòng quay may mắn Tết Bính Ngọ 2026 - Cấu hình giải thưởng, theo dõi người chơi
-                </p>
-            </div>
-
-            {/* Stats Cards */}
-            <div className="games-stats-grid">
-                <div className="game-stat-card">
-                    <div className="stat-header-game">
-                        <span className="stat-title-game">Tổng lượt quay</span>
-                        <GiftIcon className="stat-icon-game" />
-                    </div>
-                    <div className="stat-value-game">{gameStats.totalSpins.toLocaleString()}</div>
-                    <div className="stat-trend positive">+{gameStats.todaySpins} hôm nay</div>
-                </div>
-
-                <div className="game-stat-card">
-                    <div className="stat-header-game">
-                        <span className="stat-title-game">Người trúng thưởng</span>
-                        <TrophyIcon className="stat-icon-game" />
-                    </div>
-                    <div className="stat-value-game">{gameStats.totalWinners.toLocaleString()}</div>
-                    <div className="stat-trend positive">Tỷ lệ {gameStats.conversionRate}%</div>
-                </div>
-
-                <div className="game-stat-card">
-                    <div className="stat-header-game">
-                        <span className="stat-title-game">Quà đã trao</span>
-                        <UsersIcon className="stat-icon-game" />
-                    </div>
-                    <div className="stat-value-game">{gameStats.totalGifts.toLocaleString()}</div>
-                    <div className="stat-trend">{prizes.reduce((sum, p) => sum + p.claimed, 0)} đã nhận</div>
-                </div>
-
-                <div className="game-stat-card">
-                    <div className="stat-header-game">
-                        <span className="stat-title-game">Đang chơi</span>
-                        <CalendarIcon className="stat-icon-game" />
-                    </div>
-                    <div className="stat-value-game">{gameStats.activePlayers}</div>
-                    <div className="stat-trend">Lượt quay hôm nay</div>
+                <div className="header-actions">
+                    <button className="btn-refresh" onClick={fetchData}>
+                        <ArrowPathIcon className="w-4 h-4" />
+                        Làm mới
+                    </button>
                 </div>
             </div>
 
-            {/* Tab Navigation */}
-            <div className="games-tabs">
+            {/* Statistics Cards */}
+            <div className="stats-grid">
+                <div className="stat-card">
+                    <div className="stat-icon bg-blue">
+                        <UsersIcon className="w-6 h-6" />
+                    </div>
+                    <div className="stat-info">
+                        <div className="stat-value">{statistics.totalUsers}</div>
+                        <div className="stat-label">Người dùng</div>
+                    </div>
+                </div>
+                <div className="stat-card">
+                    <div className="stat-icon bg-gold">
+                        <StarIcon className="w-6 h-6" />
+                    </div>
+                    <div className="stat-info">
+                        <div className="stat-value">{statistics.totalPoints.toLocaleString()}</div>
+                        <div className="stat-label">Tổng điểm</div>
+                    </div>
+                </div>
+                <div className="stat-card">
+                    <div className="stat-icon bg-green">
+                        <CalendarIcon className="w-6 h-6" />
+                    </div>
+                    <div className="stat-info">
+                        <div className="stat-value">{statistics.usersSpunToday}</div>
+                        <div className="stat-label">Quay hôm nay</div>
+                    </div>
+                </div>
+                <div className="stat-card">
+                    <div className="stat-icon bg-purple">
+                        <ChartBarIcon className="w-6 h-6" />
+                    </div>
+                    <div className="stat-info">
+                        <div className="stat-value">{statistics.averagePoints.toLocaleString()}</div>
+                        <div className="stat-label">Điểm TB</div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Tabs */}
+            <div className="admin-tabs">
                 <button 
                     className={`tab-btn ${activeTab === 'prizes' ? 'active' : ''}`}
                     onClick={() => setActiveTab('prizes')}
@@ -487,37 +342,27 @@ const Games: React.FC = () => {
                     Giải thưởng
                 </button>
                 <button 
-                    className={`tab-btn ${activeTab === 'winners' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('winners')}
+                    className={`tab-btn ${activeTab === 'users' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('users')}
                 >
-                    <TrophyIcon className="tab-icon" />
-                    Người trúng thưởng
+                    <UsersIcon className="tab-icon" />
+                    Người chơi
                 </button>
                 <button 
-                    className={`tab-btn ${activeTab === 'config' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('config')}
-                >
-                    <SparklesIcon className="tab-icon" />
-                    Cấu hình
-                </button>
-                <button 
-                    className={`tab-btn ${activeTab === 'analytics' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('analytics')}
+                    className={`tab-btn ${activeTab === 'stats' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('stats')}
                 >
                     <ChartBarIcon className="tab-icon" />
                     Thống kê
                 </button>
             </div>
 
-            {/* Tab Content: Prizes */}
+            {/* Prizes Tab */}
             {activeTab === 'prizes' && (
-                <div className="prizes-section">
-                    <div className="section-header-game">
-                        <div>
-                            <h3 className="section-title-game">Danh Sách Giải Thưởng</h3>
-                            <p className="section-subtitle-game">Quản lý các giải thưởng trong vòng quay</p>
-                        </div>
-                        <button className="create-prize-btn" onClick={handleAddPrize}>
+                <div className="prizes-tab">
+                    <div className="tab-header">
+                        <h2>Danh sách giải thưởng</h2>
+                        <button className="btn-create" onClick={handleAddPrize}>
                             <PlusIcon className="w-4 h-4" />
                             Thêm giải thưởng
                         </button>
@@ -527,63 +372,33 @@ const Games: React.FC = () => {
                         {prizes.map((prize) => (
                             <div key={prize.id} className="prize-card" style={{ borderTopColor: prize.color }}>
                                 <div className="prize-card-header">
-                                    <div className="prize-icon" style={{ background: prize.color }}>
-                                        <span>{prize.icon}</span>
+                                    <div className="prize-icon" style={{ backgroundColor: prize.color }}>
+                                        <span className="prize-emoji">{prize.icon || '🎁'}</span>
                                     </div>
                                     <div className="prize-info">
-                                        <h4 className="prize-name">{prize.name}</h4>
-                                        <span className="prize-type">{getTypeText(prize.type)}</span>
+                                        <h3>{prize.name}</h3>
+                                        <span className="prize-type">{getTypeText(prize.type || 'points')}</span>
                                     </div>
                                     <div className="prize-actions">
-                                        <button className="prize-action-btn edit" onClick={() => handleEditPrize(prize)}>
+                                        <button className="action-btn edit" onClick={() => handleEditPrize(prize)}>
                                             <PencilIcon className="w-4 h-4" />
                                         </button>
-                                        <button className="prize-action-btn delete" onClick={() => handleDeletePrize(prize.id)}>
+                                        <button className="action-btn delete" onClick={() => handleDeletePrize(prize.id)}>
                                             <TrashIcon className="w-4 h-4" />
                                         </button>
                                     </div>
                                 </div>
-                                
                                 <div className="prize-card-body">
-                                    <p className="prize-description">{prize.description}</p>
-                                    
-                                    <div className="prize-stats">
-                                        <div className="prize-stat">
-                                            <span className="stat-label">Số lượng</span>
-                                            <span className="stat-value">{prize.quantity}</span>
-                                        </div>
-                                        <div className="prize-stat">
-                                            <span className="stat-label">Còn lại</span>
-                                            <span className="stat-value" style={{ color: prize.remaining > 0 ? 'var(--success)' : 'var(--error)' }}>
-                                                {prize.remaining}
-                                            </span>
-                                        </div>
-                                        <div className="prize-stat">
-                                            <span className="stat-label">Đã trao</span>
-                                            <span className="stat-value">{prize.claimed}</span>
-                                        </div>
+                                    <p className="prize-description">{prize.description || 'Chưa có mô tả'}</p>
+                                    <div className="prize-value">
+                                        <strong>Giá trị:</strong>
+                                        <span>
+                                            {prize.type === 'points' && `${prize.value} điểm`}
+                                            {prize.type === 'discount' && `Giảm ${prize.value}%`}
+                                            {prize.type === 'voucher' && formatCurrency(prize.value)}
+                                            {prize.type === 'empty' && 'Chúc may mắn lần sau'}
+                                        </span>
                                     </div>
-                                    
-                                    <div className="probability-section">
-                                        <div className="probability-header">
-                                            <span className="probability-label">Tỷ lệ trúng</span>
-                                            <span className="probability-value" style={{ color: getProbabilityColor(prize.probability) }}>
-                                                {prize.probability}%
-                                            </span>
-                                        </div>
-                                        <div className="probability-bar">
-                                            <div 
-                                                className="probability-fill" 
-                                                style={{ width: `${prize.probability}%`, background: prize.color }}
-                                            ></div>
-                                        </div>
-                                    </div>
-                                    
-                                    {prize.value && (
-                                        <div className="prize-value">
-                                            Giá trị: {prize.type === 'voucher' ? formatCurrency(prize.value) : `${prize.value}%`}
-                                        </div>
-                                    )}
                                 </div>
                             </div>
                         ))}
@@ -591,311 +406,133 @@ const Games: React.FC = () => {
                 </div>
             )}
 
-            {/* Tab Content: Winners */}
-            {activeTab === 'winners' && (
-                <div className="winners-section">
-                    <div className="section-header-game">
-                        <div>
-                            <h3 className="section-title-game">Người Trúng Thưởng</h3>
-                            <p className="section-subtitle-game">Danh sách người chơi may mắn</p>
-                        </div>
-                        <div className="winner-filters">
-                            <select className="filter-select">
-                                <option value="all">Tất cả</option>
-                                <option value="claimed">Đã nhận quà</option>
-                                <option value="unclaimed">Chưa nhận</option>
-                            </select>
-                            <input type="text" className="filter-input" placeholder="Tìm kiếm..." />
-                        </div>
+            {/* Users Tab */}
+            {activeTab === 'users' && (
+                <div className="users-tab">
+                    <div className="tab-header">
+                        <h2>Danh sách người chơi</h2>
+                        <p className="tab-subtitle">Quản lý điểm thưởng và lượt quay của người dùng</p>
                     </div>
 
-                    <div className="winners-table-container">
-                        <table className="winners-table">
-                            <thead>
-                                <tr>
-                                    <th>Người chơi</th>
-                                    <th>Giải thưởng</th>
-                                    <th>Số lượt quay</th>
-                                    <th>Ngày trúng</th>
-                                    <th>Trạng thái</th>
-                                    <th>Thao tác</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {winners.map((winner) => {
-                                    const prize = prizes.find(p => p.id === winner.prizeId);
-                                    return (
-                                        <tr key={winner.id}>
+                    <div className="users-table-container">
+                        {spinProfiles.length === 0 ? (
+                            <div className="empty-state">
+                                <ExclamationTriangleIcon className="empty-icon" />
+                                <p>Chưa có dữ liệu người chơi</p>
+                                <p className="empty-hint">Hãy đảm bảo đã thêm endpoint <code>/api/admin/lucky-wheel/profiles</code> vào backend</p>
+                            </div>
+                        ) : (
+                            <table className="users-table">
+                                <thead>
+                                    <tr>
+                                        <th>Người dùng</th>
+                                        <th>Điểm thưởng</th>
+                                        <th>Lần quay cuối</th>
+                                        <th>Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {spinProfiles.map((profile) => (
+                                        <tr key={profile.userId}>
                                             <td>
-                                                <div className="winner-info">
-                                                    <div className="winner-avatar">
-                                                        {winner.name.charAt(0)}
+                                                <div className="user-info">
+                                                    <div className="user-avatar">
+                                                        {profile.user?.fullName?.charAt(0) || profile.user?.email?.charAt(0) || 'U'}
                                                     </div>
-                                                    <div>
-                                                        <div className="winner-name">{winner.name}</div>
-                                                        <div className="winner-contact">{winner.email || winner.phone}</div>
+                                                    <div className="user-details">
+                                                        <div className="user-name">{profile.user?.fullName || 'Unknown'}</div>
+                                                        <div className="user-email">{profile.user?.email}</div>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td>
-                                                <div className="winner-prize" style={{ color: prize?.color }}>
-                                                    <span>{prize?.icon}</span>
-                                                    <span>{winner.prize}</span>
+                                                <div className="points-display">
+                                                    <StarIcon className="points-icon" />
+                                                    <span className="points-value">{profile.points?.toLocaleString() || 0}</span>
                                                 </div>
                                             </td>
-                                            <td>{winner.spinCount}</td>
-                                            <td>{winner.date.split(' ')[0]}</td>
+                                            <td>{formatDate(profile.lastSpinDate)}</td>
                                             <td>
-                                                <span className={`claim-status ${winner.claimed ? 'claimed' : 'pending'}`}>
-                                                    {winner.claimed ? 'Đã nhận' : 'Chưa nhận'}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                {!winner.claimed && (
+                                                <div className="action-buttons">
                                                     <button 
-                                                        className="claim-btn"
-                                                        onClick={() => handleClaimPrize(winner.id)}
+                                                        className="action-btn add-points"
+                                                        onClick={() => {
+                                                            setSelectedUser(profile);
+                                                            setShowPointsModal(true);
+                                                        }}
+                                                        title="Cộng điểm"
                                                     >
-                                                        Xác nhận trao
+                                                        <PlusIcon className="w-4 h-4" />
+                                                        Cộng điểm
                                                     </button>
-                                                )}
-                                                <button 
-                                                    className="view-btn"
-                                                    onClick={() => setSelectedWinner(winner)}
-                                                >
-                                                    <EyeIcon className="w-4 h-4" />
-                                                </button>
+                                                    <button 
+                                                        className="action-btn reset"
+                                                        onClick={() => handleResetSpinLimit(profile.userId, profile.user?.fullName || profile.user?.email || '')}
+                                                        title="Reset giới hạn quay"
+                                                    >
+                                                        <ArrowPathIcon className="w-4 h-4" />
+                                                        Reset
+                                                    </button>
+                                                </div>
                                             </td>
                                         </tr>
-                                    );
-                                })}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            )}
-
-            {/* Tab Content: Configuration */}
-            {activeTab === 'config' && (
-                <div className="config-section">
-                    <div className="config-card">
-                        <div className="config-header">
-                            <h3>Cấu hình vòng quay</h3>
-                            <button 
-                                className={`game-toggle-btn ${gameConfig.status === 'active' ? 'active' : 'inactive'}`}
-                                onClick={handleToggleGameStatus}
-                            >
-                                {gameConfig.status === 'active' ? (
-                                    <>
-                                        <StopIcon className="w-4 h-4" />
-                                        Tạm dừng game
-                                    </>
-                                ) : (
-                                    <>
-                                        <PlayIcon className="w-4 h-4" />
-                                        Kích hoạt game
-                                    </>
-                                )}
-                            </button>
-                        </div>
-                        
-                        <div className="config-body">
-                            <div className="form-group">
-                                <label>Tên game</label>
-                                <input 
-                                    type="text" 
-                                    className="form-input"
-                                    value={gameConfig.name}
-                                    onChange={(e) => setGameConfig({ ...gameConfig, name: e.target.value })}
-                                />
-                            </div>
-                            
-                            <div className="form-group">
-                                <label>Mô tả</label>
-                                <textarea 
-                                    className="form-input"
-                                    rows={3}
-                                    value={gameConfig.description}
-                                    onChange={(e) => setGameConfig({ ...gameConfig, description: e.target.value })}
-                                />
-                            </div>
-                            
-                            <div className="form-row">
-                                <div className="form-group">
-                                    <label>Ngày bắt đầu</label>
-                                    <input 
-                                        type="date" 
-                                        className="form-input"
-                                        value={gameConfig.startDate}
-                                        onChange={(e) => setGameConfig({ ...gameConfig, startDate: e.target.value })}
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label>Ngày kết thúc</label>
-                                    <input 
-                                        type="date" 
-                                        className="form-input"
-                                        value={gameConfig.endDate}
-                                        onChange={(e) => setGameConfig({ ...gameConfig, endDate: e.target.value })}
-                                    />
-                                </div>
-                            </div>
-                            
-                            <div className="form-row">
-                                <div className="form-group">
-                                    <label>Giới hạn lượt quay/người</label>
-                                    <input 
-                                        type="number" 
-                                        className="form-input"
-                                        value={gameConfig.spinLimit}
-                                        onChange={(e) => setGameConfig({ ...gameConfig, spinLimit: Number(e.target.value) })}
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label>Lượt quay miễn phí/ngày</label>
-                                    <input 
-                                        type="number" 
-                                        className="form-input"
-                                        value={gameConfig.freeSpinPerDay}
-                                        onChange={(e) => setGameConfig({ ...gameConfig, freeSpinPerDay: Number(e.target.value) })}
-                                    />
-                                </div>
-                            </div>
-                            
-                            <div className="form-row">
-                                <div className="form-group">
-                                    <label>Màu chủ đạo</label>
-                                    <input 
-                                        type="color" 
-                                        className="form-input"
-                                        value={gameConfig.theme.primaryColor}
-                                        onChange={(e) => setGameConfig({ 
-                                            ...gameConfig, 
-                                            theme: { ...gameConfig.theme, primaryColor: e.target.value }
-                                        })}
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label>Màu phụ</label>
-                                    <input 
-                                        type="color" 
-                                        className="form-input"
-                                        value={gameConfig.theme.secondaryColor}
-                                        onChange={(e) => setGameConfig({ 
-                                            ...gameConfig, 
-                                            theme: { ...gameConfig.theme, secondaryColor: e.target.value }
-                                        })}
-                                    />
-                                </div>
-                            </div>
-                            
-                            <div className="form-group">
-                                <div className="checkbox-group">
-                                    <label className="checkbox-label">
-                                        <input 
-                                            type="checkbox" 
-                                            checked={gameConfig.requireLogin}
-                                            onChange={(e) => setGameConfig({ ...gameConfig, requireLogin: e.target.checked })}
-                                        />
-                                        <span>Yêu cầu đăng nhập để quay</span>
-                                    </label>
-                                </div>
-                                <div className="checkbox-group">
-                                    <label className="checkbox-label">
-                                        <input 
-                                            type="checkbox" 
-                                            checked={gameConfig.allowMultipleSpin}
-                                            onChange={(e) => setGameConfig({ ...gameConfig, allowMultipleSpin: e.target.checked })}
-                                        />
-                                        <span>Cho phép quay nhiều lần</span>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div className="config-footer">
-                            <button className="btn btn-primary" onClick={() => {
-                                notify.success('Đã lưu cấu hình');
-                            }}>
-                                Lưu cấu hình
-                            </button>
-                            <button className="btn btn-danger" onClick={handleResetStats}>
-                                Reset thống kê
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Tab Content: Analytics */}
-            {activeTab === 'analytics' && (
-                <div className="analytics-section">
-                    <div className="analytics-card">
-                        <div className="analytics-header">
-                            <h3>Thống kê lượt quay</h3>
-                            <button className="refresh-btn">
-                                <ArrowPathIcon className="w-4 h-4" />
-                                Làm mới
-                            </button>
-                        </div>
-                        
-                        <div className="chart-container">
-                            <div className="simple-chart">
-                                <div className="chart-legend">
-                                    <div className="legend-item">
-                                        <div className="legend-color spins"></div>
-                                        <span>Lượt quay</span>
-                                    </div>
-                                    <div className="legend-item">
-                                        <div className="legend-color winners"></div>
-                                        <span>Người trúng</span>
-                                    </div>
-                                </div>
-                                <div className="chart-bars">
-                                    {spinData.labels.map((label, index) => (
-                                        <div key={index} className="chart-bar-group">
-                                            <div className="chart-bar-wrapper">
-                                                <div 
-                                                    className="chart-bar spins" 
-                                                    style={{ height: `${(spinData.spins[index] / Math.max(...spinData.spins)) * 100}%` }}
-                                                >
-                                                    <span className="bar-value">{spinData.spins[index]}</span>
-                                                </div>
-                                                <div 
-                                                    className="chart-bar winners" 
-                                                    style={{ height: `${(spinData.winners[index] / Math.max(...spinData.winners)) * 100}%` }}
-                                                >
-                                                    <span className="bar-value">{spinData.winners[index]}</span>
-                                                </div>
-                                            </div>
-                                            <div className="chart-label">{label}</div>
-                                        </div>
                                     ))}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div className="stats-summary">
-                        <div className="summary-card">
-                            <div className="summary-title">Tỷ lệ trúng thưởng trung bình</div>
-                            <div className="summary-value">{((gameStats.totalWinners / gameStats.totalSpins) * 100).toFixed(1)}%</div>
-                        </div>
-                        <div className="summary-card">
-                            <div className="summary-title">Giải thưởng phổ biến nhất</div>
-                            <div className="summary-value">
-                                {prizes.reduce((prev, current) => (prev.claimed > current.claimed) ? prev : current).name}
-                            </div>
-                        </div>
-                        <div className="summary-card">
-                            <div className="summary-title">Thời điểm quay nhiều nhất</div>
-                            <div className="summary-value">20:00 - 22:00</div>
-                        </div>
+                                </tbody>
+                            </table>
+                        )}
                     </div>
                 </div>
             )}
 
-            {/* Prize Modal */}
+            {/* Statistics Tab */}
+            {activeTab === 'stats' && (
+                <div className="stats-tab">
+                    <div className="stats-card">
+                        <h3>Thống kê chi tiết</h3>
+                        <div className="stats-details">
+                            <div className="stat-item">
+                                <div className="stat-label">Tổng số người dùng tham gia</div>
+                                <div className="stat-number">{statistics.totalUsers}</div>
+                            </div>
+                            <div className="stat-item">
+                                <div className="stat-label">Tổng điểm thưởng đã phát</div>
+                                <div className="stat-number">{statistics.totalPoints.toLocaleString()}</div>
+                            </div>
+                            <div className="stat-item">
+                                <div className="stat-label">Người quay hôm nay</div>
+                                <div className="stat-number">{statistics.usersSpunToday}</div>
+                            </div>
+                            <div className="stat-item">
+                                <div className="stat-label">Điểm trung bình mỗi người</div>
+                                <div className="stat-number">{statistics.averagePoints.toLocaleString()}</div>
+                            </div>
+                            <div className="stat-item">
+                                <div className="stat-label">Số lượng giải thưởng</div>
+                                <div className="stat-number">{prizes.length}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="info-card">
+                        <h4>📌 Hướng dẫn quản lý</h4>
+                        <ul>
+                            <li><strong>Giải thưởng:</strong> Thêm/sửa/xóa các giải thưởng trong vòng quay</li>
+                            <li><strong>Điểm thưởng:</strong> Có thể cộng thêm điểm cho người dùng bất kỳ lúc nào</li>
+                            <li><strong>Reset giới hạn quay:</strong> Cho phép người dùng quay lại trong ngày</li>
+                            <li><strong>Loại giải thưởng:</strong>
+                                <ul>
+                                    <li>Điểm thưởng - Cộng điểm vào tài khoản</li>
+                                    <li>Giảm giá (%) - Áp dụng cho đơn hàng</li>
+                                    <li>Voucher - Giảm giá theo số tiền</li>
+                                    <li>Cảm ơn - Không có thưởng</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            )}
+
+            {/* Prize Modal - giữ nguyên */}
             {showPrizeModal && (
                 <div className="modal-overlay" onClick={() => setShowPrizeModal(false)}>
                     <div className="prize-modal" onClick={(e) => e.stopPropagation()}>
@@ -905,89 +542,74 @@ const Games: React.FC = () => {
                         </div>
                         <div className="modal-body">
                             <div className="form-group">
-                                <label>Tên giải thưởng</label>
+                                <label>Tên giải thưởng <span className="required">*</span></label>
                                 <input 
                                     type="text" 
-                                    className="form-input"
-                                    defaultValue={editingPrize?.name}
-                                    id="prizeName"
+                                    placeholder="VD: 100 Points, Voucher 50k..."
+                                    value={prizeForm.name}
+                                    onChange={(e) => setPrizeForm({ ...prizeForm, name: e.target.value })}
                                 />
                             </div>
-                            
-                            <div className="form-group">
-                                <label>Loại giải thưởng</label>
-                                <select className="form-input" id="prizeType" defaultValue={editingPrize?.type}>
-                                    <option value="voucher">Voucher giảm giá</option>
-                                    <option value="product">Sản phẩm</option>
-                                    <option value="discount">Giảm giá</option>
-                                    <option value="none">Cảm ơn</option>
-                                </select>
+
+                            <div className="form-row">
+                                <div className="form-group">
+                                    <label>Loại giải thưởng</label>
+                                    <select 
+                                        value={prizeForm.type}
+                                        onChange={(e) => setPrizeForm({ ...prizeForm, type: e.target.value as any })}
+                                    >
+                                        <option value="points">Điểm thưởng</option>
+                                        <option value="discount">Giảm giá (%)</option>
+                                        <option value="voucher">Voucher</option>
+                                        <option value="empty">Cảm ơn</option>
+                                    </select>
+                                </div>
+
+                                <div className="form-group">
+                                    <label>Giá trị <span className="required">*</span></label>
+                                    <input 
+                                        type="number" 
+                                        placeholder={prizeForm.type === 'discount' ? '% giảm' : 'Số tiền/điểm'}
+                                        value={prizeForm.value}
+                                        onChange={(e) => setPrizeForm({ ...prizeForm, value: Number(e.target.value) })}
+                                    />
+                                </div>
                             </div>
-                            
-                            <div className="form-group">
-                                <label>Biểu tượng</label>
-                                <input 
-                                    type="text" 
-                                    className="form-input"
-                                    defaultValue={editingPrize?.icon}
-                                    id="prizeIcon"
-                                />
+
+                            <div className="form-row">
+                                <div className="form-group">
+                                    <label>Biểu tượng (Emoji)</label>
+                                    <input 
+                                        type="text" 
+                                        placeholder="VD: 🎁, 🎟️, ⭐"
+                                        value={prizeForm.icon}
+                                        onChange={(e) => setPrizeForm({ ...prizeForm, icon: e.target.value })}
+                                    />
+                                </div>
+
+                                <div className="form-group">
+                                    <label>Màu nền</label>
+                                    <input 
+                                        type="color" 
+                                        value={prizeForm.color}
+                                        onChange={(e) => setPrizeForm({ ...prizeForm, color: e.target.value })}
+                                    />
+                                </div>
                             </div>
-                            
+
                             <div className="form-group">
                                 <label>Mô tả</label>
                                 <textarea 
-                                    className="form-input" 
                                     rows={3}
-                                    defaultValue={editingPrize?.description}
-                                    id="prizeDescription"
-                                />
-                            </div>
-                            
-                            <div className="form-row">
-                                <div className="form-group">
-                                    <label>Số lượng</label>
-                                    <input 
-                                        type="number" 
-                                        className="form-input"
-                                        defaultValue={editingPrize?.quantity}
-                                        id="prizeQuantity"
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label>Tỷ lệ trúng (%)</label>
-                                    <input 
-                                        type="number" 
-                                        className="form-input"
-                                        defaultValue={editingPrize?.probability}
-                                        id="prizeProbability"
-                                    />
-                                </div>
-                            </div>
-                            
-                            <div className="form-group">
-                                <label>Màu sắc</label>
-                                <input 
-                                    type="color" 
-                                    className="form-input"
-                                    defaultValue={editingPrize?.color || '#c41e3a'}
-                                    id="prizeColor"
+                                    placeholder="Mô tả chi tiết về giải thưởng..."
+                                    value={prizeForm.description}
+                                    onChange={(e) => setPrizeForm({ ...prizeForm, description: e.target.value })}
                                 />
                             </div>
                         </div>
                         <div className="modal-footer">
                             <button className="btn-cancel" onClick={() => setShowPrizeModal(false)}>Hủy</button>
-                            <button className="btn-submit" onClick={() => {
-                                const name = (document.getElementById('prizeName') as HTMLInputElement)?.value;
-                                const type = (document.getElementById('prizeType') as HTMLSelectElement)?.value as GamePrize['type'];
-                                const icon = (document.getElementById('prizeIcon') as HTMLInputElement)?.value;
-                                const description = (document.getElementById('prizeDescription') as HTMLTextAreaElement)?.value;
-                                const quantity = Number((document.getElementById('prizeQuantity') as HTMLInputElement)?.value);
-                                const probability = Number((document.getElementById('prizeProbability') as HTMLInputElement)?.value);
-                                const color = (document.getElementById('prizeColor') as HTMLInputElement)?.value;
-                                
-                                handleSavePrize({ name, type, icon, description, quantity, probability, color });
-                            }}>
+                            <button className="btn-submit" onClick={handleSavePrize}>
                                 {editingPrize ? 'Cập nhật' : 'Thêm mới'}
                             </button>
                         </div>
@@ -995,64 +617,46 @@ const Games: React.FC = () => {
                 </div>
             )}
 
-            {/* Winner Detail Modal */}
-            {selectedWinner && (
-                <div className="modal-overlay" onClick={() => setSelectedWinner(null)}>
-                    <div className="winner-detail-modal" onClick={(e) => e.stopPropagation()}>
+            {/* Add Points Modal - giữ nguyên */}
+            {showPointsModal && selectedUser && (
+                <div className="modal-overlay" onClick={() => setShowPointsModal(false)}>
+                    <div className="points-modal" onClick={(e) => e.stopPropagation()}>
                         <div className="modal-header">
-                            <h3>Chi tiết người trúng thưởng</h3>
-                            <button className="modal-close" onClick={() => setSelectedWinner(null)}>×</button>
+                            <h3>Cộng điểm cho người dùng</h3>
+                            <button className="modal-close" onClick={() => setShowPointsModal(false)}>×</button>
                         </div>
                         <div className="modal-body">
-                            <div className="winner-detail">
-                                <div className="detail-item">
-                                    <label>Họ tên:</label>
-                                    <span>{selectedWinner.name}</span>
+                            <div className="user-summary">
+                                <div className="user-avatar-large">
+                                    {selectedUser.user?.fullName?.charAt(0) || selectedUser.user?.email?.charAt(0) || 'U'}
                                 </div>
-                                <div className="detail-item">
-                                    <label>Email:</label>
-                                    <span>{selectedWinner.email || '---'}</span>
-                                </div>
-                                <div className="detail-item">
-                                    <label>Số điện thoại:</label>
-                                    <span>{selectedWinner.phone || '---'}</span>
-                                </div>
-                                <div className="detail-item">
-                                    <label>Giải thưởng:</label>
-                                    <span className="prize-highlight">{selectedWinner.prize}</span>
-                                </div>
-                                <div className="detail-item">
-                                    <label>Số lượt quay:</label>
-                                    <span>{selectedWinner.spinCount}</span>
-                                </div>
-                                <div className="detail-item">
-                                    <label>Ngày trúng:</label>
-                                    <span>{selectedWinner.date}</span>
-                                </div>
-                                <div className="detail-item">
-                                    <label>Trạng thái:</label>
-                                    <span className={`claim-status ${selectedWinner.claimed ? 'claimed' : 'pending'}`}>
-                                        {selectedWinner.claimed ? 'Đã nhận quà' : 'Chưa nhận quà'}
-                                    </span>
-                                </div>
-                                {selectedWinner.claimedDate && (
-                                    <div className="detail-item">
-                                        <label>Ngày nhận:</label>
-                                        <span>{selectedWinner.claimedDate}</span>
+                                <div className="user-info-summary">
+                                    <div className="user-name">{selectedUser.user?.fullName || 'Unknown'}</div>
+                                    <div className="user-email">{selectedUser.user?.email}</div>
+                                    <div className="current-points">
+                                        Điểm hiện tại: <strong>{selectedUser.points?.toLocaleString() || 0}</strong>
                                     </div>
-                                )}
+                                </div>
+                            </div>
+
+                            <div className="form-group">
+                                <label>Số điểm cần cộng</label>
+                                <input 
+                                    type="number" 
+                                    className="points-input"
+                                    placeholder="Nhập số điểm..."
+                                    value={pointsToAdd}
+                                    onChange={(e) => setPointsToAdd(Number(e.target.value))}
+                                    autoFocus
+                                />
                             </div>
                         </div>
                         <div className="modal-footer">
-                            {!selectedWinner.claimed && (
-                                <button className="btn-submit" onClick={() => {
-                                    handleClaimPrize(selectedWinner.id);
-                                    setSelectedWinner(null);
-                                }}>
-                                    Xác nhận trao thưởng
-                                </button>
-                            )}
-                            <button className="btn-cancel" onClick={() => setSelectedWinner(null)}>Đóng</button>
+                            <button className="btn-cancel" onClick={() => setShowPointsModal(false)}>Hủy</button>
+                            <button className="btn-submit" onClick={handleAddPoints}>
+                                <CheckCircleIcon className="w-4 h-4" />
+                                Xác nhận cộng
+                            </button>
                         </div>
                     </div>
                 </div>
