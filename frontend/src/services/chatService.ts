@@ -1,63 +1,76 @@
+// src/services/ChatService.ts
 import api from './api';
-import faqData from '../mock-data/faq.json';
-import { FAQItem } from '../types/model';
+
+export interface ChatMessage {
+    id?: number;
+    sessionId: number;
+    senderType: 'USER' | 'BOT';
+    content: string;
+    createdAt?: string;
+}
+
+export interface ChatRequest {
+    message: string;
+    sessionId?: number;
+    userId?: number;
+    anonymousId?: string;
+    isAnonymous?: boolean;
+}
+
+export interface ChatResponse {
+    reply: string;
+    sessionId: number;
+    isAnonymous: boolean;
+    anonymousId?: string;
+}
 
 export const ChatService = {
-    async getHistory(userId: string) {
-        const res = await api.get(`/messages?userId=${userId}`);
-        return res.data;
-    },
-
-    async saveMessage(msgData: any) {
-        const res = await api.post('/messages', msgData);
-        return res.data;
-    },
-
-    async findContextData(userInput: string): Promise<string> {
+    // Gửi tin nhắn đến chatbot
+    async sendMessage(request: ChatRequest): Promise<ChatResponse> {
         try {
-            const lowerInput = userInput.trim().toLowerCase();
-            
-            // 1. Tìm match trong FAQ với kiểu dữ liệu FAQItem
-            const match = (faqData as FAQItem[]).find((f) => 
-                f.keywords.some((key: string) => lowerInput.includes(key.toLowerCase()))
-            );
-
-            if (!match) return "";
-
-            // 2. Metadata danh mục - Cung cấp ID để AI tạo link: /products?page=1&cat=ID
-            const categoryMeta = `[HỆ THỐNG DANH MỤC]: { id: "${match.categoryId || ''}", tên: "${match.targetCategory || ''}" }`;
-
-            // 3. Xử lý khi yêu cầu hiển thị sản phẩm
-            if (match.action === "SHOW_PRODUCT" && match.targetCategory) {
-                // Encode URL để tránh lỗi tiếng Việt có dấu
-                const res = await api.get(`/products?category=${encodeURIComponent(match.targetCategory)}`);
-                const products = res.data;
-
-                // Lọc sản phẩm liên quan theo tên
-                const relatedProducts = products.filter((p: any) => 
-                    p.name.toLowerCase().includes(lowerInput)
-                );
-
-                // Ưu tiên sản phẩm liên quan, nếu không có thì lấy 3 sản phẩm đầu của danh mục
-                const displayList = relatedProducts.length > 0 ? relatedProducts : products.slice(0, 3);
-
-                if (displayList.length > 0) {
-                    const productListText = displayList
-                        .map((p: any) => `- ${p.name} | Giá: ${p.price.toLocaleString()}đ | ID: ${p.id}`)
-                        .join("\n");
-                    
-                    return `${categoryMeta}\nSẢN PHẨM HIỆN CÓ:\n${productListText}\nTHÔNG ĐIỆP GỐC: ${match.responseText}`;
-                } else {
-                    // Trường hợp danh mục tồn tại nhưng không có sản phẩm nào bên trong
-                    return `${categoryMeta}\nSẢN PHẨM HIỆN CÓ: HẾT HÀNG\nTHÔNG ĐIỆP GỐC: ${match.responseText}`;
-                }
-            }
-
-            // 4. Các trường hợp hỏi đáp thông thường (không cần list sản phẩm)
-            return `${categoryMeta}\nTHÔNG ĐIỆP GỐC: ${match.responseText}`;
-        } catch (error) {
-            console.error("Lỗi ChatService:", error);
-            return "";
+            const res = await api.post('/chat/ask', request);
+            return res.data;
+        } catch (error: any) {
+            console.error('Error sending message:', error);
+            throw new Error(error.response?.data?.error || 'Không thể gửi tin nhắn');
         }
+    },
+
+    // Lấy lịch sử chat theo sessionId
+    async getHistory(sessionId: number): Promise<ChatMessage[]> {
+        try {
+            const res = await api.get(`/chat/history/${sessionId}`);
+            return res.data;
+        } catch (error: any) {
+            console.error('Error getting history:', error);
+            return [];
+        }
+    },
+
+    // Đóng session chat
+    async closeSession(sessionId: number): Promise<void> {
+        try {
+            await api.post(`/chat/session/close/${sessionId}`);
+        } catch (error: any) {
+            console.error('Error closing session:', error);
+        }
+    },
+
+    // Lưu anonymousId vào localStorage
+    getAnonymousId(): string {
+        let anonymousId = localStorage.getItem('anonymous_chat_id');
+        if (!anonymousId) {
+            anonymousId = 'ANON_' + Math.random().toString(36).substring(2, 15);
+            localStorage.setItem('anonymous_chat_id', anonymousId);
+        }
+        return anonymousId;
+    },
+
+    // Lấy userId từ token hoặc anonymous
+    getUserId(currentUser: any): number | undefined {
+        if (currentUser?.id) {
+            return currentUser.id;
+        }
+        return undefined;
     }
 };
