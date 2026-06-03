@@ -48,30 +48,41 @@ public class MySecurity {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, CorsConfigurationSource corsConfigurationSource) throws Exception {
         http
-                // 1. Cấu hình CORS và CSRF
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .csrf(csrf -> csrf.disable())
-
-                // 2. Stateless: Không dùng Session (để fix lỗi invalid session id)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-                // 3. Xử lý lỗi 401
+                // Cấu hình xử lý lỗi
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint((request, response, authException) -> {
+                            String message = (String) request.getAttribute("exception");
+                            if (message == null) message = "Bạn cần đăng nhập để truy cập tài nguyên này.";
                             response.setStatus(401);
-                            response.setContentType("application/json");
-                            response.getWriter().write("{\"error\": \"Unauthorized: Login required\"}");
+                            response.setContentType("application/json;charset=UTF-8");
+                            response.getWriter().write("{\"status\": 401, \"message\": \"" + message + "\"}");
+                        })
+                        .accessDeniedHandler((request, response, accessDeniedException) -> {
+                            response.setStatus(403);
+                            response.setContentType("application/json;charset=UTF-8");
+                            response.getWriter().write("{\"status\": 403, \"message\": \"Bạn không có quyền truy cập vào tài nguyên này.\"}");
                         })
                 )
 
-                // 4. Định nghĩa quyền truy cập (Thứ tự từ công khai đến bảo mật)
+                // ===== ĐỊNH NGHĨA QUYỀN TRUY CẬP (Thứ tự ưu tiên từ TRÊN XUỐNG DƯỚI) =====
                 .authorizeHttpRequests(auth -> auth
-                        // Cho phép tất cả
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+
+                        // ==================== CẤP ĐỘ 1: PUBLIC - Ai cũng được truy cập ====================
+                        // OPTIONS requests cho CORS
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
+                        // Health check
                         .requestMatchers("/api/health").permitAll()
+
+                        // Authentication endpoints
                         .requestMatchers("/api/auth/**").permitAll()
 
-                        // Công khai GET
+                        // ===== PUBLIC GET ENDPOINTS =====
                         .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/product-images/**").permitAll()
@@ -81,20 +92,58 @@ public class MySecurity {
                         // Payment public
                         .requestMatchers("/api/payment/**").permitAll()
 
-                        // Carts công khai
+                        // Carts public
                         .requestMatchers("/api/carts/**").permitAll()
 
-                        // Bảo mật cao hơn
-                        .requestMatchers(HttpMethod.POST, "/api/reviews/**").hasAnyRole("USER", "ADMIN")
-                        .requestMatchers("/api/users/**").hasAnyRole("USER", "ADMIN")
-                        .requestMatchers("/api/orders/**").hasAnyRole("USER", "ADMIN") // orders cần đăng nhập
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        // ===== CHATBOX PUBLIC =====
+                        .requestMatchers("/api/chat/**").permitAll()
+                        .requestMatchers("/api/chat/ask").permitAll()
+                        .requestMatchers("/api/chat/history/**").permitAll()
+                        .requestMatchers("/api/chat/session/**").permitAll()
 
-                        // Còn lại phải đăng nhập
+                        // ===== LUCKY WHEEL PUBLIC =====
+                        .requestMatchers(HttpMethod.GET, "/api/prizes").permitAll()
+                        .requestMatchers("/api/lucky-wheel/spin").permitAll()
+                        .requestMatchers("/api/lucky-wheel/**").permitAll()
+
+                        // ===== TEST ENDPOINTS (Chỉ dùng cho development) =====
+                        .requestMatchers("/api/test/**").permitAll()
+                        .requestMatchers("/api/public/**").permitAll()
+
+                        // ==================== CẤP ĐỘ 2: AUTHENTICATED - Cần đăng nhập ====================
+                        // Lucky wheel authenticated endpoints
+                        .requestMatchers("/api/lucky-wheel/history").authenticated()
+                        .requestMatchers("/api/lucky-wheel/my-points").authenticated()
+
+                        // Reviews POST - Cần USER hoặc ADMIN
+                        .requestMatchers(HttpMethod.POST, "/api/reviews/**").hasAnyRole("USER", "ADMIN")
+
+                        // Users và Orders - Cần USER hoặc ADMIN
+                        .requestMatchers("/api/users/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/api/orders/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/api/admin/orders/**").hasRole("ADMIN")
+
+                        // ==================== CẤP ĐỘ 3: ADMIN - Chỉ ADMIN mới được truy cập ====================
+                        // Admin Chat Configuration
+                        .requestMatchers("/api/admin/chat-config/**").hasRole("ADMIN")
+                        .requestMatchers("/api/admin/chat-faq/**").hasRole("ADMIN")
+
+                        // Admin Lucky Wheel
+                        .requestMatchers("/api/admin/lucky-wheel/**").hasRole("ADMIN")
+                        .requestMatchers("/api/admin/lucky-wheel/prizes").hasRole("ADMIN")
+                        .requestMatchers("/api/admin/lucky-wheel/prizes/**").hasRole("ADMIN")
+                        .requestMatchers("/api/admin/lucky-wheel/spin-profiles").hasRole("ADMIN")
+                        .requestMatchers("/api/admin/lucky-wheel/users/**").hasRole("ADMIN")
+                        .requestMatchers("/api/admin/lucky-wheel/statistics").hasRole("ADMIN")
+
+                        // General Admin endpoints
+
+                        // ==================== CẤP ĐỘ 4: MẶC ĐỊNH - Tất cả các request còn lại ====================
+                        // Bất kỳ request nào không match các rule trên đều cần authenticated
                         .anyRequest().authenticated()
                 )
 
-                // 5. Đặt Filter JWT trước UsernamePasswordAuthenticationFilter
+                // Đặt Filter JWT trước UsernamePasswordAuthenticationFilter
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
