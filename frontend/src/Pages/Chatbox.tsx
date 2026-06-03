@@ -1,34 +1,38 @@
+// src/Pages/ChatBox.tsx
 import React, { useState, useRef, useEffect } from 'react';
-import { User } from "../types/model";
-import { renderMessageWithLinks } from "../untils/renderMessage";
-import { useChat } from "../hooks/useChat"; // Import hook vừa tách
-
+import { User } from '../types/model';
+import { renderMessageWithLinks, formatChatTime } from '../untils/renderMessage';
+import { useChat } from '../hooks/useChat';
 import '../Styles/chatbox.css';
 import '../Styles/chatWidget.css';
 
 interface ChatboxProps {
     currentUser: User | null;
+    onClose?: () => void;
 }
 
-const ChatBox: React.FC<ChatboxProps> = ({ currentUser }) => {
+const ChatBox: React.FC<ChatboxProps> = ({ currentUser, onClose }) => {
     const [input, setInput] = useState<string>('');
-    const { messages, isTyping, onSend } = useChat(currentUser); // Lấy data từ hook
-    const scrollBottomRef = useRef<HTMLDivElement>(null);
+    const { messages, isTyping, onSend } = useChat({ currentUser });
+    const messagesEndRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        scrollBottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messages, isTyping]);
 
     const handleSend = () => {
-        onSend(input);
-        setInput('');
+        if (input.trim() && !isTyping) {
+            onSend(input);
+            setInput('');
+        }
     };
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
-        if (e.key === 'Enter') handleSend();
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            handleSend();
+        }
     };
-
-    if (!currentUser) return <div className="chatbox-error">Vui lòng đăng nhập để chat</div>;
 
     return (
         <div className="chatbox">
@@ -38,15 +42,32 @@ const ChatBox: React.FC<ChatboxProps> = ({ currentUser }) => {
                     <span>Hỗ trợ HandMade</span>
                     <small>AI Assistant đang trực tuyến</small>
                 </div>
+                {onClose && (
+                    <button className="close-btn" onClick={onClose}>×</button>
+                )}
             </div>
 
             <div className="chat-body">
-                {messages.map((m) => (
-                    <div key={m.id || Math.random()} className={`chat-message ${m.sender === 'user' ? 'right' : 'left'}`}>
+                {messages.length === 0 && (
+                    <div className="welcome-message">
+                        <i className="fa-regular fa-comment-dots"></i>
+                        <p>Chào bạn! Tôi là trợ lý ảo của HandMade Shop.</p>
+                        <p>Tôi có thể tư vấn về sản phẩm, giá cả, chính sách...</p>
+                        <p>Bạn cần tôi giúp gì ạ?</p>
+                    </div>
+                )}
+                
+                {messages.map((msg, idx) => (
+                    <div 
+                        key={msg.id || idx} 
+                        className={`chat-message ${msg.senderType === 'USER' ? 'right' : 'left'}`}
+                    >
                         <div className="chat-bubble">
-                            <div className="msg-text">{renderMessageWithLinks(m.content)}</div>
+                            <div className="msg-text">
+                                {renderMessageWithLinks(msg.content)}
+                            </div>
                             <span className="chat-time">
-                                {new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                {formatChatTime(msg.createdAt)}
                             </span>
                         </div>
                     </div>
@@ -59,18 +80,23 @@ const ChatBox: React.FC<ChatboxProps> = ({ currentUser }) => {
                         </div>
                     </div>
                 )}
-                <div ref={scrollBottomRef} />
+                <div ref={messagesEndRef} />
             </div>
 
             <div className="chat-input">
                 <input
+                    type="text"
                     placeholder="Hỏi về sản phẩm..."
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={handleKeyDown}
+                    disabled={isTyping}
                 />
-                <button onClick={handleSend} disabled={!input.trim() || isTyping}>
-                    Gửi
+                <button 
+                    onClick={handleSend} 
+                    disabled={!input.trim() || isTyping}
+                >
+                    {isTyping ? '...' : 'Gửi'}
                 </button>
             </div>
         </div>
