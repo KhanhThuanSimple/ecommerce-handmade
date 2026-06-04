@@ -1,275 +1,262 @@
-// src/admin/pages/Dashboard.tsx
-import React, { useState, useEffect } from 'react';
-
-
+// src/admin/pages/SuperDashboard.tsx
+import React from 'react';
+import { Line, Bar, Pie } from 'react-chartjs-2';
 import {
     Chart as ChartJS,
     CategoryScale,
     LinearScale,
+    PointElement,
+    LineElement,
     BarElement,
     Title,
     Tooltip,
     Legend,
     ArcElement,
-    PointElement,
-    LineElement,
     Filler,
 } from 'chart.js';
-import { Line } from 'react-chartjs-2';
 import {
     CurrencyDollarIcon,
     ShoppingBagIcon,
-    ShoppingCartIcon,
-    UserGroupIcon,
-    ArrowTrendingUpIcon,
-    ArrowTrendingDownIcon,
-    LockClosedIcon,
-    LockOpenIcon,
-    ShieldCheckIcon
+    UsersIcon,
+    ArrowPathIcon,
+    ExclamationTriangleIcon,
+    CreditCardIcon,
+    ChartBarIcon,
+    TruckIcon,
 } from '@heroicons/react/24/outline';
+import { useSuperDashboard } from '../../services/useSuperDashboard';
+import '../styles/dashboard.css';
 
-// FIX LỖI IMPORT: Thay đổi từ '../services/api' sang đúng file service tập trung trong hooks
-import { getAdminUsers, putToggleUserActive, putToggleAdminRole, UserAdminResponse } from '../hooks/adminService';
-
+// Register ChartJS
 ChartJS.register(
     CategoryScale,
     LinearScale,
+    PointElement,
+    LineElement,
     BarElement,
     Title,
     Tooltip,
     Legend,
     ArcElement,
-    PointElement,
-    LineElement,
     Filler
 );
 
-interface DashboardStats {
-    totalProducts: number;
-    totalOrders: number;
-    totalRevenue: number;
-    totalUsers: number;
-    pendingOrders: number;
-    lowStock: number;
-    revenueGrowth: number;
-    ordersGrowth: number;
-    usersGrowth: number;
-}
+// Helper
+const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+};
 
-interface StatCardProps {
-    title: string;
-    value: string | number;
-    icon: React.ElementType;
-    trend?: number;
-    color: 'red' | 'yellow' | 'green' | 'blue' | 'orange' | 'purple';
-}
-
-const StatCard: React.FC<StatCardProps> = ({ title, value, icon: Icon, trend, color }) => {
-    const colorClasses = {
-        red: { bg: 'bg-red-50', icon: 'text-red-600' },
-        yellow: { bg: 'bg-yellow-50', icon: 'text-yellow-600' },
-        green: { bg: 'bg-green-50', icon: 'text-green-600' },
-        blue: { bg: 'bg-blue-50', icon: 'text-blue-600' },
-        orange: { bg: 'bg-orange-50', icon: 'text-orange-600' },
-        purple: { bg: 'bg-purple-50', icon: 'text-purple-600' },
+const getStatusClass = (status: string) => {
+    const map: Record<string, string> = {
+        'Hoàn thành': '#10b981',
+        'Đang xử lý': '#3b82f6',
+        'Chờ thanh toán': '#f59e0b',
+        'Đã hủy': '#ef4444',
     };
-
-    return (
-        <div className="p-6 bg-white rounded-xl shadow-sm border border-gray-100">
-            <div className="flex justify-between items-start">
-                <div>
-                    <p className="text-sm font-medium text-gray-400">{title}</p>
-                    <p className="text-2xl font-bold text-gray-800 mt-1">{value}</p>
-                    {trend !== undefined && (
-                        <div className={`flex items-center gap-1 text-xs font-semibold mt-2 ${trend < 0 ? 'text-red-500' : 'text-green-500'}`}>
-                            {trend >= 0 ? <ArrowTrendingUpIcon className="w-3 h-3" /> : <ArrowTrendingDownIcon className="w-3 h-3" />}
-                            {Math.abs(trend)}% so với tháng trước
-                        </div>
-                    )}
-                </div>
-                <div className={`p-3 rounded-lg ${colorClasses[color].bg}`}>
-                    <Icon className={`h-6 w-6 ${colorClasses[color].icon}`} />
-                </div>
-            </div>
-        </div>
-    );
+    return map[status] || '#6b7280';
 };
 
 const Dashboard: React.FC = () => {
-    const [users, setUsers] = useState<UserAdminResponse[]>([]);
-    const [page, setPage] = useState<number>(0);
-    const [totalPages, setTotalPages] = useState<number>(1);
-    const [loading, setLoading] = useState<boolean>(false);
+    const { data, loading, error, dateRange, setDateRange, refresh } = useSuperDashboard();
 
-    const [stats, setStats] = useState<DashboardStats>({
-        totalProducts: 45,
-        totalOrders: 128,
-        totalRevenue: 125000000,
-        totalUsers: 342,
-        pendingOrders: 15,
-        lowStock: 8,
-        revenueGrowth: 34,
-        ordersGrowth: 23,
-        usersGrowth: 18,
-    });
-
-    const fetchUsers = async (currentPage: number) => {
-        setLoading(true);
-        try {
-            const data = await getAdminUsers(currentPage, 5);
-            setUsers(data.content);
-            setTotalPages(data.totalPages);
-            setStats(prev => ({ ...prev, totalUsers: data.totalElements }));
-        } catch (error) {
-            console.error("Lỗi khi tải danh sách người dùng:", error);
-            alert("Không thể tải danh sách thành viên từ máy chủ.");
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        void fetchUsers(page);
-    }, [page]);
-
-    const handleToggleStatus = async (userId: number) => {
-        try {
-            const message = await putToggleUserActive(userId);
-            alert(message);
-            void fetchUsers(page);
-        } catch (error) {
-            alert("Thao tác thất bại!");
-        }
-    };
-
-    const handleToggleRole = async (userId: number) => {
-        try {
-            const message = await putToggleAdminRole(userId);
-            alert(message);
-            void fetchUsers(page);
-        } catch (error) {
-            alert("Thao tác phân quyền thất bại!");
-        }
-    };
-
-    const revenueData = {
-        labels: ['Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12', 'Tháng 1'],
+    // Chart data
+    const lineChartData = {
+        labels: data.revenueTrend.map(item => item.date_label),
         datasets: [{
             label: 'Doanh thu (VNĐ)',
-            data: [85000000, 92000000, 108000000, 125000000, 142000000, 168000000],
-            borderColor: '#C41E3A',
-            backgroundColor: 'rgba(196, 30, 58, 0.1)',
-            tension: 0.4,
+            data: data.revenueTrend.map(item => item.daily_revenue),
+            borderColor: '#c41e3a',
+            backgroundColor: 'rgba(196, 30, 58, 0.05)',
             fill: true,
+            tension: 0.3,
+            pointRadius: 0,
+            borderWidth: 2,
         }],
     };
 
-    return (
-        <div className="p-6 max-w-[1600px] mx-auto bg-gray-50 min-h-screen">
-            {/* Header */}
-            <div className="mb-8">
-                <h1 className="text-2xl font-bold flex items-center gap-2 text-gray-800">
-                    <span>Tổng Quan Quản Trị Hệ Thống Tết Bính Ngọ 2026</span>
-                    <span className="text-2xl animate-bounce">🐎</span>
-                </h1>
-                <p className="text-gray-500 mt-1">
-                    Hệ thống tích hợp theo dõi doanh thu và Quản lý thành viên (CRM) chuẩn RESTful.
-                </p>
-            </div>
+    const userPieData = {
+        labels: data.userDistribution.map(item => item.name),
+        datasets: [{
+            data: data.userDistribution.map(item => item.value),
+            backgroundColor: data.userDistribution.map(item => item.color || '#94a3b8'),
+            borderWidth: 0,
+        }],
+    };
 
-            {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
-                <StatCard title="Tổng Sản Phẩm" value={stats.totalProducts} icon={ShoppingBagIcon} trend={12} color="red" />
-                <StatCard title="Tổng Đơn Hàng" value={stats.totalOrders} icon={ShoppingCartIcon} trend={stats.ordersGrowth} color="yellow" />
-                <StatCard title="Doanh Thu" value={new Intl.NumberFormat('vi-VN').format(stats.totalRevenue) + 'đ'} icon={CurrencyDollarIcon} trend={stats.revenueGrowth} color="green" />
-                <StatCard title="Người Dùng Hệ Thống" value={stats.totalUsers} icon={UserGroupIcon} trend={stats.usersGrowth} color="blue" />
-                <StatCard title="Đơn Chờ Xử Lý" value={stats.pendingOrders} icon={ShoppingCartIcon} color="orange" />
-            </div>
+    const lineOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { position: 'top' as const, labels: { boxWidth: 12 } } },
+        scales: { y: { ticks: { callback: (v: any) => formatCurrency(v) } } },
+    };
 
-            {/* Charts & Marketing Row */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 lg:col-span-2">
-                    <h3 className="text-md font-semibold text-gray-700 mb-4 flex items-center gap-2">
-                        <ArrowTrendingUpIcon className="w-5 h-5 text-red-600" /> Doanh Thu Theo Tháng
-                    </h3>
-                    <div className="w-full">
-                        <Line data={revenueData} options={{ responsive: true, plugins: { legend: { position: 'bottom' } } }} />
-                    </div>
+    const pieOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom' as const, labels: { font: { size: 11 } } } },
+    };
+
+    if (loading) {
+        return (
+            <div className="super-dashboard">
+                <div className="dashboard-loading">
+                    <div className="loading-spinner-super"></div>
+                    <span>Đang tổng hợp dữ liệu toàn hệ thống...</span>
                 </div>
+            </div>
+        );
+    }
 
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-center items-center text-center">
-                    <div className="text-6xl mb-4">🧧</div>
-                    <h4 className="text-lg font-semibold mb-2 text-gray-800">Chương Trình Khuyến Mãi Tết</h4>
-                    <p className="text-gray-500 mb-6 text-sm">Giảm giá tự động lên đến 30% cho các sản phẩm thủ công mỹ nghệ.</p>
-                    <button className="px-5 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium shadow-sm transition">
-                        Cấu hình chiến dịch
+    if (error) {
+        return (
+            <div className="super-dashboard">
+                <div className="dashboard-error">
+                    <ExclamationTriangleIcon className="w-12 h-12 mx-auto mb-3 text-red-500" />
+                    <h3>{error}</h3>
+                    <button onClick={refresh} className="refresh-btn mt-3">Thử lại</button>
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div className="super-dashboard">
+            {/* Header */}
+            <div className="dashboard-header">
+                <div className="dashboard-title">
+                    <h1>📊 Super Dashboard · Tổng quan toàn hệ thống</h1>
+                    <p>Phân tích doanh thu, quản lý kho, cổng thanh toán & người dùng thời gian thực</p>
+                </div>
+                <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                    <div className="date-range-selector">
+                        <button className={`range-btn ${dateRange === 'today' ? 'active' : ''}`} onClick={() => setDateRange('today')}>Hôm nay</button>
+                        <button className={`range-btn ${dateRange === 'month' ? 'active' : ''}`} onClick={() => setDateRange('month')}>30 ngày</button>
+                        <button className={`range-btn ${dateRange === 'year' ? 'active' : ''}`} onClick={() => setDateRange('year')}>Năm nay</button>
+                    </div>
+                    <button className="refresh-btn" onClick={refresh}>
+                        <ArrowPathIcon className="w-4 h-4" /> Làm mới
                     </button>
                 </div>
             </div>
 
-            {/* BẢNG QUẢN LÝ THÀNH VIÊN */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                <div className="p-6 border-b border-gray-100 flex justify-between items-center">
-                    <div>
-                        <h3 className="text-lg font-bold text-gray-800">Quản Lý Thành Viên & Phân Quyền</h3>
-                        <p className="text-xs text-gray-400 mt-1">Quản lý trạng thái hoạt động và phân quyền Admin trực tiếp vào cơ sở dữ liệu.</p>
+            {/* KPI Row */}
+            {data.kpi && (
+                <div className="kpi-grid-super">
+                    <div className="kpi-card-super">
+                        <div className="kpi-header-super">
+                            <span className="kpi-label">{data.kpi.revenue.label}</span>
+                            <div className="kpi-icon-super" style={{ background: '#fee2e2' }}><CurrencyDollarIcon className="w-5 h-5 text-red-600" /></div>
+                        </div>
+                        <div className="kpi-value-super">{formatCurrency(data.kpi.revenue.value)}</div>
                     </div>
-                    {loading && <span className="text-sm text-gray-400 animate-pulse">Đang đồng bộ DB...</span>}
+                    <div className="kpi-card-super">
+                        <div className="kpi-header-super">
+                            <span className="kpi-label">{data.kpi.successOrders.label}</span>
+                            <div className="kpi-icon-super" style={{ background: '#e0f2fe' }}><ShoppingBagIcon className="w-5 h-5 text-blue-600" /></div>
+                        </div>
+                        <div className="kpi-value-super">{data.kpi.successOrders.value} đơn</div>
+                    </div>
+                    <div className="kpi-card-super">
+                        <div className="kpi-header-super">
+                            <span className="kpi-label">{data.kpi.aov.label}</span>
+                            <div className="kpi-icon-super" style={{ background: '#dcfce7' }}><CurrencyDollarIcon className="w-5 h-5 text-green-600" /></div>
+                        </div>
+                        <div className="kpi-value-super">{formatCurrency(data.kpi.aov.value)}</div>
+                    </div>
+                    <div className="kpi-card-super">
+                        <div className="kpi-header-super">
+                            <span className="kpi-label">{data.kpi.conversionRate.label}</span>
+                            <div className="kpi-icon-super" style={{ background: '#f3e8ff' }}><UsersIcon className="w-5 h-5 text-purple-600" /></div>
+                        </div>
+                        <div className="kpi-value-super">{data.kpi.conversionRate.value}%</div>
+                    </div>
+                </div>
+            )}
+
+            {/* 2-column: Revenue Chart + Right Widgets */}
+            <div className="dashboard-two-columns">
+                {/* Biểu đồ doanh thu */}
+                <div className="chart-card-super">
+                    <div className="chart-title-super">
+                        <ChartBarIcon className="w-5 h-5 text-red-600" />
+                        Xu hướng doanh thu theo thời gian
+                    </div>
+                    <div className="chart-container-super">
+                        <Line data={lineChartData} options={lineOptions} />
+                    </div>
                 </div>
 
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left border-collapse">
-                        <thead>
-                            <tr className="bg-gray-50 text-gray-500 text-xs font-semibold uppercase tracking-wider border-b border-gray-100">
-                                <th className="p-4">ID</th>
-                                <th className="p-4">Họ và Tên</th>
-                                <th className="p-4">Email</th>
-                                <th className="p-4">Số điện thoại</th>
-                                <th className="p-4">Quyền hạn (Roles)</th>
-                                <th className="p-4">Trạng thái</th>
-                                <th className="p-4 text-center">Hành động</th>
-                            </tr>
-                        </thead>
-                        <tbody className="text-sm text-gray-600 divide-y divide-gray-50">
-                            {users.map((user) => (
-                                <tr key={user.id} className="hover:bg-gray-50/50 transition">
-                                    <td className="p-4 font-medium text-gray-400">#{user.id}</td>
-                                    <td className="p-4 font-semibold text-gray-800">{user.fullName || 'Chưa cập nhật'}</td>
-                                    <td className="p-4">{user.email}</td>
-                                    <td className="p-4">{user.phone || '---'}</td>
-                                    <td className="p-4">
-                                        <div className="flex gap-1 flex-wrap">
-                                            {/* FIX LỖI TS7006: Thêm định kiểu tường minh (: string) cho biến role trong vòng lặp map */}
-                                            {user.roles.map((role: string) => (
-                                                <span key={role} className={`text-[10px] px-2 py-0.5 font-bold rounded-full ${role === 'ROLE_ADMIN' ? 'bg-purple-100 text-purple-700 border border-purple-200' : 'bg-gray-100 text-gray-600'}`}>
-                                                    {role.replace('ROLE_', '')}
-                                                </span>
-                                            ))}
+                {/* Right side: Low stock + Payment methods */}
+                <div className="right-widgets">
+                    {/* Low stock alert */}
+                    <div className="widget-card">
+                        <div className="widget-title">
+                            <ExclamationTriangleIcon className="w-4 h-4 text-amber-600" />
+                            ⚠️ Cảnh báo tồn kho thấp (≤5)
+                        </div>
+                        <div className="low-stock-list">
+                            {data.lowStockAlerts.length === 0 ? (
+                                <div style={{ textAlign: 'center', padding: '20px', color: '#64748b' }}>✅ Hàng hóa dồi dào</div>
+                            ) : (
+                                data.lowStockAlerts.slice(0, 4).map(item => (
+                                    <div key={item.sku} className="low-stock-item">
+                                        <div>
+                                            <div style={{ fontWeight: 500, fontSize: '13px' }}>{item.product_name}</div>
+                                            <div style={{ fontSize: '10px', color: '#94a3b8' }}>{item.variant_name}</div>
                                         </div>
-                                    </td>
-                                    <td className="p-4">
-                                        <span className={`inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full font-medium ${user.enabled ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
-                                            <span className={`w-1.5 h-1.5 rounded-full ${user.enabled ? 'bg-green-500' : 'bg-red-500'}`}></span>
-                                            {user.enabled ? 'Đang hoạt động' : 'Đang bị khóa'}
+                                        <span className={`stock-badge-super ${item.inventory === 0 ? 'empty' : 'low'}`}>
+                                            {item.inventory === 0 ? 'Hết hàng' : `Còn ${item.inventory}`}
                                         </span>
-                                    </td>
-                                    <td className="p-4">
-                                        <div className="flex justify-center items-center gap-3">
-                                            <button 
-                                                onClick={() => handleToggleStatus(user.id)}
-                                                title={user.enabled ? "Khóa tài khoản" : "Mở khóa tài khoản"}
-                                                className={`p-1.5 rounded-lg border transition ${user.enabled ? 'text-red-600 hover:bg-red-50 border-red-100' : 'text-green-600 hover:bg-green-50 border-green-100'}`}
-                                            >
-                                                {user.enabled ? <LockClosedIcon className="w-4 h-4" /> : <LockOpenIcon className="w-4 h-4" />}
-                                            </button>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    </div>
 
-                                            <button 
-                                                onClick={() => handleToggleRole(user.id)}
-                                                title="Thay đổi quyền Admin"
-                                                className="p-1.5 rounded-lg border text-purple-600 hover:bg-purple-50 border-purple-100 transition"
-                                            >
-                                                <ShieldCheckIcon className="w-4 h-4" />
-                                            </button>
+                    {/* Payment methods status */}
+                    <div className="widget-card">
+                        <div className="widget-title">
+                            <CreditCardIcon className="w-4 h-4 text-green-600" />
+                            Trạng thái cổng thanh toán
+                        </div>
+                        <div className="payment-methods-list">
+                            {data.paymentMethods.slice(0, 4).map(method => (
+                                <div key={method.code} className="payment-method-item">
+                                    <span>
+                                        <span className={`method-status ${method.is_active ? 'active' : 'inactive'}`}></span>
+                                        {method.name}
+                                    </span>
+                                    <span style={{ fontSize: '11px', color: method.is_active ? '#10b981' : '#ef4444' }}>
+                                        {method.is_active ? '● Hoạt động' : '○ Tạm dừng'}
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* 3-column: Top products + User distribution + Abandoned cart */}
+            <div className="dashboard-three-columns">
+                {/* Top products */}
+                <div className="table-card">
+                    <div className="widget-title">🏆 Top sản phẩm theo doanh thu</div>
+                    <table className="simple-table">
+                        <thead>
+                            <tr><th>#</th><th>Sản phẩm</th><th>Doanh thu</th><th>%</th></tr>
+                        </thead>
+                        <tbody>
+                            {data.topProducts.slice(0, 4).map((p, idx) => (
+                                <tr key={p.id}>
+                                    <td className="product-rank-cell">#{idx+1}</td>
+                                    <td style={{ maxWidth: '140px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.name}</td>
+                                    <td>{formatCurrency(p.revenue)}</td>
+                                    <td>
+                                        <div className="revenue-bar-cell">
+                                            <div style={{ width: '50px', background: '#e2e8f0', borderRadius: '3px' }}>
+                                                <div className="revenue-bar-fill-super" style={{ width: `${p.percentage}%` }}></div>
+                                            </div>
+                                            <span style={{ fontSize: '11px' }}>{p.percentage}%</span>
                                         </div>
                                     </td>
                                 </tr>
@@ -278,23 +265,61 @@ const Dashboard: React.FC = () => {
                     </table>
                 </div>
 
-                <div className="p-4 bg-gray-50/50 border-t border-gray-100 flex justify-between items-center text-xs text-gray-500">
-                    <span>Trang {page + 1} trên tổng số {totalPages} trang</span>
-                    <div className="flex gap-2">
-                        <button 
-                            disabled={page === 0} 
-                            onClick={() => setPage(p => p - 1)}
-                            className="px-3 py-1.5 bg-white border border-gray-200 rounded disabled:opacity-50 hover:bg-gray-50"
-                        >
-                            Trước
-                        </button>
-                        <button 
-                            disabled={page >= totalPages - 1} 
-                            onClick={() => setPage(p => p + 1)}
-                            className="px-3 py-1.5 bg-white border border-gray-200 rounded disabled:opacity-50 hover:bg-gray-50"
-                        >
-                            Sau
-                        </button>
+                {/* User distribution */}
+                <div className="table-card">
+                    <div className="widget-title"><UsersIcon className="w-4 h-4 text-blue-600" /> Phân bố người dùng</div>
+                    <div className="user-dist-list">
+                        {data.userDistribution.length > 0 ? (
+                            <>
+                                <div className="chart-container-super" style={{ height: '160px' }}>
+                                    <Pie data={userPieData} options={pieOptions} />
+                                </div>
+                                {data.userDistribution.map((item, idx) => (
+                                    <div key={idx} className="user-dist-item">
+                                        <div className="dist-color" style={{ background: item.color }}></div>
+                                        <span className="dist-name">{item.name}</span>
+                                        <span className="dist-value">{item.value}</span>
+                                    </div>
+                                ))}
+                            </>
+                        ) : (
+                            <div style={{ padding: '20px', textAlign: 'center', color: '#94a3b8' }}>Chưa có dữ liệu</div>
+                        )}
+                    </div>
+                </div>
+
+                {/* Abandoned cart + Recent orders quick view */}
+                <div className="table-card">
+                    <div className="widget-title"><TruckIcon className="w-4 h-4 text-amber-600" /> Giỏ hàng bỏ dở & Đơn gần đây</div>
+                    {data.abandonedCart && (
+                        <div className="abandoned-alert" style={{ margin: '12px 16px', padding: '12px', borderRadius: '12px' }}>
+                            <div className="alert-content">
+                                <ExclamationTriangleIcon className="w-8 h-8 text-amber-500" />
+                                <div className="alert-text">
+                                    <strong>{data.abandonedCart.abandonedCartsCount} giỏ hàng</strong> bỏ dở ·{' '}
+                                    <strong>{formatCurrency(data.abandonedCart.potentialLossValue)}</strong> cơ hội
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                    <div className="scrollable-orders">
+                        <table className="simple-table">
+                            <thead><tr><th>Mã đơn</th><th>Khách hàng</th><th>Trạng thái</th><th>Tiền</th></tr></thead>
+                            <tbody>
+                                {data.recentOrders.map(order => (
+                                    <tr key={order.id}>
+                                        <td style={{ fontSize: '11px' }}>#{order.id.slice(-6)}</td>
+                                        <td>{order.fullName?.split(' ').pop()}</td>
+                                        <td>
+                                            <span className="order-status-badge-super" style={{ background: `${getStatusClass(order.status)}20`, color: getStatusClass(order.status) }}>
+                                                {order.status}
+                                            </span>
+                                        </td>
+                                        <td>{formatCurrency(order.payableAmount)}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
