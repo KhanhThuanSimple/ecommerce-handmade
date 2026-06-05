@@ -1,82 +1,70 @@
-// src/services/apiInterceptor.ts - File MỚI
 import axios from 'axios';
 
-// Extend axios config to include custom cache properties
-declare module 'axios' {
-  interface InternalAxiosRequestConfig {
-    __cachedResponse?: any;
+const apiCache = new Map<string, { data: any; timestamp: number; ttl: number }>();
+
+const getCache = (key: string) => {
+  const cached = apiCache.get(key);
+  if (!cached) return null;
+
+  const isExpired = Date.now() - cached.timestamp > cached.ttl;
+  if (isExpired) {
+    apiCache.delete(key);
+    return null;
   }
-}
 
-// Cache storage
-const apiCache = new Map();
+  return cached.data;
+};
 
-// Hàm cache response
-function cacheResponse(url: string, data: any, ttl = 300000) {
-  apiCache.set(url, {
+const setCache = (key: string, data: any, ttl = 300000) => {
+  apiCache.set(key, {
     data,
     timestamp: Date.now(),
     ttl,
   });
-  
-  // Auto clear after TTL
-  setTimeout(() => {
-    apiCache.delete(url);
-    console.log(`Cache expired: ${url}`);
-  }, ttl);
-}
+};
 
-// Axios interceptor - TỰ ĐỘNG cache mà không cần sửa component
-axios.interceptors.request.use(async (config) => {
-  // Only cache GET requests
+// =====================
+// REQUEST INTERCEPTOR
+// =====================
+axios.interceptors.request.use((config) => {
   if (config.method === 'get' && config.url?.includes('/api/')) {
     const cacheKey = config.url;
-    
-    // Check cache
-    const cached = apiCache.get(cacheKey);
-    if (cached && Date.now() - cached.timestamp < cached.ttl) {
-      console.log(`✅ Cache hit: ${cacheKey}`);
-      // Cancel actual request and return cached data
-      const cancelToken = axios.CancelToken.source();
-      config.cancelToken = cancelToken.token;
-      cancelToken.cancel('Using cached data');
-      
-      // Return cached data via custom property
-      config.__cachedResponse = cached.data;
-    }
+
+    const cachedData = getCache(cacheKey);
+
+    // 🔥 KHÔNG CANCEL REQUEST NỮA
+    // chỉ gắn flag để xử lý ở response
+    (config as any).__cacheKey = cacheKey;
+    (config as any).__cachedData = cachedData;
   }
+
   return config;
 });
 
-// Response interceptor - Cache response
+// =====================
+// RESPONSE INTERCEPTOR
+// =====================
 axios.interceptors.response.use(
   (response) => {
-    if (response.config.method === 'get' && response.config.url?.includes('/api/')) {
-      const cacheKey = response.config.url;
-      cacheResponse(cacheKey, response.data);
+    const cacheKey = (response.config as any).__cacheKey;
+
+    if (cacheKey) {
+      setCache(cacheKey, response.data);
     }
+
     return response;
   },
   (error) => {
-    // Return cached data if request was cancelled
-    if (axios.isCancel(error) && (error.config as any)?.__cachedResponse) {
-      return Promise.resolve({ data: (error.config as any).__cachedResponse });
+    // ❌ CHẶN CANCEL ERROR HOÀN TOÀN
+    if (
+      error?.code === 'ERR_CANCELED' ||
+      error?.name === 'CanceledError' ||
+      error?.message?.includes('cached')
+    ) {
+      console.warn('Blocked cancel/cache error');
+      return new Promise(() => {});
     }
+
     return Promise.reject(error);
   }
 );
-
-// Export function to clear cache manually if needed
-export const clearApiCache = (urlPattern?: string) => {
-  if (urlPattern) {
-    const keys = Array.from(apiCache.keys());
-    for (const key of keys) {
-      if (key.includes(urlPattern)) {
-        apiCache.delete(key);
-      }
-    }
-  } else {
-    apiCache.clear();
-  }
-  console.log('API Cache cleared');
-};

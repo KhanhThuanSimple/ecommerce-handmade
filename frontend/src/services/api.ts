@@ -1,5 +1,10 @@
 import axios from 'axios';
 
+/**
+ * =========================
+ * ACCOUNT HELPERS
+ * =========================
+ */
 const getStoredAccount = () => {
     const keys = ['user', 'adminUser', 'currentUser', 'authUser'];
 
@@ -10,41 +15,67 @@ const getStoredAccount = () => {
         try {
             const parsed = JSON.parse(raw);
             if (parsed && typeof parsed === 'object') return parsed;
-        } catch {
-            // ignore invalid JSON and continue
-        }
+        } catch {}
     }
 
     return null;
 };
 
+const getTokenFromStorage = () => {
+    const rawToken = localStorage.getItem('authHeader');
+
+    if (rawToken) return rawToken;
+
+    const account = getStoredAccount();
+
+    const token =
+        account?.token ||
+        account?.accessToken ||
+        account?.jwt ||
+        account?.authToken ||
+        '';
+
+    return token.startsWith('Bearer ')
+        ? token
+        : token
+        ? `Bearer ${token}`
+        : '';
+};
+
 const getAdminIdForRequest = () => {
     const account = getStoredAccount();
-    const id = account?.id ?? account?.userId ?? account?.adminId ?? account?.user?.id ?? account?.admin?.id;
+
+    const id =
+        account?.id ??
+        account?.userId ??
+        account?.adminId ??
+        account?.user?.id ??
+        account?.admin?.id;
+
     return id ? String(id) : '';
 };
 
-const getTokenFromStorage = () => {
-    const authHeader = localStorage.getItem('authHeader');
-    if (authHeader) return authHeader;
-
-    const account = getStoredAccount();
-    return account?.token || account?.accessToken || account?.jwt || account?.authToken || '';
-};
-
+/**
+ * =========================
+ * AXIOS INSTANCE
+ * =========================
+ */
 const api = axios.create({
-    // Mặc định /api + setupProxy.js (dev) hoặc http://localhost:8080/api (production build)
     baseURL: process.env.REACT_APP_API_URL || '/api',
-    timeout: 10000,
+    timeout: 15000, // tăng timeout tránh false cancel
     headers: {
         'Content-Type': 'application/json',
     },
 });
 
-// REQUEST INTERCEPTOR
+/**
+ * =========================
+ * REQUEST INTERCEPTOR
+ * =========================
+ */
 api.interceptors.request.use(
     (config) => {
-        config.headers = config.headers ?? {};
+        config.headers = config.headers || {};
 
         const isAuthEndpoint =
             config.url?.includes('/auth/login') ||
@@ -54,10 +85,10 @@ api.interceptors.request.use(
             const token = getTokenFromStorage();
 
             if (token) {
-                config.headers.Authorization = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
+                config.headers.Authorization = token;
             }
 
-            if (config.url?.startsWith('/admin/') || config.url?.includes('/admin/')) {
+            if (config.url?.includes('/admin/')) {
                 const adminId = getAdminIdForRequest();
                 if (adminId) {
                     config.headers['adminId'] = adminId;
@@ -68,6 +99,37 @@ api.interceptors.request.use(
         return config;
     },
     (error) => Promise.reject(error)
+);
+
+/**
+ * =========================
+ * RESPONSE INTERCEPTOR (FIX CACHED + CANCEL ERROR)
+ * =========================
+ */
+api.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        // 🔥 CHẶN TRIỆT ĐỂ CANCELED ERROR (NGUYÊN NHÂN CHÍNH)
+        if (
+            error?.code === 'ERR_CANCELED' ||
+            error?.name === 'CanceledError' ||
+            error?.message?.toLowerCase?.().includes('cached') ||
+            error?.message?.toLowerCase?.().includes('canceled')
+        ) {
+            console.warn('🚫 Ignored cached/canceled request:', error.message);
+
+            // KHÔNG THROW ERROR → tránh crash React
+            return new Promise(() => {});
+        }
+
+        // 🔐 Unauthorized
+        if (error?.response?.status === 401) {
+            localStorage.removeItem('user');
+            window.location.href = '/login';
+        }
+
+        return Promise.reject(error);
+    }
 );
 
 export default api;
