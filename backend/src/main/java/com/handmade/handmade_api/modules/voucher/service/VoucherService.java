@@ -7,6 +7,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 
 import java.util.List;
 import java.util.Map;
@@ -21,11 +24,13 @@ public class VoucherService {
         this.voucherRepository = voucherRepository;
     }
 
+    @Cacheable(value = "vouchers", key = "'all'")
     public List<Voucher> getAllVouchers() {
         return voucherRepository.findAll();
     }
 
     @Transactional
+    @CacheEvict(value = "vouchers", allEntries = true)
     public Voucher createVoucher(VoucherRequest request) {
         Voucher voucher = Voucher.builder()
                 .id(request.getId())
@@ -41,11 +46,13 @@ public class VoucherService {
         return voucherRepository.save(voucher);
     }
 
+    @Cacheable(value = "vouchers", key = "#code")
     public Optional<Voucher> findByCode(String code) {
         return voucherRepository.findByCode(code);
     }
 
     @Transactional
+    @CacheEvict(value = "vouchers", allEntries = true)
     public Voucher applyVoucherCode(String code) {
         Voucher voucher = voucherRepository.findByCode(code)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Không tìm thấy voucher: " + code));
@@ -61,6 +68,7 @@ public class VoucherService {
     }
 
     @Transactional
+    @CacheEvict(value = "vouchers", allEntries = true)
     public Voucher updateVoucher(String id, Map<String, Object> updates) {
         Voucher voucher = voucherRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy voucher: " + id));

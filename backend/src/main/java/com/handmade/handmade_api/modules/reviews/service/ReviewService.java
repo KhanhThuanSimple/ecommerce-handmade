@@ -9,6 +9,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 
 import java.util.List;
 
@@ -23,6 +26,7 @@ public class ReviewService {
         this.orderItemRepository = orderItemRepository;
     }
 
+    @Cacheable(value = "reviews", key = "#productId")
     public List<ReviewResponse> getReviewsByProductId(Long productId) {
         return reviewRepository.findReviewsByProductId(productId);
     }
@@ -38,6 +42,11 @@ public class ReviewService {
     }
 
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "reviews", key = "#request.productId"),
+            @CacheEvict(value = "products", key = "#request.productId"),
+            @CacheEvict(value = "products", key = "'all'")
+    })
     public ReviewResponse createReview(ReviewRequest request) {
         if (request.getUserId() == null || request.getProductId() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Thiếu userId hoặc productId");

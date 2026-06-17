@@ -11,6 +11,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,6 +31,7 @@ public class ProductService {
 
     // LUỒNG 1: LẤY DANH SÁCH SẢN PHẨM
     // LUỒNG 1: LẤY DANH SÁCH SẢN PHẨM (ĐÃ SỬA TÊN HÀM)
+    @Cacheable(value = "products", key = "'all'")
     public List<ProductResponse> getAllProducts() {
         // Gọi đúng tên phương thức mới đã được lọc status = 'active'
         List<ProductProjection> projections = productRepository.findAllActiveProducts();
@@ -35,6 +39,7 @@ public class ProductService {
     }
 
     // LUỒNG 2: LẤY CHI TIẾT 1 SẢN PHẨM (An toàn tuyệt đối, không lo ClassCastException)
+    @Cacheable(value = "products", key = "#id")
     public ProductResponse getProductById(Long id) {
         ProductProjection projection = productRepository.findProductDetailRawById(id);
         if (projection == null) {
@@ -45,6 +50,7 @@ public class ProductService {
 
     // LUỒNG 3: TẠO MỚI SẢN PHẨM
     @Transactional
+    @CacheEvict(value = "products", allEntries = true)
     public ProductResponse createProduct(ProductCreateRequest request) {
         Product product = new Product();
         product.setName(request.getName());
@@ -94,6 +100,10 @@ public class ProductService {
     }
 
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "products", key = "#productId"),
+            @CacheEvict(value = "products", key = "'all'")
+    })
     public void decreaseInventory(Long productId, Integer quantity) {
         ProductVariant variant = productVariantRepository.findFirstByProductIdOrderByIdAsc(productId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,

@@ -16,6 +16,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -60,6 +62,7 @@ public class AdminProductService {
 
     // 3. THÊM MỚI SẢN PHẨM & TỰ ĐỘNG KHỞI TẠO BIẾN THỂ MẶC ĐỊNH
     @Transactional
+    @CacheEvict(value = "products", allEntries = true)
     public ProductResponse createProduct(ProductCreateRequest request) {
         Product product = new Product();
         product.setName(request.getName());
@@ -82,6 +85,10 @@ public class AdminProductService {
 
     // 4. CẬP NHẬT TOÀN DIỆN THÔNG TIN SẢN PHẨM
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "products", key = "#id"),
+            @CacheEvict(value = "products", key = "'all'")
+    })
     public ProductResponse updateProduct(Long id, AdminProductUpdateRequest request) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Sản phẩm không tồn tại với ID: " + id));
@@ -99,6 +106,10 @@ public class AdminProductService {
 
     // 5. CẬP NHẬT NHANH KHO HÀNG (INVENTORY)
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "products", key = "#productId"),
+            @CacheEvict(value = "products", key = "'all'")
+    })
     public void updateInventory(Long productId, AdminVariantInventoryUpdateRequest request) {
         if (request.getInventory() < 0) {
             throw new IllegalArgumentException("Số lượng tồn kho không được nhỏ hơn 0");
@@ -125,6 +136,10 @@ public class AdminProductService {
 
     // 6. THAY ĐỔI TRẠNG THÁI NHANH (BẬT/TẮT KINH DOANH)
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "products", key = "#id"),
+            @CacheEvict(value = "products", key = "'all'")
+    })
     public void updateStatus(Long id, String status) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Sản phẩm không tồn tại!"));
@@ -134,6 +149,10 @@ public class AdminProductService {
 
     // 7. XÓA SẢN PHẨM (KIỂM TRA RÀNG BUỘC ĐƠN HÀNG TRƯỚC KHI XÓA)
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "products", key = "#id"),
+            @CacheEvict(value = "products", key = "'all'")
+    })
     public void deleteProduct(Long id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Sản phẩm không tồn tại!"));
@@ -163,6 +182,7 @@ public class AdminProductService {
                 .build();
     }
     @Transactional
+    @CacheEvict(value = "products", allEntries = true)
     public String importProductsFromExcel(MultipartFile file) {
         // TRƯỜNG HỢP LỖI 1: File trống rỗng
         if (file == null || file.isEmpty()) {

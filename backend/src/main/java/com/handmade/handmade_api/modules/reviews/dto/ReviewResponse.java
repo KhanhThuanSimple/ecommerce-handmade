@@ -10,6 +10,8 @@ private Long id;
     private LocalDateTime createdAt;
 
     // Constructors, Getters, Setters
+    public ReviewResponse() {}
+
     public ReviewResponse(Long id, Long userId, String userName, Long productId, Integer rating, String comment, LocalDateTime createdAt) {
         this.id = id;
         this.userId = userId;
