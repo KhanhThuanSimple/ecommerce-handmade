@@ -1,38 +1,39 @@
-/* Khung bao và vị trí ảnh gốc */
+/* ── IMAGE MAGNIFIER ── */
+
 .mag-container {
-    position: relative;
-    width: 100%;
-    cursor: crosshair;
-    padding-top: 30px; /* Đẩy ảnh gốc xuống dưới một chút */
-    display: flex;
-    justify-content: center;
+  position: relative;
+  width: 100%;
+  cursor: crosshair;
+  padding-top: var(--sp-6);
+  display: flex;
+  justify-content: center;
 }
 
-/* Style cho ảnh chính */
 .mag-original {
-    width: 100%;
-    max-width: 450px;
-    height: auto;
-    display: block;
-    border: 1px solid #eee;
+  width: 100%;
+  max-width: 450px;
+  height: auto;
+  display: block;
+  border: 1px solid var(--border-color);
+  border-radius: var(--r-lg);
 }
 
-/* Cửa sổ phóng to bên trái */
 .mag-zoom-window {
-    position: absolute;
-    right: 100%;
-    top: 30px;
-    width: 230px;
-    height: 230px;
-    border: 1px solid #333;
-    background-repeat: no-repeat;
-    background-size: 250%; /* Độ phóng to */
-    background-color: #fff;
-    z-index: 9999;
-    pointer-events: none;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  position: absolute;
+  right: 100%;
+  top: var(--sp-6);
+  width: 240px;
+  height: 240px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--r-xl);
+  background-repeat: no-repeat;
+  background-size: 280%;
+  background-color: var(--surface-card);
+  z-index: var(--z-overlay);
+  pointer-events: none;
+  box-shadow: var(--shadow-lg);
 }
 
 .product-detail-image-wrapper {
-    overflow: visible !important;
+  overflow: visible !important;
 }

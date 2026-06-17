@@ -1,31 +1,25 @@
 /* =========================================
-   VARIABLES: CHỦ ĐỀ TẾT BÍNH NGỌ 2025
+   HOME PAGE — Tết Bính Ngọ Theme
+   Uses design tokens from tokens.css
    ========================================= */
+
+/* ── VARIABLES LOCAL (map to tokens) ── */
 :root {
-    /* Màu chính: Đỏ và Vàng Tết */
-    --tet-red: #C62828;
-    --tet-red-dark: #8B0000;
-    --tet-gold: #FFD700;
-    --tet-gold-light: #FFF9C4;
-    --tet-orange: #FF9800;
-    
-    /* Màu nền: Trắng kem với điểm nhấn Tết */
-    --bg-color: #FFFBF0;
-    --bg-section: #FFF8E1;
-    
-    /* Màu chữ */
-    --text-dark: #3E2723;
-    --text-light: #795548;
-    --text-accent: #D84315;
-    
-    /* Font chữ Tết */
-    --font-heading: 'Playfair Display', 'Noto Serif', serif;
-    --font-body: 'Inter', 'Segoe UI', sans-serif;
-    --font-chinese: 'Ma Shan Zheng', cursive;
+    --tet-red:        var(--brand-primary);
+    --tet-red-dark:   var(--brand-primary-dark);
+    --tet-gold:       var(--brand-accent);
+    --tet-gold-light: var(--brand-accent-light);
+    --tet-orange:     var(--brand-orange);
+    --bg-color:       var(--surface-page);
+    --bg-section:     #fef9f0;
+    --text-dark:      var(--text-primary);
+    --text-light:     var(--text-secondary);
+    --text-accent:    var(--brand-primary);
+    --font-heading:   var(--font-display);
+    --font-body:      var(--font-sans);
 }
 
-/* Import font đặc biệt cho Tết */
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Ma+Shan+Zheng&family=Inter:wght@300;400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap');
 
 /* --- GLOBAL LAYOUT với hiệu ứng Tết --- */
 .home-container {

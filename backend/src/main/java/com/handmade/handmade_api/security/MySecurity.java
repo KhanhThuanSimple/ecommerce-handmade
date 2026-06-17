@@ -70,10 +70,8 @@ public class MySecurity {
 
                 // ===== ĐỊNH NGHĨA QUYỀN TRUY CẬP (Thứ tự ưu tiên từ TRÊN XUỐNG DƯỚI) =====
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
-
-                        // ==================== CẤP ĐỘ 1: PUBLIC - Ai cũng được truy cập ====================
-                        // OPTIONS requests cho CORS
+                        // ==================== CẤP ĐỘ 0: PREFLIGHT CORS — PHẢI ĐẶT ĐẦU TIÊN ====================
+                        // OPTIONS requests cho CORS — đặt trước mọi rule bảo mật
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
                         // Health check
@@ -124,6 +122,9 @@ public class MySecurity {
                         .requestMatchers("/api/admin/orders/**").hasRole("ADMIN")
 
                         // ==================== CẤP ĐỘ 3: ADMIN - Chỉ ADMIN mới được truy cập ====================
+                        // Rule tổng quát admin — đặt tại đây, SAU các public rules
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+
                         // Admin Chat Configuration
                         .requestMatchers("/api/admin/chat-config/**").hasRole("ADMIN")
                         .requestMatchers("/api/admin/chat-faq/**").hasRole("ADMIN")

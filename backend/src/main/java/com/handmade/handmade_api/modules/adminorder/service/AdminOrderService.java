@@ -164,8 +164,15 @@ public class AdminOrderService {
         Double thisMonthRevenue = orderRepository.calculateRevenueByRange(startOfMonth, now.plusNanos(1));
 
         // 2. Thống kê đơn hàng
+        long totalOrders = orderRepository.count();
         long pendingOrders = orderRepository.count(OrderSpecification.buildFilterSpecification(
                 AdminOrderFilterRequest.builder().orderStatus("Chờ thanh toán").build()));
+        long processingOrders = orderRepository.count(OrderSpecification.buildFilterSpecification(
+                AdminOrderFilterRequest.builder().orderStatus("Đang xử lý").build()));
+        long completedOrders = orderRepository.count(OrderSpecification.buildFilterSpecification(
+                AdminOrderFilterRequest.builder().orderStatus("Hoàn thành").build()));
+        long cancelledOrders = orderRepository.count(OrderSpecification.buildFilterSpecification(
+                AdminOrderFilterRequest.builder().orderStatus("Đã hủy").build()));
 
         // 3. Thống kê phương thức thanh toán
         List<Object[]> paymentStats = orderRepository.getPaymentMethodStats();
@@ -175,6 +182,11 @@ public class AdminOrderService {
         }
 
         return AdminOrderSummaryResponse.builder()
+                .totalOrders(totalOrders)
+                .pendingOrders(pendingOrders)
+                .processingOrders(processingOrders)
+                .completedOrders(completedOrders)
+                .cancelledOrders(cancelledOrders)
                 .totalRevenue(totalRevenue)
                 .todayRevenue(todayRevenue)
                 .thisWeekRevenue(thisWeekRevenue)

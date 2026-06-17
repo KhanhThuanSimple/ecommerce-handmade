@@ -68,6 +68,20 @@ public class AdminUserService {
         return userRepository.findAll(pageable);
     }
 
+    // CHỨC NĂNG MỚI: Lấy số liệu thống kê người dùng
+    public java.util.Map<String, Long> getUserStats() {
+        long total   = userRepository.count();
+        long active  = userRepository.countByEnabled(true);
+        long locked  = userRepository.countByAccountNonLocked(false);
+        long admin   = userRepository.countAdminUsers();
+        return java.util.Map.of(
+            "total",  total,
+            "active", active,
+            "locked", locked,
+            "admin",  admin
+        );
+    }
+
     // CHỨC NĂNG 2: Khóa / Mở khóa tài khoản
     @Transactional
     public String toggleLockUser(Long id, String adminEmail) {

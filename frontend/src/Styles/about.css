@@ -1,173 +1,194 @@
-:root {
-  --primary-gold: #b28e5e;
-  --dark-oak: #3d2b1f;
-  --soft-cream: #fdfaf7;
-  --glass-white: rgba(255, 255, 255, 0.9);
-}
+/* ── ABOUT PAGE ── */
 
 .about-page {
-  background-color: #f8f9fa;
-  color: var(--dark-oak);
-  font-family: 'Inter', sans-serif;
+  background: var(--surface-page);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
 }
 
-.container {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 0 20px;
-}
-
-/* HERO NÂNG CẤP */
+/* HERO */
 .about-hero {
-  height: 450px;
-  background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), 
-              url('https://images.unsplash.com/photo-1513519245088-0e12902e35ca?auto=format&fit=crop&q=80') center/cover;
+  height: 420px;
+  background:
+    linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)),
+    url('https://images.unsplash.com/photo-1513519245088-0e12902e35ca?auto=format&fit=crop&q=80') center/cover no-repeat;
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
-  color: white;
-  margin-bottom: -60px; /* Tạo hiệu ứng đè lên */
+  color: var(--text-inverse);
+  margin-bottom: calc(-1 * var(--sp-12));
 }
 
 .hero-badge {
-  background: var(--primary-gold);
-  padding: 5px 15px;
-  border-radius: 20px;
-  font-size: 0.8rem;
+  background: var(--brand-primary);
+  padding: var(--sp-1) var(--sp-4);
+  border-radius: var(--r-full);
+  font-size: var(--text-xs);
   text-transform: uppercase;
-  letter-spacing: 2px;
+  letter-spacing: 3px;
+  font-weight: 600;
 }
 
 .about-hero h1 {
-  font-size: 3.5rem;
-  margin: 15px 0;
-  font-weight: 800;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  margin: var(--sp-4) 0;
+  font-weight: 700;
 }
 
 .welcome-tag {
-  margin-top: 20px;
-  background: var(--glass-white);
-  color: var(--dark-oak);
+  margin-top: var(--sp-5);
+  background: rgba(255,255,255,0.92);
+  color: var(--text-primary);
   display: inline-block;
-  padding: 8px 20px;
-  border-radius: 50px;
-  backdrop-filter: blur(5px);
+  padding: var(--sp-2) var(--sp-5);
+  border-radius: var(--r-full);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  backdrop-filter: blur(4px);
 }
 
 /* GRID SECTIONS */
 .about-grid-section {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 30px;
-  margin-bottom: 50px;
+  gap: var(--sp-6);
+  margin-bottom: var(--sp-12);
 }
 
 .about-card {
-  background: white;
-  padding: 40px;
-  border-radius: 24px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-  border: 1px solid #eee;
+  background: var(--surface-card);
+  padding: var(--sp-10);
+  border-radius: var(--r-2xl);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border-color);
+  transition: transform var(--ease-spring), box-shadow var(--ease-base);
+}
+
+.about-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-xl);
 }
 
 .icon-box {
-  width: 50px;
-  height: 50px;
-  background: var(--soft-cream);
-  color: var(--primary-gold);
+  width: 48px; height: 48px;
+  background: var(--brand-primary-light);
+  color: var(--brand-primary);
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 12px;
-  margin-bottom: 20px;
+  border-radius: var(--r-lg);
+  margin-bottom: var(--sp-5);
+  font-size: 1.3rem;
 }
 
-/* CAM KẾT */
+/* COMMITMENTS */
 .commitments-section {
-  background: white;
-  padding: 60px 40px;
-  border-radius: 24px;
-  margin-bottom: 50px;
+  background: var(--surface-card);
+  padding: var(--sp-12) var(--sp-10);
+  border-radius: var(--r-2xl);
+  margin-bottom: var(--sp-12);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
 }
 
 .section-title {
   text-align: center;
-  margin-bottom: 40px;
-  font-size: 2rem;
+  margin-bottom: var(--sp-10);
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+  font-weight: 700;
+  color: var(--text-primary);
 }
 
 .commitments-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--sp-4);
 }
 
 .commit-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 15px;
-  background: var(--soft-cream);
-  border-radius: 12px;
-  transition: 0.3s;
+  gap: var(--sp-3);
+  padding: var(--sp-4);
+  background: var(--surface-sunken);
+  border-radius: var(--r-xl);
+  transition: all var(--ease-fast);
+  cursor: default;
+  border: 1px solid var(--border-color);
 }
 
 .commit-item:hover {
-  background: var(--primary-gold);
-  color: white;
+  background: var(--brand-primary);
+  color: var(--text-inverse);
+  border-color: var(--brand-primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-brand);
 }
 
 .commit-icon {
-  color: var(--primary-gold);
+  color: var(--brand-primary);
+  font-size: 1.2rem;
+  flex-shrink: 0;
+  transition: color var(--ease-fast);
 }
 
 .commit-item:hover .commit-icon {
-  color: white;
+  color: var(--text-inverse);
 }
 
-/* BOTTOM LAYOUT */
+/* BOTTOM */
 .bottom-grid {
   display: grid;
   grid-template-columns: 1.5fr 1fr;
-  gap: 30px;
-  margin-bottom: 80px;
+  gap: var(--sp-6);
+  margin-bottom: var(--sp-16);
 }
 
 .contact-info-card {
-  background: var(--dark-oak) !important;
-  color: white !important;
+  background: var(--gray-800) !important;
+  color: var(--text-inverse) !important;
 }
 
 .contact-list {
   display: flex;
   flex-direction: column;
-  gap: 15px;
-  margin-top: 20px;
+  gap: var(--sp-4);
+  margin-top: var(--sp-5);
 }
 
 .contact-item {
   display: flex;
   align-items: center;
-  gap: 15px;
-  opacity: 0.9;
+  gap: var(--sp-4);
+  opacity: 0.88;
+  font-size: var(--text-sm);
 }
 
 .workshop-badge {
   display: inline-block;
-  margin-top: 20px;
-  padding: 5px 15px;
-  border: 1px dashed var(--primary-gold);
-  color: var(--primary-gold);
-  border-radius: 8px;
+  margin-top: var(--sp-5);
+  padding: var(--sp-1) var(--sp-4);
+  border: 1.5px dashed var(--brand-accent);
+  color: var(--brand-accent);
+  border-radius: var(--r-md);
+  font-size: var(--text-sm);
+  font-weight: 600;
 }
 
 /* RESPONSIVE */
 @media (max-width: 768px) {
-  .about-grid-section, .bottom-grid {
+  .about-grid-section,
+  .bottom-grid {
     grid-template-columns: 1fr;
   }
-  .about-hero h1 {
-    font-size: 2.5rem;
+  .about-hero {
+    height: 320px;
+    margin-bottom: calc(-1 * var(--sp-8));
+  }
+  .commitments-section {
+    padding: var(--sp-8) var(--sp-5);
   }
 }

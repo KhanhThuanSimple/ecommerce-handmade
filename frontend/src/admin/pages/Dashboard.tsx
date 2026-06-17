@@ -181,7 +181,7 @@ const Dashboard: React.FC = () => {
                         <ChartBarIcon className="w-5 h-5 text-red-600" />
                         Xu hướng doanh thu theo thời gian
                     </div>
-                    <div className="chart-container-super">
+                    <div className="chart-container-super" style={{ position: 'relative', height: '300px' }}>
                         <Line data={lineChartData} options={lineOptions} />
                     </div>
                 </div>
@@ -271,7 +271,7 @@ const Dashboard: React.FC = () => {
                     <div className="user-dist-list">
                         {data.userDistribution.length > 0 ? (
                             <>
-                                <div className="chart-container-super" style={{ height: '160px' }}>
+                                <div className="chart-container-super" style={{ height: '160px', position: 'relative' }}>
                                     <Pie data={userPieData} options={pieOptions} />
                                 </div>
                                 {data.userDistribution.map((item, idx) => (

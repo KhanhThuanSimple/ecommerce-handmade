@@ -122,10 +122,12 @@ api.interceptors.response.use(
             return new Promise(() => {});
         }
 
-        // 🔐 Unauthorized
+        // 🔐 Unauthorized — xóa toàn bộ auth data để tránh phantom token
         if (error?.response?.status === 401) {
             localStorage.removeItem('user');
-            window.location.href = '/login';
+            localStorage.removeItem('authHeader');
+            localStorage.removeItem('userEmail');
+            // Không redirect ở đây để tránh vòng lặp nếu trang public — để App.tsx xử lý
         }
 
         return Promise.reject(error);

@@ -74,7 +74,9 @@ const Users: React.FC = () => {
 
     // Cơ chế kết nối và lắng nghe dữ liệu thời gian thực qua WebSockets
     useEffect(() => {
-        const socket = new SockJS('http://localhost:8080/ws'); 
+        // Dùng biến môi trường nếu có, fallback về localhost dev
+        const wsBaseUrl = process.env.REACT_APP_WS_URL || 'http://localhost:8080';
+        const socket = new SockJS(`${wsBaseUrl}/ws`);
         const stompClient = new Client({
             webSocketFactory: () => socket,
             onConnect: () => {
@@ -196,7 +198,7 @@ const Users: React.FC = () => {
                         <UserCircleIcon className="stat-icon" />
                     </div>
                     <div className="stat-content">
-                        <div className="stat-number">{stats.total}</div>
+                        <div className="stat-number">{stats.total ?? 0}</div>
                         <div className="stat-label">Tổng người dùng</div>
                     </div>
                 </div>
@@ -205,7 +207,7 @@ const Users: React.FC = () => {
                         <CheckCircleIcon className="stat-icon" />
                     </div>
                     <div className="stat-content">
-                        <div className="stat-number">{stats.active}</div>
+                        <div className="stat-number">{stats.active ?? 0}</div>
                         <div className="stat-label">Đang hoạt động</div>
                     </div>
                 </div>
@@ -214,7 +216,7 @@ const Users: React.FC = () => {
                         <LockClosedIcon className="stat-icon" />
                     </div>
                     <div className="stat-content">
-                        <div className="stat-number">{stats.locked}</div>
+                        <div className="stat-number">{stats.locked ?? 0}</div>
                         <div className="stat-label">Đang bị khóa</div>
                     </div>
                 </div>
@@ -223,218 +225,264 @@ const Users: React.FC = () => {
                         <ShieldCheckIcon className="stat-icon" />
                     </div>
                     <div className="stat-content">
-                        <div className="stat-number">{stats.admin}</div>
+                        <div className="stat-number">{stats.admin ?? 0}</div>
                         <div className="stat-label">Quản trị viên</div>
                     </div>
                 </div>
             </div>
 
-            {/* 3. Panel Quản lý Danh mục Quyền Hệ thống Động */}
-            <div className="role-management-panel">
-                <h3 style={{ fontSize: '15px', fontWeight: 600, marginBottom: '12px', color: '#1e293b' }}>⚙️ Danh Mục Vai Trò Hệ Thống (Real-time DB)</h3>
-                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
-                    {availableRoles.map(role => (
-                        <div key={role.id} className="role-dynamic-item" style={{ borderLeft: `4px solid ${role.color || '#cbd5e1'}` }}>
-                            <span style={{ fontWeight: 600, fontSize: '13px', color: '#334155' }}>
-                                {role.displayName} <span style={{ fontWeight: 400, color: '#64748b', fontSize: '11px' }}>({role.name})</span>
-                            </span>
-                            {role.name !== 'ROLE_ADMIN' && role.name !== 'ROLE_USER' && (
-                                <button 
-                                    onClick={() => { setSelectedRoleIdToDelete(String(role.id)); setShowDeleteRoleConfirm(true); }}
-                                    className="role-delete-btn"
-                                    disabled={updating}
-                                    title="Xóa bỏ vai trò này"
+            {/* 3. Panel quản lý vai trò đã chuyển vào Panel phải bên dưới */}
+
+            {/* ══════════════════════════════════════════════════════
+                SINGLE-PANEL LAYOUT
+                - Block A (trên): Vai trò hệ thống
+                - Block B (dưới): Bảng thông tin người dùng + vai trò
+            ══════════════════════════════════════════════════════ */}
+            <div className="users-single-panel">
+
+                {/* ─── BLOCK A: VAI TRÒ HỆ THỐNG ─── */}
+                <div className="usp-block usp-block--roles">
+                    <div className="usp-block-header">
+                        <ShieldCheckIcon className="panel-header-icon" />
+                        <div>
+                            <h2 className="panel-title">Vai trò hệ thống</h2>
+                            <p className="panel-subtitle">Danh mục phân quyền · Real-time DB</p>
+                        </div>
+                    </div>
+
+                    <div className="usp-roles-body">
+                        {/* Tags */}
+                        <div className="role-system-tags">
+                            {availableRoles.map(role => (
+                                <div
+                                    key={role.id}
+                                    className="role-system-tag"
+                                    style={{ borderLeftColor: role.color || 'var(--border-color)' }}
                                 >
-                                    <XMarkIcon className="w-4 h-4" />
-                                </button>
-                            )}
+                                    <span className="role-system-tag-name">{role.displayName}</span>
+                                    <span className="role-system-tag-code">{role.name}</span>
+                                    {role.name !== 'ROLE_ADMIN' && role.name !== 'ROLE_USER' && (
+                                        <button
+                                            className="role-system-tag-del"
+                                            onClick={() => {
+                                                setSelectedRoleIdToDelete(String(role.id));
+                                                setShowDeleteRoleConfirm(true);
+                                            }}
+                                            disabled={updating}
+                                            title="Xóa vai trò này"
+                                        >
+                                            <XMarkIcon className="role-icon-xs" />
+                                        </button>
+                                    )}
+                                </div>
+                            ))}
                         </div>
-                    ))}
-                    
-                    <button 
-                        onClick={() => setShowAddRoleModal(true)}
-                        disabled={updating}
-                        style={{ padding: '1px 24px', borderRadius: '15px', border: '1px dashed #3b82f6', color: '#3b82f6', background: '#fff', fontWeight: 300, cursor: 'pointer', fontSize: '12px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
-                    >
-                        <PlusIcon className="w-4 h-4" />
-                        <span>Thêm vai trò mới</span>
-                    </button>
-                    
-                    {/* ✨ ĐÃ FIX: Nút xóa tổng quan kích hoạt Modal chọn danh sách vai trò từ FE để xóa */}
-                    <button 
-                        onClick={() => setShowDeleteRoleConfirm(true)}
-                        disabled={updating}
-                        style={{ padding: '1px 24px', borderRadius: '15px', border: '1px dashed #ef4444', color: '#ef4444', background: '#fff', fontWeight: 300, cursor: 'pointer', fontSize: '12px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
-                    >
-                        <TrashIcon className="w-4 h-4" />
-                        <span>Xóa vai trò</span>
-                    </button>
-                </div>
-            </div>
 
-            {/* 4. Table UI */}
-            <div className="table-wrapper">
-                <div className="table-container">
-                    <table className="users-table">
-                        <thead>
-                            <tr>
-                                <th>Người dùng</th>
-                                <th>Thông tin liên hệ</th>
-                                <th>Vai trò</th>
-                                <th>Trạng thái</th>
-                                <th>Thao tác độc lập</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {loading ? (
-                                <tr className="empty-row">
-                                    <td colSpan={5}>
-                                        <div className="empty-state">
-                                            <ArrowPathIcon className="w-6 h-6 spinning text-gray-400" />
-                                            <div className="empty-title">Đang đồng bộ dữ liệu từ PostgreSQL...</div>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ) : paginatedUsers.length === 0 ? (
-                                <tr className="empty-row">
-                                    <td colSpan={5}>
-                                        <div className="empty-state">
-                                            <div className="empty-icon">👥</div>
-                                            <div className="empty-title">Không tìm thấy thành viên nào</div>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ) : (
-                                paginatedUsers.map((user: User) => (
-                                    <tr key={user.id} className="user-row">
-                                        <td data-label="Người dùng">
-                                            <div className="user-info">
-                                                <div className="user-avatar-wrapper">
-                                                    <div className="user-avatar">
-                                                        {user.fullName?.charAt(0)?.toUpperCase() || user.username?.charAt(0)?.toUpperCase()}
-                                                    </div>
-                                                    {user.enabled && <span className="online-dot"></span>}
-                                                </div>
-                                                <div className="user-details">
-                                                    <div className="user-name">
-                                                        {user.fullName || user.username}
-                                                        {user.roles?.includes('ROLE_ADMIN') && (
-                                                            <CheckBadgeIcon className="verified-badge" />
-                                                        )}
-                                                    </div>
-                                                    <div className="user-username">@{user.username}</div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td data-label="Liên hệ">
-                                            <div className="user-email">
-                                                <EnvelopeIcon className="inline-icon" />
-                                                <span className="contact-text">{user.email}</span>
-                                            </div>
-                                            <div className="user-phone">
-                                                <PhoneIcon className="inline-icon" />
-                                                <span>{user.phone || 'Chưa cập nhật'}</span>
-                                            </div>
-                                        </td>
-                                        <td data-label="Vai trò">
-                                            <div className="roles-container" style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-                                                {user.roles && user.roles.map((roleString) => {
-                                                    const dbRole = availableRoles.find(r => r.name === roleString);
-                                                    const badgeColor = dbRole ? dbRole.color : '#6b7280';
-                                                    const badgeLabel = dbRole ? dbRole.displayName : roleString;
-
-                                                    return (
-                                                        <span 
-                                                            key={roleString} 
-                                                            className="role-badge"
-                                                            style={{ 
-                                                                backgroundColor: `${badgeColor}15`, 
-                                                                color: badgeColor, 
-                                                                border: `1px solid ${badgeColor}40`,
-                                                            }}
-                                                        >
-                                                            <ShieldCheckIcon className="w-3 h-3" /> 
-                                                            {badgeLabel}
-                                                        </span>
-                                                    );
-                                                })}
-                                            </div>
-                                        </td>
-                                        <td data-label="Trạng thái">
-                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                                <span className={`status-tag-custom ${user.accountNonLocked ? 'active' : 'locked'}`}>
-                                                    {user.accountNonLocked ? '🔓 Mở khóa' : '🔒 Đang khóa'}
-                                                </span>
-                                                <span className={`status-tag-custom ${user.enabled ? 'active' : 'inactive'}`}>
-                                                    {user.enabled ? '✅ Kích hoạt' : '❌ Vô hiệu'}
-                                                </span>
-                                            </div>
-                                        </td>
-                                        <td data-label="Thao tác">
-                                            <div className="action-buttons">
-                                                <button 
-                                                    className={`action-icon ${user.accountNonLocked ? 'unlock' : 'lock'}`}
-                                                    onClick={() => toggleLock(user.id)} 
-                                                    disabled={updating}
-                                                    title={user.accountNonLocked ? "Khóa tài khoản" : "Mở khóa tài khoản"}
-                                                    style={{ color: user.accountNonLocked ? '#3b82f6' : '#ef4444' }}
-                                                >
-                                                    {user.accountNonLocked ? <LockOpenIcon className="w-4 h-4" /> : <LockClosedIcon className="w-4 h-4" />}
-                                                </button>
-                                                
-                                                <button 
-                                                    className="action-icon status"
-                                                    onClick={() => toggleStatus(user.id)} 
-                                                    disabled={updating}
-                                                    title={user.enabled ? "Vô hiệu hóa hoạt động" : "Kích hoạt hoạt động"}
-                                                    style={{ color: user.enabled ? '#10b981' : '#64748b' }}
-                                                >
-                                                    <CheckBadgeIcon className="w-4 h-4" />
-                                                </button>
-                                                
-                                                <button 
-                                                    className="action-icon shield"
-                                                    onClick={() => { setSelectedUser(user); setShowRoleModal(true); }}
-                                                    title="Thay đổi vai trò"
-                                                >
-                                                    <ShieldCheckIcon className="w-4 h-4" />
-                                                </button>
-                                                
-                                                <button 
-                                                    className="action-icon delete"
-                                                    onClick={() => { setSelectedUser(user); setShowDeleteConfirm(true); }}
-                                                    title="Xóa vĩnh viễn"
-                                                >
-                                                    <TrashIcon className="w-4 h-4" />
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))
-                            )}
-                        </tbody>
-                    </table>
-                </div>
-
-                {/* 5. Pagination */}
-                {totalPages > 1 && (
-                    <div className="pagination">
-                        <div className="pagination-info">
-                            Hiển thị trang <strong>{page}</strong> trên tổng số <strong>{totalPages}</strong> trang
-                        </div>
-                        <div className="pagination-controls">
-                            <button className="pagination-btn" disabled={page === 1} onClick={() => setPage((p) => p - 1)}>
-                                <ChevronLeftIcon className="w-4 h-4" />
-                                <span>Trước</span>
+                        {/* Actions */}
+                        <div className="role-system-actions">
+                            <button
+                                className="role-action-btn role-action-btn--add"
+                                onClick={() => setShowAddRoleModal(true)}
+                                disabled={updating}
+                            >
+                                <PlusIcon className="role-icon-sm" />
+                                <span>Thêm vai trò</span>
                             </button>
-                            <button className="pagination-btn" disabled={page === totalPages} onClick={() => setPage((p) => p + 1)}>
-                                <span>Sau</span>
-                                <ChevronRightIcon className="w-4 h-4" />
+                            <button
+                                className="role-action-btn role-action-btn--del"
+                                onClick={() => setShowDeleteRoleConfirm(true)}
+                                disabled={updating}
+                            >
+                                <TrashIcon className="role-icon-sm" />
+                                <span>Xóa vai trò</span>
                             </button>
                         </div>
                     </div>
-                )}
-            </div>
+                </div>
+
+                {/* ─── BLOCK B: BẢNG NGƯỜI DÙNG (vai trò gộp vào) ─── */}
+                <div className="usp-block usp-block--users">
+                    <div className="usp-block-header">
+                        <UserCircleIcon className="panel-header-icon" />
+                        <div>
+                            <h2 className="panel-title">Thông tin người dùng</h2>
+                            <p className="panel-subtitle">Người dùng · Liên hệ · Vai trò · Trạng thái · Thao tác</p>
+                        </div>
+                    </div>
+
+                    <div className="usp-table-wrap">
+                        <table className="usp-table">
+                            <thead>
+                                <tr>
+                                    <th>Người dùng</th>
+                                    <th>Thông tin liên hệ</th>
+                                    <th>Vai trò</th>
+                                    <th>Trạng thái</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {loading ? (
+                                    <tr>
+                                        <td colSpan={5}>
+                                            <div className="empty-state">
+                                                <ArrowPathIcon className="icon-spin" />
+                                                <div className="empty-title">Đang tải dữ liệu...</div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ) : paginatedUsers.length === 0 ? (
+                                    <tr>
+                                        <td colSpan={5}>
+                                            <div className="empty-state">
+                                                <span className="empty-icon">👥</span>
+                                                <div className="empty-title">Không tìm thấy thành viên</div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ) : (
+                                    paginatedUsers.map((user: User) => (
+                                        <tr key={user.id} className="user-row">
+
+                                            {/* Người dùng */}
+                                            <td>
+                                                <div className="user-info">
+                                                    <div className="user-avatar-wrapper">
+                                                        <div className="user-avatar">
+                                                            {user.fullName?.charAt(0)?.toUpperCase() || user.username?.charAt(0)?.toUpperCase()}
+                                                        </div>
+                                                        {user.enabled && <span className="online-dot" />}
+                                                    </div>
+                                                    <div className="user-details">
+                                                        <div className="user-name">
+                                                            {user.fullName || user.username}
+                                                            {user.roles?.includes('ROLE_ADMIN') && (
+                                                                <CheckBadgeIcon className="verified-badge-icon" />
+                                                            )}
+                                                        </div>
+                                                        <div className="user-username">@{user.username}</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+
+                                            {/* Liên hệ */}
+                                            <td>
+                                                <div className="user-email">
+                                                    <EnvelopeIcon className="inline-icon" />
+                                                    <span className="contact-text">{user.email}</span>
+                                                </div>
+                                                <div className="user-phone">
+                                                    <PhoneIcon className="inline-icon" />
+                                                    <span>{user.phone || 'Chưa cập nhật'}</span>
+                                                </div>
+                                            </td>
+
+                                            {/* Vai trò — gộp vào đây */}
+                                            <td>
+                                                <div className="roles-container">
+                                                    {user.roles?.map(roleString => {
+                                                        const dbRole = availableRoles.find(r => r.name === roleString);
+                                                        const color = dbRole?.color || '#6b7280';
+                                                        const label = dbRole?.displayName || roleString;
+                                                        return (
+                                                            <span
+                                                                key={roleString}
+                                                                className="role-badge"
+                                                                style={{
+                                                                    backgroundColor: `${color}15`,
+                                                                    color,
+                                                                    border: `1px solid ${color}40`,
+                                                                }}
+                                                            >
+                                                                <ShieldCheckIcon className="role-icon-xs" />
+                                                                {label}
+                                                            </span>
+                                                        );
+                                                    })}
+                                                </div>
+                                            </td>
+
+                                            {/* Trạng thái */}
+                                            <td>
+                                                <div className="status-stack">
+                                                    <span className={`status-pill ${user.accountNonLocked ? 'status-pill--open' : 'status-pill--locked'}`}>
+                                                        {user.accountNonLocked
+                                                            ? <><LockOpenIcon className="status-pill-icon" /> Mở khóa</>
+                                                            : <><LockClosedIcon className="status-pill-icon" /> Đang khóa</>
+                                                        }
+                                                    </span>
+                                                    <span className={`status-pill ${user.enabled ? 'status-pill--active' : 'status-pill--inactive'}`}>
+                                                        {user.enabled
+                                                            ? <><CheckCircleIcon className="status-pill-icon" /> Kích hoạt</>
+                                                            : <><XMarkIcon className="status-pill-icon" /> Vô hiệu</>
+                                                        }
+                                                    </span>
+                                                </div>
+                                            </td>
+
+                                            {/* Thao tác */}
+                                            <td>
+                                                <div className="action-buttons">
+                                                    <button
+                                                        className={`action-icon ${user.accountNonLocked ? 'unlock' : 'lock'}`}
+                                                        onClick={() => toggleLock(user.id)}
+                                                        disabled={updating}
+                                                        title={user.accountNonLocked ? 'Khóa tài khoản' : 'Mở khóa'}
+                                                    >
+                                                        {user.accountNonLocked
+                                                            ? <LockOpenIcon className="action-icon-svg" />
+                                                            : <LockClosedIcon className="action-icon-svg" />}
+                                                    </button>
+                                                    <button
+                                                        className="action-icon status"
+                                                        onClick={() => toggleStatus(user.id)}
+                                                        disabled={updating}
+                                                        title={user.enabled ? 'Vô hiệu hóa' : 'Kích hoạt'}
+                                                    >
+                                                        <CheckBadgeIcon className="action-icon-svg" />
+                                                    </button>
+                                                    <button
+                                                        className="action-icon shield"
+                                                        onClick={() => { setSelectedUser(user); setShowRoleModal(true); }}
+                                                        title="Thay đổi vai trò"
+                                                    >
+                                                        <ShieldCheckIcon className="action-icon-svg" />
+                                                    </button>
+                                                    <button
+                                                        className="action-icon delete"
+                                                        onClick={() => { setSelectedUser(user); setShowDeleteConfirm(true); }}
+                                                        title="Xóa tài khoản"
+                                                    >
+                                                        <TrashIcon className="action-icon-svg" />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {/* Pagination */}
+                    {totalPages > 1 && (
+                        <div className="panel-pagination">
+                            <span className="pagination-info">
+                                Trang <strong>{page}</strong> / <strong>{totalPages}</strong>
+                            </span>
+                            <div className="pagination-controls">
+                                <button className="pagination-btn" disabled={page === 1} onClick={() => setPage(p => p - 1)}>
+                                    <ChevronLeftIcon className="action-icon-svg" />
+                                </button>
+                                <button className="pagination-btn" disabled={page === totalPages} onClick={() => setPage(p => p + 1)}>
+                                    <ChevronRightIcon className="action-icon-svg" />
+                                </button>
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+            </div>{/* end .users-single-panel */}
 
             {/* CỬA SỔ MODAL 1: Thêm Người Dùng Mới */}
             {showAddModal && (

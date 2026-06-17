@@ -440,15 +440,26 @@ const Orders: React.FC = () => {
     }
   }, []);
 
+  // Trigger fetch khi filter thay đổi (tách riêng khỏi fetchOrders dependency)
+  const [filterTrigger, setFilterTrigger] = useState(0);
+
   useEffect(() => {
     fetchOrders();
     fetchSummary();
   }, [fetchOrders, fetchSummary]);
 
+  // Re-fetch khi user nhấn "Tìm kiếm" hoặc "Đặt lại"
+  useEffect(() => {
+    if (filterTrigger === 0) return; // Bỏ qua lần mount đầu tiên
+    fetchOrders();
+    fetchSummary();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filterTrigger]);
+
   // Handlers
   const handleSearch = () => {
     setPagination(prev => ({ ...prev, page: 0 }));
-    fetchOrders();
+    setFilterTrigger(t => t + 1);
   };
 
   const handleReset = () => {
@@ -457,7 +468,7 @@ const Orders: React.FC = () => {
     setDateFrom('');
     setDateTo('');
     setPagination(prev => ({ ...prev, page: 0 }));
-    setTimeout(() => fetchOrders(), 0);
+    setFilterTrigger(t => t + 1);
   };
 
   const handleUpdateStatus = async (orderId: string, status: string, note: string) => {
@@ -494,16 +505,26 @@ const Orders: React.FC = () => {
       </div>
 
       {/* Stats Cards */}
-      {summary && (
-        <div className="stats-grid">
-          <div className="stat-card"><div className="stat-value">{summary.totalOrders}</div><div className="stat-label">Tổng đơn</div></div>
-          <div className="stat-card"><div className="stat-value">{formatCurrency(summary.totalRevenue)}</div><div className="stat-label">Doanh thu</div></div>
-          <div className="stat-card"><div className="stat-value">{summary.pendingOrders}</div><div className="stat-label">Chờ thanh toán</div></div>
-          <div className="stat-card"><div className="stat-value">{summary.processingOrders}</div><div className="stat-label">Đang xử lý</div></div>
-          <div className="stat-card"><div className="stat-value">{summary.completedOrders}</div><div className="stat-label">Hoàn thành</div></div>
-          <div className="stat-card"><div className="stat-value">{summary.cancelledOrders}</div><div className="stat-label">Đã hủy</div></div>
-        </div>
-      )}
+      <div className="stats-grid">
+        {summary ? (
+          <>
+            <div className="stat-card"><div className="stat-value">{summary.totalOrders ?? 0}</div><div className="stat-label">Tổng đơn</div></div>
+            <div className="stat-card"><div className="stat-value">{summary.totalRevenue != null ? formatCurrency(summary.totalRevenue) : '0 ₫'}</div><div className="stat-label">Doanh thu</div></div>
+            <div className="stat-card"><div className="stat-value">{summary.pendingOrders ?? 0}</div><div className="stat-label">Chờ thanh toán</div></div>
+            <div className="stat-card"><div className="stat-value">{summary.processingOrders ?? 0}</div><div className="stat-label">Đang xử lý</div></div>
+            <div className="stat-card"><div className="stat-value">{summary.completedOrders ?? 0}</div><div className="stat-label">Hoàn thành</div></div>
+            <div className="stat-card"><div className="stat-value">{summary.cancelledOrders ?? 0}</div><div className="stat-label">Đã hủy</div></div>
+          </>
+        ) : (
+          /* Skeleton giữ chỗ khi đang tải */
+          [1,2,3,4,5,6].map(i => (
+            <div key={i} className="stat-card">
+              <div className="stat-value" style={{ background: 'var(--gray-200)', borderRadius: 6, minHeight: 28, minWidth: 60, color: 'transparent' }}>—</div>
+              <div className="stat-label" style={{ background: 'var(--gray-100)', borderRadius: 4, minHeight: 12, marginTop: 6, color: 'transparent' }}>—</div>
+            </div>
+          ))
+        )}
+      </div>
 
       {/* Filter Bar */}
       <div className="filter-bar">

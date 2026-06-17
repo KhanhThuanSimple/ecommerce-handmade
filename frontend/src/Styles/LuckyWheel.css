@@ -1,17 +1,18 @@
-/* LuckyWheel.css */
+/* ── LUCKY WHEEL ── */
 
 .lucky-wheel-game {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 30px 20px;
-  font-family: 'Segoe UI', system-ui, sans-serif;
+  padding: var(--sp-8) var(--sp-6);
+  font-family: var(--font-sans);
 }
 
-/* Layout chính */
+/* LAYOUT */
 .wheel-container {
   display: flex;
-  gap: 40px;
-  min-height: 700px;
+  gap: var(--sp-10);
+  align-items: flex-start;
+  min-height: 660px;
 }
 
 .wheel-section {
@@ -20,126 +21,115 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 30px;
-  background: linear-gradient(135deg, #FFFFFF, #F9FAFB);
-  border-radius: 24px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+  padding: var(--sp-8);
+  background: var(--surface-card);
+  border-radius: var(--r-2xl);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-md);
 }
 
 .prize-section {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 25px;
+  gap: var(--sp-6);
 }
 
-/* Header */
+/* HEADER */
 .wheel-header {
   text-align: center;
-  margin-bottom: 30px;
+  margin-bottom: var(--sp-8);
   width: 100%;
 }
 
 .wheel-header h2 {
-  font-size: 2.2rem;
-  color: #1F2937;
-  margin-bottom: 10px;
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+  color: var(--text-primary);
+  margin-bottom: var(--sp-2);
   font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-}
-
-.wheel-header h2 .icon {
-  font-size: 2.5rem;
+  gap: var(--sp-3);
 }
 
 .wheel-header .subtitle {
-  font-size: 1.1rem;
-  color: #6B7280;
-  margin-bottom: 25px;
+  font-size: var(--text-base);
+  color: var(--text-muted);
 }
 
-/* Thông tin lượt quay */
+/* SPIN INFO */
 .spin-info {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: var(--sp-4);
   width: 100%;
-  max-width: 400px;
+  max-width: 380px;
   margin: 0 auto;
 }
 
 .spin-counter {
   display: flex;
   align-items: center;
-  gap: 15px;
-  background: linear-gradient(135deg, #4F46E5, #7C3AED);
-  padding: 20px;
-  border-radius: 16px;
-  color: white;
-  box-shadow: 0 8px 25px rgba(79, 70, 229, 0.25);
+  gap: var(--sp-4);
+  background: linear-gradient(135deg, var(--brand-primary), var(--brand-orange));
+  padding: var(--sp-5);
+  border-radius: var(--r-xl);
+  color: var(--text-inverse);
+  box-shadow: var(--shadow-brand-lg);
 }
 
 .spin-counter .counter-icon {
-  font-size: 2.2rem;
-  background: rgba(255, 255, 255, 0.2);
-  width: 60px;
-  height: 60px;
+  font-size: 2rem;
+  background: rgba(255,255,255,0.18);
+  width: 56px;
+  height: 56px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
-}
-
-.spin-counter .counter-text {
-  flex: 1;
+  border-radius: var(--r-full);
+  flex-shrink: 0;
 }
 
 .spin-counter .count {
-  font-size: 2.8rem;
+  font-size: 2.5rem;
   font-weight: 800;
   line-height: 1;
   display: block;
 }
 
 .spin-counter .label {
-  font-size: 0.95rem;
+  font-size: var(--text-sm);
   opacity: 0.9;
-  margin-top: 5px;
+  margin-top: var(--sp-1);
 }
 
 .spin-rule {
   display: flex;
   align-items: center;
-  gap: 12px;
-  background: #F3F4F6;
-  padding: 15px 20px;
-  border-radius: 12px;
-  color: #4B5563;
-  font-size: 0.95rem;
+  gap: var(--sp-3);
+  background: var(--surface-sunken);
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--r-lg);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
 }
 
-.spin-rule .rule-icon {
-  font-size: 1.3rem;
-}
-
-/* Vòng quay */
+/* WHEEL BOX */
 .wheel-box {
   position: relative;
-  width: 380px;
-  height: 380px;
-  margin: 20px 0;
+  width: 360px;
+  height: 360px;
+  margin: var(--sp-5) 0;
 }
 
 canvas {
-  border-radius: 50%;
+  border-radius: var(--r-full);
   background: transparent;
-  transition: all 0.3s ease;
-  box-shadow: 
-    0 20px 60px rgba(0, 0, 0, 0.1),
-    0 8px 32px rgba(79, 70, 229, 0.15);
+  transition: box-shadow var(--ease-base);
+  box-shadow: var(--shadow-xl), 0 0 0 4px var(--brand-accent-light);
 }
 
 canvas.spinning {
@@ -147,21 +137,17 @@ canvas.spinning {
 }
 
 @keyframes wheelGlow {
-  0%, 100% { 
-    transform: scale(1);
-    box-shadow: 
-      0 20px 60px rgba(0, 0, 0, 0.1),
-      0 8px 32px rgba(79, 70, 229, 0.15);
+  0%, 100% {
+    box-shadow: var(--shadow-xl), 0 0 0 4px var(--brand-accent-light);
   }
-  50% { 
-    transform: scale(1.02);
-    box-shadow: 
-      0 25px 80px rgba(0, 0, 0, 0.15),
-      0 12px 40px rgba(79, 70, 229, 0.25);
+  50% {
+    box-shadow: var(--shadow-xl), 0 0 0 8px var(--brand-primary-light),
+                0 0 40px rgba(192,57,43,0.2);
+    transform: scale(1.01);
   }
 }
 
-/* Pointer */
+/* POINTER */
 .pointer-container {
   position: absolute;
   top: 150px;
@@ -176,60 +162,54 @@ canvas.spinning {
 .pointer-triangle {
   width: 0;
   height: 0;
-  border-left: 18px solid transparent;
-  border-right: 18px solid transparent;
-  border-top: 28px solid #EF4444;
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
-   transform: rotate(90deg);
+  border-left: 16px solid transparent;
+  border-right: 16px solid transparent;
+  border-top: 26px solid var(--brand-primary);
+  filter: drop-shadow(0 3px 6px rgba(0,0,0,0.15));
+  transform: rotate(90deg);
 }
 
-
-
-
-/* Nút quay */
+/* SPIN BUTTON */
 .wheel-controls {
-  margin-top: 30px;
+  margin-top: var(--sp-8);
   text-align: center;
 }
 
 .spin-button {
-  padding: 18px 50px;
-  font-size: 1.2rem;
+  padding: var(--sp-4) var(--sp-12);
+  font-size: var(--text-lg);
   font-weight: 700;
-  color: white;
-  background: linear-gradient(135deg, #4F46E5, #7C3AED);
+  color: var(--text-inverse);
+  background: linear-gradient(135deg, var(--brand-primary), var(--brand-orange));
   border: none;
-  border-radius: 50px;
+  border-radius: var(--r-full);
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all var(--ease-spring);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  box-shadow: 0 10px 30px rgba(79, 70, 229, 0.3);
+  gap: var(--sp-3);
+  box-shadow: var(--shadow-brand-lg);
   position: relative;
   overflow: hidden;
   min-width: 220px;
+  font-family: var(--font-sans);
 }
 
-.spin-button:before {
+.spin-button::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  transition: 0.5s;
+  top: 0; left: -100%;
+  width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left var(--ease-slow);
 }
 
-.spin-button:hover:before {
-  left: 100%;
-}
+.spin-button:hover:not(:disabled)::before { left: 100%; }
 
 .spin-button:hover:not(:disabled) {
   transform: translateY(-3px);
-  box-shadow: 0 15px 40px rgba(79, 70, 229, 0.4);
+  box-shadow: 0 16px 40px rgba(192,57,43,0.45);
 }
 
 .spin-button:active:not(:disabled) {
@@ -237,396 +217,321 @@ canvas.spinning {
 }
 
 .spin-button:disabled {
-  background: linear-gradient(135deg, #9CA3AF, #6B7280);
+  background: linear-gradient(135deg, var(--gray-400), var(--gray-500));
   cursor: not-allowed;
   opacity: 0.7;
-  transform: none !important;
-  box-shadow: none !important;
-}
-
-.spin-button .icon {
-  font-size: 1.4rem;
+  transform: none;
+  box-shadow: none;
 }
 
 .spinner {
-  width: 20px;
-  height: 20px;
-  border: 3px solid rgba(255, 255, 255, 0.3);
-  border-radius: 50%;
+  width: 20px; height: 20px;
+  border: 3px solid rgba(255,255,255,0.3);
+  border-radius: var(--r-full);
   border-top-color: white;
-  animation: spin 1s ease-in-out infinite;
+  animation: spin 0.9s linear infinite;
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
+@keyframes spin { to { transform: rotate(360deg); } }
 
-/* Phần giải thưởng */
-.prize-section {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-/* Kết quả nổi bật */
+/* RESULT HIGHLIGHT */
 .result-highlight {
-  background: white;
-  border-radius: 20px;
-  padding: 30px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-  animation: slideIn 0.4s ease-out;
+  background: var(--surface-card);
+  border-radius: var(--r-2xl);
+  padding: var(--sp-8);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-lg);
+  animation: slideInRight 0.35s var(--ease-spring);
 }
 
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateX(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: translateX(0); }
 }
 
 .highlight-header {
   text-align: center;
-  margin-bottom: 30px;
+  margin-bottom: var(--sp-6);
 }
 
 .highlight-header h3 {
-  font-size: 1.8rem;
-  color: #1F2937;
-  margin-bottom: 8px;
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  color: var(--text-primary);
+  margin-bottom: var(--sp-2);
   font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-}
-
-.highlight-header h3 .icon {
-  font-size: 2rem;
 }
 
 .highlight-header p {
-  color: #6B7280;
-  font-size: 1.1rem;
+  color: var(--text-muted);
+  font-size: var(--text-base);
 }
 
 .highlight-prize {
-  padding: 30px;
-  border-radius: 16px;
-  border: 3px solid;
+  padding: var(--sp-6);
+  border-radius: var(--r-xl);
+  border: 2px solid;
   display: flex;
   align-items: center;
-  gap: 25px;
-  margin-bottom: 30px;
-  animation: pulse 2s infinite;
+  gap: var(--sp-6);
+  margin-bottom: var(--sp-6);
+  animation: prizePulse 2s infinite;
 }
 
-@keyframes pulse {
+@keyframes prizePulse {
   0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.02); }
+  50%       { transform: scale(1.015); }
 }
 
 .prize-icon-large {
-  font-size: 4.5rem;
-  background: rgba(255, 255, 255, 0.9);
-  width: 120px;
-  height: 120px;
+  font-size: 3.5rem;
+  background: rgba(255,255,255,0.9);
+  width: 100px; height: 100px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
+  border-radius: var(--r-full);
   flex-shrink: 0;
+  box-shadow: var(--shadow-md);
 }
 
-.prize-info {
-  flex: 1;
-}
+.prize-info { flex: 1; }
 
 .prize-info h4 {
-  font-size: 2rem;
+  font-size: var(--text-2xl);
   font-weight: 700;
-  margin-bottom: 10px;
+  margin-bottom: var(--sp-2);
+  font-family: var(--font-display);
 }
 
 .prize-description {
-  color: #4B5563;
-  font-size: 1.1rem;
-  margin-bottom: 15px;
-  line-height: 1.5;
+  color: var(--text-secondary);
+  font-size: var(--text-base);
+  margin-bottom: var(--sp-3);
+  line-height: 1.6;
 }
 
 .prize-value {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 1.2rem;
-  color: #374151;
+  gap: var(--sp-2);
+  font-size: var(--text-base);
+  color: var(--text-secondary);
 }
 
 .prize-value strong {
-  font-size: 1.4rem;
+  font-size: var(--text-lg);
+  color: var(--brand-primary);
 }
 
-/* Actions */
+/* ACTIONS */
 .highlight-actions {
   display: flex;
-  gap: 15px;
-  margin-bottom: 25px;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-5);
 }
 
-.btn-primary, .btn-secondary {
+.btn-primary,
+.btn-secondary {
   flex: 1;
-  padding: 18px;
-  margin-top: 20px;
+  padding: var(--sp-4);
   border: none;
-  border-radius: 12px;
-  font-weight: 600;
-  font-size: 1rem;
+  border-radius: var(--r-lg);
+  font-weight: 700;
+  font-size: var(--text-base);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--ease-fast);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: var(--sp-2);
+  font-family: var(--font-sans);
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #4F46E5, #7C3AED);
-  color: white;
+  background: var(--brand-primary);
+  color: var(--text-inverse);
+  box-shadow: var(--shadow-brand);
 }
 
 .btn-primary:hover {
+  background: var(--brand-primary-dark);
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(79, 70, 229, 0.3);
+  box-shadow: var(--shadow-brand-lg);
 }
 
 .btn-secondary {
-  background: #F3F4F6;
-  color: #374151;
+  background: var(--gray-100);
+  color: var(--text-secondary);
+  border: 1.5px solid var(--border-color);
 }
 
 .btn-secondary:hover {
-  background: #E5E7EB;
+  background: var(--gray-200);
   transform: translateY(-2px);
 }
 
 .highlight-note {
   text-align: center;
-  padding-top: 20px;
-  border-top: 1px solid #E5E7EB;
+  padding-top: var(--sp-5);
+  border-top: 1px solid var(--border-color);
 }
 
 .highlight-note p {
-  color: #4B5563;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  margin-bottom: 8px;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-2);
 }
 
 .highlight-note .small {
-  font-size: 0.9rem;
-  color: #9CA3AF;
+  font-size: var(--text-xs);
+  color: var(--text-muted);
 }
 
-/* Danh sách giải thưởng */
+/* PRIZE LIST */
 .prize-list {
-  background: white;
-  border-radius: 20px;
-  padding: 30px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+  background: var(--surface-card);
+  border-radius: var(--r-2xl);
+  padding: var(--sp-6);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
 }
 
 .list-header {
   text-align: center;
-  margin-bottom: 30px;
+  margin-bottom: var(--sp-6);
 }
 
 .list-header h3 {
-  font-size: 1.8rem;
-  color: #1F2937;
-  margin-bottom: 8px;
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  color: var(--text-primary);
   font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
+  margin-bottom: var(--sp-1);
 }
 
 .list-header .subtitle {
-  color: #6B7280;
-  font-size: 1.1rem;
+  color: var(--text-muted);
+  font-size: var(--text-sm);
 }
 
 .prize-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
+  gap: var(--sp-4);
 }
 
 .prize-card {
-  background: white;
-  border-radius: 12px;
+  background: var(--surface-card);
+  border-radius: var(--r-xl);
   border: 2px solid;
   overflow: hidden;
-  transition: all 0.3s ease;
+  transition: all var(--ease-spring);
 }
 
 .prize-card:hover {
   transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
 }
 
 .prize-card.highlighted {
-  animation: highlightCard 1.5s ease-in-out infinite;
+  animation: highlightPrize 1.5s ease-in-out infinite;
   position: relative;
-  z-index: 10;
+  z-index: 2;
 }
 
-@keyframes highlightCard {
-  0%, 100% { 
-    transform: translateY(0);
-    box-shadow: 0 0 20px rgba(79, 70, 229, 0.4);
-  }
-  50% { 
-    transform: translateY(-6px);
-    box-shadow: 0 10px 30px rgba(79, 70, 229, 0.6);
-  }
+@keyframes highlightPrize {
+  0%, 100% { transform: translateY(0); box-shadow: var(--shadow-md); }
+  50%       { transform: translateY(-6px); box-shadow: var(--shadow-xl); }
 }
 
 .card-header {
-  padding: 20px;
+  padding: var(--sp-5);
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: var(--sp-2);
 }
 
-.card-header .prize-icon {
-  font-size: 2rem;
-}
+.card-header .prize-icon { font-size: 2rem; }
 
 .card-header h4 {
-  font-size: 1.2rem;
+  font-size: var(--text-base);
   font-weight: 700;
   margin: 0;
+  color: var(--text-primary);
 }
 
-.card-body {
-  padding: 20px;
-}
+.card-body { padding: var(--sp-5); }
 
-.prize-description {
-  color: #4B5563;
-  font-size: 0.95rem;
-  margin-bottom: 15px;
-  line-height: 1.4;
-}
-
-/* Thông tin game */
+/* GAME INFO */
 .game-info {
-  background: white;
-  border-radius: 20px;
-  padding: 25px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+  background: var(--surface-card);
+  border-radius: var(--r-2xl);
+  padding: var(--sp-6);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
 }
 
 .info-item {
   display: flex;
   align-items: flex-start;
-  gap: 15px;
-  padding: 15px 0;
-  border-bottom: 1px solid #F3F4F6;
+  gap: var(--sp-4);
+  padding: var(--sp-4) 0;
+  border-bottom: 1px solid var(--border-color);
 }
 
-.info-item:last-child {
-  border-bottom: none;
-}
+.info-item:last-child { border-bottom: none; }
 
 .info-item .info-icon {
-  font-size: 1.5rem;
-  color: #4F46E5;
-}
-
-.info-item div {
-  flex: 1;
+  font-size: 1.4rem;
+  color: var(--brand-primary);
+  flex-shrink: 0;
 }
 
 .info-item strong {
   display: block;
-  color: #1F2937;
-  margin-bottom: 4px;
-  font-size: 1rem;
+  color: var(--text-primary);
+  margin-bottom: var(--sp-1);
+  font-size: var(--text-sm);
+  font-weight: 700;
 }
 
 .info-item p {
-  color: #6B7280;
-  font-size: 0.95rem;
+  color: var(--text-muted);
+  font-size: var(--text-sm);
   margin: 0;
+  line-height: 1.5;
 }
 
-/* Responsive */
+/* RESPONSIVE */
 @media (max-width: 1200px) {
   .wheel-container {
     flex-direction: column;
-    gap: 30px;
+    gap: var(--sp-6);
+    min-height: auto;
   }
-  
-  .wheel-section {
-    padding: 20px;
-  }
-  
-  .prize-grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
+  .wheel-section { padding: var(--sp-5); }
+  .prize-grid { grid-template-columns: repeat(4, 1fr); }
 }
 
 @media (max-width: 768px) {
-  .prize-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  .highlight-prize {
-    flex-direction: column;
-    text-align: center;
-  }
-  
-  .wheel-box {
-    width: 320px;
-    height: 320px;
-  }
-  
-  canvas {
-    width: 320px;
-    height: 320px;
-  }
-  
-  .highlight-actions {
-    flex-direction: column;
-  }
+  .lucky-wheel-game { padding: var(--sp-5) var(--sp-4); }
+  .prize-grid { grid-template-columns: repeat(2, 1fr); }
+  .highlight-prize { flex-direction: column; text-align: center; }
+  .wheel-box { width: 300px; height: 300px; }
+  canvas { width: 300px !important; height: 300px !important; }
+  .highlight-actions { flex-direction: column; }
+  .pointer-container { left: 83%; }
 }
 
 @media (max-width: 480px) {
-  .prize-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .wheel-box {
-    width: 380px;
-    height: 380px;
-  }
-  
-  canvas {
-    width: 280px;
-    height: 280px;
-  }
-  
-  .spin-button {
-    padding: 16px 30px;
-    font-size: 1.1rem;
-  }
+  .prize-grid { grid-template-columns: 1fr; }
+  .wheel-box { width: 280px; height: 280px; }
+  canvas { width: 280px !important; height: 280px !important; }
 }

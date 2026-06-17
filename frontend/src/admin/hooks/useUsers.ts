@@ -62,11 +62,24 @@ const useUsers = () => {
         }
     }, []);
 
-    // 2B. Tải số liệu thống kê chuẩn (Backend xử lý COUNT(*))
+    // 2B. Tải số liệu thống kê (BE trả Map<String, Long>)
     const fetchUserStats = useCallback(async () => {
         try {
-            const response = await api.get<UserStats>('/admin/users/stats');
-            setDbStats(response.data);
+            const response = await api.get<{
+                total: number;
+                active: number;
+                locked: number;
+                admin: number;
+            }>('/admin/users/stats');
+            const d = response.data;
+            setDbStats({
+                total:        d.total  ?? 0,
+                active:       d.active ?? 0,
+                locked:       d.locked ?? 0,
+                admin:        d.admin  ?? 0,
+                user:         0,
+                newThisMonth: 0,
+            });
         } catch (error) {
             console.error("Không thể tải số liệu thống kê người dùng thực tế:", error);
         }

@@ -35,6 +35,12 @@ public class AdminUserController {
         return ResponseEntity.ok(dtoPage);
     }
 
+    // ENDPOINT MỚI: Thống kê tổng quan người dùng
+    @GetMapping("/stats")
+    public ResponseEntity<java.util.Map<String, Long>> getUserStats() {
+        return ResponseEntity.ok(adminUserService.getUserStats());
+    }
+
     // ĐÃ ĐỔI CHỖ LÊN ĐÂY: Ưu tiên đường dẫn tĩnh cố định để tránh lỗi 405 ngầm
     @GetMapping("/roles")
     public ResponseEntity<List<AdminRoleDTO>> getAllSystemRoles() {

@@ -85,12 +85,24 @@ const Header: React.FC<HeaderProps> = ({ currentUser, onLogout }) => {
       <div className="user-area">
         {currentUser ? (
           <>
-            <Link to="/profile" className="user-info">
+            {/* Nút Admin Panel — CHỈ hiển thị với admin */}
+            {(currentUser.roles?.includes('ROLE_ADMIN') || currentUser.roles?.includes('ADMIN')) && (
+              <Link to="/admin" className="back-to-admin-btn" title="Quay về trang quản trị">
+                <i className="fas fa-tachometer-alt"></i>
+                <span>Admin Panel</span>
+              </Link>
+            )}
+
+            {/* Avatar / Profile */}
+            <Link to="/profile" className="user-info" title={currentUser.username}>
               <i className="fas fa-user-circle"></i>
             </Link>
-            {/* <button className="logout-btn" onClick={onLogout}>
-              Đăng xuất
-            </button> */}
+
+            {/* Nút Đăng xuất — hiển thị cho tất cả user đã đăng nhập */}
+            <button className="logout-btn" onClick={onLogout} title="Đăng xuất">
+              <i className="fas fa-sign-out-alt"></i>
+              <span>Đăng xuất</span>
+            </button>
           </>
         ) : (
           <Link to="/login" className="login-btn">Đăng nhập</Link>

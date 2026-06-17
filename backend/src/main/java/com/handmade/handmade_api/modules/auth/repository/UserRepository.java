@@ -20,6 +20,13 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByUsername(String username);
     boolean existsByEmail(String email);
 
+    // Đếm thống kê nhanh cho admin dashboard
+    long countByEnabled(boolean enabled);
+    long countByAccountNonLocked(boolean accountNonLocked);
+
+    @Query("SELECT COUNT(DISTINCT u) FROM User u JOIN u.roles r WHERE r.name = 'ROLE_ADMIN'")
+    long countAdminUsers();
+
     // BỘ LỌC CHUYÊN NGHIỆP: Phân trang + Tìm kiếm theo từ khóa + Lọc theo Tên quyền + Lọc trạng thái hoạt động
     @Query("SELECT DISTINCT u FROM User u LEFT JOIN u.roles r WHERE " +
             "(:search IS NULL OR LOWER(u.fullName) LIKE LOWER(CONCAT('%', :search, '%')) " +

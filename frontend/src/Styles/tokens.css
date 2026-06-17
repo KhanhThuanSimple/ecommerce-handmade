@@ -1,0 +1,325 @@
+/* ================================================================
+   DESIGN TOKENS — Handmade Store
+   Font: Be Vietnam Pro (Sans-serif, hỗ trợ tiếng Việt)
+   Color rule: 60-30-10
+     60% → nền trung tính kem/xám (--surface-page, --surface-sunken)
+     30% → bề mặt trắng card/header (--surface-card)
+     10% → màu thương hiệu làm điểm nhấn (--brand-primary, --brand-accent)
+   ================================================================ */
+
+/* ── FONT: Be Vietnam Pro — Sans-serif, hỗ trợ đầy đủ tiếng Việt ── */
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
+
+:root {
+  /* ══════════════════════════════════════════
+     BRAND — 10% điểm nhấn
+     Đỏ gạch truyền thống + vàng đồng mỹ nghệ
+  ══════════════════════════════════════════ */
+  --brand-primary:        #b5341c;   /* đỏ gạch — chủ đạo */
+  --brand-primary-hover:  #952a15;   /* hover đậm hơn */
+  --brand-primary-light:  #fef0ed;   /* tint nhạt background */
+  --brand-primary-soft:   #fad9d2;   /* soft tint cho border/tag */
+
+  --brand-accent:         #c8900c;   /* vàng đồng */
+  --brand-accent-hover:   #a87309;
+  --brand-accent-light:   #fef7e6;
+  --brand-accent-soft:    #f5dcaa;
+
+  --brand-orange:         #d96b1a;   /* cam ấm — phụ trợ */
+
+  /* ══════════════════════════════════════════
+     NEUTRAL 60% + 30% — nền & bề mặt
+     Dải kem ấm nhẹ — không lạnh, không tối
+  ══════════════════════════════════════════ */
+
+  /* 60% — nền trang & khu vực lùi */
+  --surface-page:         #f6f2ee;   /* kem trung tính */
+  --surface-sunken:       #ede8e3;   /* hơi đậm hơn — input bg, row hover */
+  --surface-stripe:       #f2ede8;   /* row zebra, section phụ */
+
+  /* 30% — bề mặt card, panel, header */
+  --surface-card:         #ffffff;
+  --surface-overlay:      #ffffff;
+
+  /* Border */
+  --border-default:       #ddd5cc;   /* neutral ấm */
+  --border-subtle:        #ece6e0;   /* rất nhạt */
+  --border-focus:         #b5341c;   /* brand khi focus */
+  --border-strong:        #c4b8ad;
+
+  /* ══════════════════════════════════════════
+     GRAY SCALE — thuần trung tính
+  ══════════════════════════════════════════ */
+  --gray-0:   #ffffff;
+  --gray-50:  #fafaf9;
+  --gray-100: #f5f3f0;
+  --gray-150: #eeebe7;
+  --gray-200: #e4dfd9;
+  --gray-300: #cfc8c1;
+  --gray-400: #b0a89f;
+  --gray-500: #877f77;
+  --gray-600: #5e574f;
+  --gray-700: #3b3530;
+  --gray-800: #231f1b;
+  --gray-900: #0f0d0b;
+
+  /* ══════════════════════════════════════════
+     SEMANTIC — trạng thái UI
+  ══════════════════════════════════════════ */
+  --color-success:     #2e7d32;
+  --color-success-bg:  #eaf4ea;
+  --color-success-border: #a8d5a9;
+
+  --color-warning:     #b45309;
+  --color-warning-bg:  #fef3e2;
+  --color-warning-border: #f5c878;
+
+  --color-error:       #b91c1c;
+  --color-error-bg:    #fef0ed;
+  --color-error-border: #f5b0a0;
+
+  --color-info:        #1d4ed8;
+  --color-info-bg:     #eff4ff;
+  --color-info-border: #a5b8f5;
+
+  /* ══════════════════════════════════════════
+     TYPOGRAPHY
+     Be Vietnam Pro — Sans-serif, tiếng Việt
+  ══════════════════════════════════════════ */
+  --font-sans:    'Be Vietnam Pro', -apple-system, BlinkMacSystemFont,
+                  'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  --font-mono:    'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+
+  /* Không dùng font có chân (serif) cho text chính — chỉ dùng cho display */
+  --font-display: 'Be Vietnam Pro', sans-serif;   /* heading vẫn sans */
+
+  /* Scale */
+  --text-2xs: 0.6875rem;  /* 11px */
+  --text-xs:  0.75rem;    /* 12px */
+  --text-sm:  0.875rem;   /* 14px */
+  --text-md:  1rem;       /* 16px */
+  --text-lg:  1.125rem;   /* 18px */
+  --text-xl:  1.25rem;    /* 20px */
+  --text-2xl: 1.5rem;     /* 24px */
+  --text-3xl: 1.875rem;   /* 30px */
+  --text-4xl: 2.25rem;    /* 36px */
+  --text-5xl: 3rem;       /* 48px */
+
+  /* Weight */
+  --fw-light:    300;
+  --fw-regular:  400;
+  --fw-medium:   500;
+  --fw-semibold: 600;
+  --fw-bold:     700;
+  --fw-extrabold:800;
+
+  /* Line-height */
+  --lh-tight:  1.25;
+  --lh-snug:   1.375;
+  --lh-normal: 1.5;
+  --lh-relaxed:1.625;
+  --lh-loose:  1.8;
+
+  /* Text colors */
+  --text-primary:   #231f1b;   /* tối ấm */
+  --text-secondary: #4a4340;
+  --text-muted:     #7a7068;
+  --text-placeholder:#a89e96;
+  --text-disabled:  #b8b0a8;
+  --text-inverse:   #ffffff;
+  --text-brand:     #b5341c;
+  --text-link:      #b5341c;
+  --text-link-hover:#952a15;
+
+  /* ══════════════════════════════════════════
+     SPACING — 4px base grid
+  ══════════════════════════════════════════ */
+  --sp-0:  0;
+  --sp-1:  0.25rem;    /*  4px */
+  --sp-2:  0.5rem;     /*  8px */
+  --sp-3:  0.75rem;    /* 12px */
+  --sp-4:  1rem;       /* 16px */
+  --sp-5:  1.25rem;    /* 20px */
+  --sp-6:  1.5rem;     /* 24px */
+  --sp-7:  1.75rem;    /* 28px */
+  --sp-8:  2rem;       /* 32px */
+  --sp-10: 2.5rem;     /* 40px */
+  --sp-12: 3rem;       /* 48px */
+  --sp-14: 3.5rem;     /* 56px */
+  --sp-16: 4rem;       /* 64px */
+  --sp-20: 5rem;       /* 80px */
+  --sp-24: 6rem;       /* 96px */
+
+  /* ══════════════════════════════════════════
+     BORDER RADIUS
+  ══════════════════════════════════════════ */
+  --r-xs:   0.25rem;   /*  4px */
+  --r-sm:   0.375rem;  /*  6px */
+  --r-md:   0.5rem;    /*  8px */
+  --r-lg:   0.75rem;   /* 12px */
+  --r-xl:   1rem;      /* 16px */
+  --r-2xl:  1.25rem;   /* 20px */
+  --r-3xl:  1.5rem;    /* 24px */
+  --r-full: 9999px;
+
+  /* ══════════════════════════════════════════
+     SHADOWS — tinh tế, ấm
+  ══════════════════════════════════════════ */
+  --shadow-xs: 0 1px 2px rgba(35,31,27,0.05);
+  --shadow-sm: 0 1px 3px rgba(35,31,27,0.08), 0 1px 2px rgba(35,31,27,0.04);
+  --shadow-md: 0 4px 8px rgba(35,31,27,0.08), 0 2px 4px rgba(35,31,27,0.04);
+  --shadow-lg: 0 8px 20px rgba(35,31,27,0.10), 0 4px 8px rgba(35,31,27,0.04);
+  --shadow-xl: 0 20px 40px rgba(35,31,27,0.12), 0 8px 16px rgba(35,31,27,0.06);
+  --shadow-2xl:0 32px 64px rgba(35,31,27,0.14);
+
+  /* Brand shadow — dùng cho CTA, card nổi bật */
+  --shadow-brand:    0 4px 14px rgba(181,52,28,0.22);
+  --shadow-brand-lg: 0 8px 24px rgba(181,52,28,0.30);
+
+  /* Inset (input focus ring) */
+  --ring-brand: 0 0 0 3px rgba(181,52,28,0.14);
+  --ring-focus: 0 0 0 2px rgba(181,52,28,0.40);
+
+  /* ══════════════════════════════════════════
+     TRANSITIONS
+  ══════════════════════════════════════════ */
+  --ease-fast:   150ms cubic-bezier(0.4,0,0.2,1);
+  --ease-base:   220ms cubic-bezier(0.4,0,0.2,1);
+  --ease-slow:   380ms cubic-bezier(0.4,0,0.2,1);
+  --ease-spring: 280ms cubic-bezier(0.175,0.885,0.32,1.275);
+  --ease-bounce: 400ms cubic-bezier(0.34,1.56,0.64,1);
+
+  /* ══════════════════════════════════════════
+     LAYOUT
+  ══════════════════════════════════════════ */
+  --container-xs:  480px;
+  --container-sm:  640px;
+  --container-md:  768px;
+  --container-lg:  1024px;
+  --container-xl:  1280px;
+  --container-2xl: 1440px;
+  --container-3xl: 1680px;
+
+  --header-h:      64px;
+  --sidebar-w:     268px;
+  --sidebar-col:    68px;
+
+  /* ══════════════════════════════════════════
+     Z-INDEX
+  ══════════════════════════════════════════ */
+  --z-base:     0;
+  --z-raised:   1;
+  --z-dropdown: 50;
+  --z-sticky:   100;
+  --z-fixed:    200;
+  --z-overlay:  300;
+  --z-modal:    400;
+  --z-popover:  500;
+  --z-toast:    600;
+  --z-top:      9999;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   GLOBAL BASE
+   60% kem ấm → body, 30% trắng → card, 10% brand → accent
+══════════════════════════════════════════════════════════════ */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: var(--fw-regular);
+  line-height: var(--lh-normal);
+  color: var(--text-primary);
+  background-color: var(--surface-page);   /* 60% kem ấm */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* Heading — vẫn Sans-serif, chỉ tăng weight */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-sans);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-tight);
+  color: var(--text-primary);
+}
+
+img, video, svg { max-width: 100%; height: auto; display: block; }
+
+button { font-family: var(--font-sans); cursor: pointer; }
+
+a {
+  color: var(--text-link);
+  text-decoration: none;
+  transition: color var(--ease-fast);
+}
+a:hover { color: var(--text-link-hover); }
+
+input, textarea, select {
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+}
+
+:focus-visible {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: 2px;
+  border-radius: var(--r-sm);
+}
+
+::selection {
+  background: var(--brand-primary-soft);
+  color: var(--brand-primary-hover);
+}
+
+/* ── CUSTOM SCROLLBAR ── */
+::-webkit-scrollbar        { width: 5px; height: 5px; }
+::-webkit-scrollbar-track  { background: var(--surface-sunken); }
+::-webkit-scrollbar-thumb  { background: var(--gray-300); border-radius: var(--r-full); }
+::-webkit-scrollbar-thumb:hover { background: var(--gray-400); }
+
+/* ── UTILITY CLASSES ── */
+.container {
+  width: 100%;
+  max-width: var(--container-xl);
+  margin-inline: auto;
+  padding-inline: var(--sp-6);
+}
+
+/* Muted text */
+.text-muted     { color: var(--text-muted); }
+.text-secondary { color: var(--text-secondary); }
+.text-brand     { color: var(--brand-primary); }
+
+/* Truncate */
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Screen reader only */
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 768px) {
+  .container { padding-inline: var(--sp-4); }
+}

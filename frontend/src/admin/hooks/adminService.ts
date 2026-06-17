@@ -29,12 +29,12 @@ export const getAdminUsers = async (page = 0, size = 10): Promise<SpringPage<Use
 };
 
 export const putToggleUserActive = async (userId: number): Promise<string> => {
-    const res = await api.put(`/admin/users/${userId}/toggle-status`);
+    const res = await api.patch(`/admin/users/${userId}/toggle-status`);
     return res.data;
 };
 
 export const putToggleAdminRole = async (userId: number): Promise<string> => {
-    const res = await api.put(`/admin/users/${userId}/toggle-role`);
+    const res = await api.patch(`/admin/users/${userId}/toggle-lock`);
     return res.data;
 };
 

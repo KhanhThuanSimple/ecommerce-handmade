@@ -37,10 +37,8 @@ export const useLogin = (onLoginSuccess: (user: User) => void) => {
             onLoginSuccess(user);
 
             // 6. Điều hướng cuối cùng sau khi mọi thứ đã sẵn sàng
-            if (roles.includes('ROLE_ADMIN')) {
-                navigate('/admin/Dashboard');
-            } else if (roles.includes('ROLE_TEACHER')) {
-                navigate('/teacher/my-courses');
+            if (roles.includes('ROLE_ADMIN') || roles.includes('ADMIN')) {
+                navigate('/admin');
             } else {
                 navigate('/');
             }

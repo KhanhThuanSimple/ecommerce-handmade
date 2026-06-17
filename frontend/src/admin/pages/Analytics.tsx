@@ -561,19 +561,19 @@ const handleExportCSV = () => {
                             <div className="charts-grid">
                                 <div className="chart-card full-width">
                                     <div className="chart-title"><CurrencyDollarIcon className="w-4 h-4 text-red-600" /> Biểu đồ đường biến động xu hướng doanh thu</div>
-                                    <div className="chart-container" style={{height: '320px'}}>
+                                    <div className="chart-container line-bar-container" style={{height: '320px', position: 'relative'}}>
                                         <Line data={dynamicRevenueTrendData} options={lineChartOptions} />
                                     </div>
                                 </div>
                                 <div className="chart-card">
                                     <div className="chart-title"><ShoppingBagIcon className="w-4 h-4 text-purple-600" /> Đếm số lượng đơn hàng theo chuỗi trạng thái</div>
-                                    <div className="chart-container" style={{height: '260px'}}>
+                                    <div className="chart-container line-bar-container" style={{height: '260px', position: 'relative'}}>
                                         <Bar data={dynamicOrderFunnelData} options={barChartOptions} />
                                     </div>
                                 </div>
                                 <div className="chart-card">
                                     <div className="chart-title"><UsersIcon className="w-4 h-4 text-emerald-600" /> Phân cấp cấu trúc tệp người dùng hệ thống</div>
-                                    <div className="chart-container" style={{height: '260px'}}>
+                                    <div className="chart-container pie-container" style={{height: '260px', position: 'relative'}}>
                                         <Pie data={dynamicUserPieData} options={pieChartOptions} />
                                     </div>
                                 </div>

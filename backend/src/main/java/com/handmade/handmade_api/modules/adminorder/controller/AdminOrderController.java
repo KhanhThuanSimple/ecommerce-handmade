@@ -37,12 +37,29 @@ public class AdminOrderController {
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "20") Integer size
     ) {
+        // Parse chuỗi ngày từ FE (format yyyy-MM-dd) sang LocalDateTime
+        java.time.LocalDateTime parsedFromDate = null;
+        java.time.LocalDateTime parsedToDate = null;
+        if (fromDate != null && !fromDate.isBlank()) {
+            try {
+                parsedFromDate = java.time.LocalDate.parse(fromDate).atStartOfDay();
+            } catch (Exception ignored) {}
+        }
+        if (toDate != null && !toDate.isBlank()) {
+            try {
+                // Đến cuối ngày toDate (23:59:59)
+                parsedToDate = java.time.LocalDate.parse(toDate).atTime(23, 59, 59);
+            } catch (Exception ignored) {}
+        }
+
         AdminOrderFilterRequest filter = AdminOrderFilterRequest.builder()
                 .orderId(orderId)
                 .userId(userId)
                 .phone(phone)
                 .orderStatus(orderStatus)
                 .paymentMethod(paymentMethod)
+                .fromDate(parsedFromDate)
+                .toDate(parsedToDate)
                 .minAmount(minAmount)
                 .maxAmount(maxAmount)
                 .sortBy(sortBy)

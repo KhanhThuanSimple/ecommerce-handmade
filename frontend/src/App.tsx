@@ -174,10 +174,8 @@ function App() {
             JSON.stringify(user)
         );
 
-        const redirectPath =
-            (location.state as any)?.from || '/';
-
-        navigate(redirectPath);
+        // useLogin hook đã xử lý redirect theo role,
+        // hàm này chỉ cần cập nhật state — không navigate thêm.
     };
 
     // =======================
@@ -185,11 +183,25 @@ function App() {
     // =======================
     const handleLogout = () => {
         localStorage.removeItem('user');
+        localStorage.removeItem('authHeader');
+        localStorage.removeItem('userEmail');
 
         setCurrentUser(null);
 
         navigate('/login');
     };
+
+    // =======================
+    // LẮNG NGHE LOGOUT TỪ ADMIN
+    // (AdminLayout dispatch 'auth:logout' khi logout từ sidebar)
+    // =======================
+    useEffect(() => {
+        const handleAdminLogout = () => {
+            setCurrentUser(null);
+        };
+        window.addEventListener('auth:logout', handleAdminLogout);
+        return () => window.removeEventListener('auth:logout', handleAdminLogout);
+    }, []);
 
     // =======================
     // SCROLL TO TOP
@@ -264,7 +276,13 @@ function App() {
                         path="/login"
                         element={
                             currentUser ? (
-                                <Navigate to="/" />
+                                (() => {
+                                    const roles = currentUser.roles || [];
+                                    const isAdmin =
+                                        roles.includes('ROLE_ADMIN') ||
+                                        roles.includes('ADMIN');
+                                    return <Navigate to={isAdmin ? '/admin' : '/'} replace />;
+                                })()
                             ) : (
                                 <div className="auth-page-wrapper">
                                     <Login

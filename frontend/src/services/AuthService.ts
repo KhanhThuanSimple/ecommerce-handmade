@@ -46,12 +46,19 @@ export const logoutUser = () => {
     window.location.href = '/login';
 };
 
-// === 4. QUÊN MẬT KHẨU (Sửa lỗi ở useForgotPassword.ts) ===
+// === 4. QUÊN MẬT KHẨU ===
 export const forgotPassword = async (email: string): Promise<boolean> => {
-    // Gọi API quên mật khẩu ở BE (nếu chưa có BE thì để tạm fake như bên dưới)
-    console.log(`[Request] Gửi mail reset tới: ${email}`);
-    await new Promise(res => setTimeout(res, 800)); // Giả lập delay
-    return true; 
+    try {
+        await api.post('/auth/forgot-password', { email });
+        return true;
+    } catch (error: any) {
+        // Nếu BE chưa implement endpoint này, trả về false thay vì throw
+        if (error?.response?.status === 404) {
+            console.warn('[forgotPassword] Endpoint chưa được implement trên backend.');
+            return false;
+        }
+        throw error;
+    }
 };
 
 // === 5. CẬP NHẬT EMAIL (Sửa lỗi ở useProfile.ts) ===

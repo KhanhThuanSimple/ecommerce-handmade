@@ -1,613 +1,75 @@
-/* Admin Chat Config Styles */
-.admin-chat-container {
-    padding: 24px;
-    max-width: 1400px;
-    margin: 0 auto;
-}
+/* ── ADMIN PROMOTIONS (Chat Config) ── */
+@import './variables.css';
+
+.admin-chat-container { padding: var(--space-6); max-width: 1400px; margin: 0 auto; font-family: var(--font-sans); }
 
 .admin-chat-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 24px;
-    padding-bottom: 16px;
-    border-bottom: 1px solid #e5e7eb;
+  display: flex; justify-content: space-between; align-items: center;
+  gap: var(--space-4); margin-bottom: var(--space-6);
+  padding: var(--space-5) var(--space-6);
+  background: var(--surface-card); border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl); box-shadow: var(--shadow-sm);
 }
 
-.header-title {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.header-title h1 {
-    font-size: 24px;
-    font-weight: 600;
-    color: #111827;
-    margin: 0;
-}
-
-.header-subtitle {
-    color: #6b7280;
-    font-size: 14px;
-    margin-top: 4px;
-}
+.header-title { display: flex; align-items: center; gap: var(--space-4); }
+.header-title svg { width: 28px; height: 28px; color: var(--primary-red); }
+.header-title h1 { font-family: var(--font-display); font-size: 1.5rem; font-weight: 700; color: var(--gray-800); margin: 0 0 3px; }
+.header-subtitle { font-size: 0.8125rem; color: var(--gray-500); margin: 0; }
 
 .test-connection-btn {
-    padding: 8px 16px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 500;
-    transition: all 0.3s;
-}
-
-.test-connection-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-}
-
-.test-result {
-    padding: 12px 16px;
-    border-radius: 8px;
-    margin-bottom: 20px;
-}
-
-.test-result.success {
-    background: #d1fae5;
-    color: #065f46;
-    border: 1px solid #a7f3d0;
-}
-
-.test-result.error {
-    background: #fee2e2;
-    color: #991b1b;
-    border: 1px solid #fecaca;
-}
-
-.admin-tabs {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 24px;
-    border-bottom: 1px solid #e5e7eb;
-}
-
-.tab-btn {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 20px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
-    color: #6b7280;
-    transition: all 0.3s;
-}
-
-.tab-btn.active {
-    color: #667eea;
-    border-bottom: 2px solid #667eea;
-}
-
-.tab-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.tab-header h2 {
-    font-size: 18px;
-    font-weight: 600;
-    color: #111827;
-}
-
-.create-btn {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 16px;
-    background: #667eea;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 500;
-    transition: all 0.3s;
-}
-
-.create-btn:hover {
-    background: #5a67d8;
-    transform: translateY(-1px);
-}
-
-/* Config Grid */
-.configs-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
-    gap: 20px;
-}
-
-.config-card {
-    background: white;
-    border: 1px solid #e5e7eb;
-    border-radius: 12px;
-    overflow: hidden;
-    transition: all 0.3s;
-}
-
-.config-card:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.config-card-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 16px;
-    background: #f9fafb;
-    border-bottom: 1px solid #e5e7eb;
-}
-
-.config-icon {
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #e0e7ff;
-    border-radius: 10px;
-    color: #667eea;
-}
-
-.config-info h3 {
-    font-size: 14px;
-    font-weight: 600;
-    margin: 0;
-    color: #111827;
-}
-
-.config-category {
-    font-size: 11px;
-    color: #6b7280;
-}
-
-.config-card-body {
-    padding: 16px;
-}
-
-.config-value {
-    margin-bottom: 12px;
-}
-
-.config-value strong {
-    font-size: 12px;
-    color: #6b7280;
-    display: block;
-    margin-bottom: 4px;
-}
-
-.config-value code {
-    background: #f3f4f6;
-    padding: 4px 8px;
-    border-radius: 6px;
-    font-size: 12px;
-    word-break: break-all;
-    display: inline-block;
-}
-
-.config-description {
-    margin-bottom: 12px;
-}
-
-.config-description strong {
-    font-size: 12px;
-    color: #6b7280;
-    display: block;
-    margin-bottom: 4px;
-}
-
-.config-description p {
-    font-size: 13px;
-    color: #4b5563;
-    margin: 0;
-}
-
-.config-updated {
-    font-size: 11px;
-    color: #9ca3af;
-    margin-top: 12px;
-    padding-top: 8px;
-    border-top: 1px solid #e5e7eb;
-}
-
-/* FAQ Grid */
-.faqs-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
-    gap: 20px;
-}
-
-.faq-card {
-    background: white;
-    border: 1px solid #e5e7eb;
-    border-radius: 12px;
-    overflow: hidden;
-    transition: all 0.3s;
-}
-
-.faq-card.inactive {
-    opacity: 0.7;
-    background: #f9fafb;
-}
-
-.faq-card-header {
-    padding: 16px;
-    background: #f9fafb;
-    border-bottom: 1px solid #e5e7eb;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    flex-wrap: wrap;
-    gap: 12px;
-}
-
-.faq-keywords {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-wrap: wrap;
-}
-
-.keyword-tag {
-    background: #e0e7ff;
-    color: #4338ca;
-    padding: 4px 8px;
-    border-radius: 6px;
-    font-size: 11px;
-    font-weight: 500;
-}
-
-.status-badge {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    padding: 4px 8px;
-    border-radius: 6px;
-    font-size: 12px;
-}
-
-.status-badge.active {
-    background: #d1fae5;
-    color: #065f46;
-}
-
-.status-badge.inactive {
-    background: #fee2e2;
-    color: #991b1b;
-}
-
-.faq-card-body {
-    padding: 16px;
-}
-
-.faq-response {
-    font-size: 14px;
-    color: #374151;
-    line-height: 1.5;
-    margin-bottom: 12px;
-}
-
-.faq-date {
-    font-size: 11px;
-    color: #9ca3af;
-}
-
-.config-card-footer,
-.faq-card-footer {
-    display: flex;
-    gap: 8px;
-    padding: 12px 16px;
-    border-top: 1px solid #e5e7eb;
-    background: #f9fafb;
-}
-
-.card-btn {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 6px 12px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 12px;
-    font-weight: 500;
-    transition: all 0.2s;
-}
-
-.card-btn.edit {
-    background: #e0e7ff;
-    color: #4338ca;
-}
-
-.card-btn.edit:hover {
-    background: #c7d2fe;
-}
-
-.card-btn.delete {
-    background: #fee2e2;
-    color: #991b1b;
-}
-
-.card-btn.delete:hover {
-    background: #fecaca;
-}
-
-.card-btn.activate {
-    background: #d1fae5;
-    color: #065f46;
-}
-
-.card-btn.deactivate {
-    background: #fed7aa;
-    color: #92400e;
-}
-
-/* Modal Styles */
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-}
-
-.config-modal,
-.faq-modal {
-    background: white;
-    border-radius: 16px;
-    width: 90%;
-    max-width: 600px;
-    max-height: 90vh;
-    overflow-y: auto;
-}
-
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px 24px;
-    border-bottom: 1px solid #e5e7eb;
-}
-
-.modal-header h3 {
-    font-size: 18px;
-    font-weight: 600;
-    margin: 0;
-}
-
-.modal-close {
-    background: none;
-    border: none;
-    font-size: 24px;
-    cursor: pointer;
-    color: #6b7280;
-}
-
-.modal-body {
-    padding: 24px;
-}
-
-.modal-footer {
-    display: flex;
-    justify-content: flex-end;
-    gap: 12px;
-    padding: 16px 24px;
-    border-top: 1px solid #e5e7eb;
-}
-
-.form-group {
-    margin-bottom: 20px;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 500;
-    font-size: 14px;
-    color: #374151;
-}
-
-.form-group .required {
-    color: #ef4444;
-}
-
-.form-group input,
-.form-group select,
-.form-group textarea {
-    width: 100%;
-    padding: 8px 12px;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-    font-size: 14px;
-    transition: all 0.3s;
-}
-
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
-    outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-}
-
-.form-group small {
-    display: block;
-    margin-top: 4px;
-    font-size: 12px;
-    color: #6b7280;
-}
-
-.checkbox-label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-}
-
-.checkbox-label input {
-    width: auto;
-}
-
-.btn-cancel {
-    padding: 8px 16px;
-    background: #f3f4f6;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 500;
-}
-
-.btn-submit {
-    padding: 8px 16px;
-    background: #667eea;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 500;
-}
-
-.btn-submit:hover {
-    background: #5a67d8;
-}
-
-/* Loading */
-.loading-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 400px;
-}
-
-.loading-spinner {
-    width: 40px;
-    height: 40px;
-    border: 3px solid #e5e7eb;
-    border-top-color: #667eea;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-
-.loading-text {
-    margin-top: 12px;
-    color: #6b7280;
-}
+  display: inline-flex; align-items: center; gap: var(--space-2);
+  padding: var(--space-2) var(--space-5);
+  background: linear-gradient(135deg, var(--primary-red), var(--primary-gold));
+  color: #fff; border: none; border-radius: var(--radius-lg);
+  font-size: 0.8125rem; font-weight: 700; cursor: pointer;
+  transition: all var(--transition-base); font-family: var(--font-sans);
+  box-shadow: var(--shadow-brand);
+}
+.test-connection-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: var(--shadow-brand-lg); }
+.test-connection-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+/* Configs grid */
+.configs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: var(--space-5); }
+.faqs-grid    { display: grid; grid-template-columns: repeat(auto-fill, minmax(440px, 1fr)); gap: var(--space-5); }
+
+.tab-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-5); }
+.tab-header h2 { font-size: 1.125rem; font-weight: 700; color: var(--gray-800); margin: 0; }
+
+.config-info h3 { font-size: 0.875rem; font-weight: 700; color: var(--gray-800); margin: 0 0 3px; font-family: 'Courier New', monospace; }
+.config-category { display: inline-block; font-size: 0.6875rem; padding: 2px 8px; background: var(--gray-100); border-radius: var(--radius-full); color: var(--gray-600); font-weight: 600; }
+
+.config-value strong, .config-description strong {
+  display: block; font-size: 0.6875rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .06em;
+  color: var(--gray-500); margin-bottom: var(--space-1);
+}
+.config-value { margin-bottom: var(--space-3); }
+.config-value code { display: inline-block; padding: 3px 8px; background: var(--surface-sunken); border-radius: var(--radius-sm); font-size: 0.75rem; font-family: 'Courier New', monospace; word-break: break-all; color: var(--primary-red); }
+.config-description p { font-size: 0.8125rem; color: var(--gray-600); line-height: 1.5; margin: 0; }
+.config-updated { font-size: 0.6875rem; color: var(--gray-400); padding-top: var(--space-3); margin-top: var(--space-3); border-top: 1px solid var(--border-color); }
+.config-icon { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: var(--primary-red-light); border-radius: var(--radius-lg); color: var(--primary-red); border: 1px solid rgba(192,57,43,.15); }
+.config-icon svg { width: 22px; height: 22px; }
+
+.faq-response { font-size: 0.875rem; color: var(--gray-700); line-height: 1.6; margin-bottom: var(--space-3); }
+.faq-date     { font-size: 0.6875rem; color: var(--gray-400); }
+.faq-keywords { display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap; flex: 1; }
+.faq-keywords svg { width: 14px; height: 14px; color: var(--gray-400); }
+
+.status-badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: var(--radius-full); font-size: 0.6875rem; font-weight: 700; }
+.status-badge.active   { background: var(--success-light); color: var(--success); }
+.status-badge.inactive { background: var(--error-light);   color: var(--error); }
+.status-badge svg { width: 12px; height: 12px; }
+
+.faq-card.inactive { opacity: 0.65; }
+
+/* Checkbox */
+.checkbox-label { display: flex; align-items: center; gap: var(--space-2); cursor: pointer; user-select: none; }
+.checkbox-label input { width: auto; cursor: pointer; accent-color: var(--primary-red); }
+.checkbox-label span  { font-size: 0.875rem; color: var(--gray-700); }
 
 /* Responsive */
 @media (max-width: 768px) {
-    .admin-chat-container {
-        padding: 16px;
-    }
-    
-    .configs-grid,
-    .faqs-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .admin-chat-header {
-        flex-direction: column;
-        gap: 12px;
-    }
-}
-/* 1. Cải tiến Typography & Biến màu */
-:root {
-    --primary: #4f46e5;
-    --primary-hover: #4338ca;
-    --bg-body: #f9fafb;
-    --border: #e5e7eb;
-    --text-main: #111827;
-    --text-muted: #6b7280;
-}
-
-body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-
-/* 2. Cấu trúc tổng thể */
-.admin-chat-container {
-    padding: 32px;
-    max-width: 1200px; /* Thu hẹp lại để dễ đọc hơn */
-    margin: 0 auto;
-}
-
-/* 3. Card hiện đại (Bỏ border đậm, dùng shadow nhẹ) */
-.config-card, .faq-card {
-    background: white;
-    border: 1px solid var(--border);
-    border-radius: 16px; /* Bo góc tròn hơn */
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.config-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
-}
-
-/* 4. Tab đơn giản & tinh tế */
-.tab-btn {
-    padding: 12px 24px;
-    font-weight: 600;
-    border-radius: 8px;
-    color: var(--text-muted);
-}
-
-.tab-btn.active {
-    background: #eef2ff;
-    color: var(--primary);
-}
-
-/* 5. Button chuyên nghiệp */
-.create-btn, .test-connection-btn {
-    border-radius: 8px;
-    padding: 10px 20px;
-    font-weight: 600;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-/* 6. Form gọn gàng */
-.form-group input, .form-group textarea {
-    border: 1px solid #d1d5db;
-    border-radius: 10px;
-    padding: 12px;
-    font-size: 15px;
-}
-
-.form-group input:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
-}
-
-/* 7. Tags nhỏ gọn */
-.keyword-tag {
-    background: #f3f4f6;
-    color: #374151;
-    border-radius: 20px; /* Dạng pill cho đẹp */
-    padding: 2px 10px;
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+  .admin-chat-container { padding: var(--space-4); }
+  .admin-chat-header { flex-direction: column; align-items: flex-start; }
+  .configs-grid, .faqs-grid { grid-template-columns: 1fr; }
 }
