@@ -16,12 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.access.channel.ChannelProcessingFilter;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
-
-import java.util.Arrays;
-import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -33,43 +28,8 @@ public class MySecurity {
     @Autowired
     private UserDetailsService userDetailsService;
 
-    // ✅ Bean CorsFilter
-    @Bean
-    public CorsFilter corsFilter() {
-        CorsConfiguration config = new CorsConfiguration();
-        
-        // ✅ Cho phép frontend domain
-        config.setAllowedOriginPatterns(List.of(
-            "https://cheerful-rejoicing-production-8efa.up.railway.app",
-            "http://localhost:3000"
-        ));
-        
-        // ✅ Cho phép tất cả methods
-        config.setAllowedMethods(Arrays.asList(
-            "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"
-        ));
-        
-        // ✅ Cho phép tất cả headers
-        config.setAllowedHeaders(Arrays.asList("*"));
-        
-        // ✅ Cho phép credentials
-        config.setAllowCredentials(true);
-        
-        // ✅ Cache preflight
-        config.setMaxAge(3600L);
-        
-        // ✅ Expose headers
-        config.setExposedHeaders(Arrays.asList(
-            "Authorization", 
-            "Content-Disposition",
-            "X-Total-Count"
-        ));
-        
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config);
-        
-        return new CorsFilter(source);
-    }
+    @Autowired
+    private CorsFilter corsFilter;  // ✅ Inject từ CorsConfig
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -92,16 +52,12 @@ public class MySecurity {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            // ✅ Đặt CorsFilter lên đầu
-            .addFilterBefore(corsFilter(), ChannelProcessingFilter.class)
-            
+            // ✅ Dùng CorsFilter đã inject
+            .addFilterBefore(corsFilter, ChannelProcessingFilter.class)
             .csrf(csrf -> csrf.disable())
-            
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
-
-            // Cấu hình xử lý lỗi
             .exceptionHandling(exception -> exception
                 .authenticationEntryPoint((request, response, authException) -> {
                     String message = (String) request.getAttribute("exception");
@@ -116,79 +72,65 @@ public class MySecurity {
                     response.getWriter().write("{\"status\": 403, \"message\": \"Bạn không có quyền truy cập vào tài nguyên này.\"}");
                 })
             )
-
-            // ===== ĐỊNH NGHĨA QUYỀN TRUY CẬP =====
             .authorizeHttpRequests(auth -> auth
-                // ==================== CẤP ĐỘ 0: PREFLIGHT CORS ====================
+                // Preflight
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
                 // Health check
                 .requestMatchers("/api/health").permitAll()
                 .requestMatchers("/actuator/health").permitAll()
 
-                // Error endpoint
+                // Error
                 .requestMatchers("/error").permitAll()
 
-                // Authentication endpoints
+                // Auth
                 .requestMatchers("/api/auth/**").permitAll()
 
-                // ===== PUBLIC GET ENDPOINTS =====
+                // Public GET
                 .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/product-images/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/reviews/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/voucher/**").permitAll()
 
-                // Payment public
+                // Payment
                 .requestMatchers("/api/payment/**").permitAll()
 
-                // Carts public
+                // Carts
                 .requestMatchers("/api/carts/**").permitAll()
 
-                // ===== CHATBOX PUBLIC =====
+                // Chat
                 .requestMatchers("/api/chat/**").permitAll()
                 .requestMatchers("/api/chat/ask").permitAll()
                 .requestMatchers("/api/chat/history/**").permitAll()
                 .requestMatchers("/api/chat/session/**").permitAll()
 
-                // ===== LUCKY WHEEL PUBLIC =====
+                // Lucky Wheel
                 .requestMatchers(HttpMethod.GET, "/api/prizes").permitAll()
                 .requestMatchers("/api/lucky-wheel/spin").permitAll()
                 .requestMatchers("/api/lucky-wheel/**").permitAll()
 
-                // ===== TEST ENDPOINTS =====
+                // Test
                 .requestMatchers("/api/test/**").permitAll()
                 .requestMatchers("/api/public/**").permitAll()
 
-                // ==================== CẤP ĐỘ 2: AUTHENTICATED ====================
-                // Lucky wheel authenticated
+                // Authenticated
                 .requestMatchers("/api/lucky-wheel/history").authenticated()
                 .requestMatchers("/api/lucky-wheel/my-points").authenticated()
-
-                // Reviews POST
                 .requestMatchers(HttpMethod.POST, "/api/reviews/**").hasAnyRole("USER", "ADMIN")
-
-                // Users và Orders
                 .requestMatchers("/api/users/**").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/api/orders/**").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/api/admin/orders/**").hasRole("ADMIN")
 
-                // ==================== CẤP ĐỘ 3: ADMIN ====================
+                // Admin
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/admin/chat-config/**").hasRole("ADMIN")
                 .requestMatchers("/api/admin/chat-faq/**").hasRole("ADMIN")
                 .requestMatchers("/api/admin/lucky-wheel/**").hasRole("ADMIN")
-                .requestMatchers("/api/admin/lucky-wheel/prizes").hasRole("ADMIN")
-                .requestMatchers("/api/admin/lucky-wheel/prizes/**").hasRole("ADMIN")
-                .requestMatchers("/api/admin/lucky-wheel/spin-profiles").hasRole("ADMIN")
-                .requestMatchers("/api/admin/lucky-wheel/users/**").hasRole("ADMIN")
-                .requestMatchers("/api/admin/lucky-wheel/statistics").hasRole("ADMIN")
 
-                // ==================== CẤP ĐỘ 4: MẶC ĐỊNH ====================
+                // Default
                 .anyRequest().authenticated()
             )
-
-            // Đặt Filter JWT
             .authenticationProvider(authenticationProvider())
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
