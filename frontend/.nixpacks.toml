@@ -1,0 +1,14 @@
+[phases.setup]
+nixPkgs = ["nodejs_20", "python3"]
+
+[phases.install]
+cmd = "npm install --legacy-peer-deps --no-audit --no-fund"
+
+[phases.build]
+cmd = "npm run build"
+
+[phases.start]
+cmd = "npm start"
+
+[phases.cleanup]
+cmd = "npm cache clean --force"
