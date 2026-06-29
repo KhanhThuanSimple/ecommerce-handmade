@@ -16,16 +16,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        java.util.List<String> allowed = new java.util.ArrayList<>(appProperties.getCorsAllowedOrigins());
-        if (!allowed.contains("http://localhost:3000")) {
-            allowed.add("http://localhost:3000");
-        }
-        if (!allowed.contains("https://cheerful-rejoicing-production-8efa.up.railway.app")) {
-            allowed.add("https://cheerful-rejoicing-production-8efa.up.railway.app");
-        }
-        String[] origins = allowed.toArray(new String[0]);
         registry.addEndpoint("/ws")
-                .setAllowedOrigins(origins)
+                .setAllowedOriginPatterns("http://localhost:*", "https://*.up.railway.app")
                 .withSockJS();
     }
 

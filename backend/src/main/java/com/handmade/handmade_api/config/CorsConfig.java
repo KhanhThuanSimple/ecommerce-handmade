@@ -25,16 +25,11 @@ public class CorsConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
-        // Cho phép origin từ danh sách cấu hình (application.properties) và thêm cứng fallback
-        List<String> configured = appProperties.getCorsAllowedOrigins();
-        List<String> allowed = new java.util.ArrayList<>(configured != null ? configured : List.of());
-        if (!allowed.contains("http://localhost:3000")) {
-            allowed.add("http://localhost:3000");
-        }
-        if (!allowed.contains("https://cheerful-rejoicing-production-8efa.up.railway.app")) {
-            allowed.add("https://cheerful-rejoicing-production-8efa.up.railway.app");
-        }
-        config.setAllowedOrigins(allowed);
+        // Cho phép các origins phù hợp với pattern để hỗ trợ dev và deploy Railway
+        config.setAllowedOriginPatterns(List.of(
+                "http://localhost:[*]",
+                "https://*.up.railway.app"
+        ));
 
         // HTTP methods được phép
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
