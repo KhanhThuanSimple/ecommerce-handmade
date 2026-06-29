@@ -39,7 +39,7 @@ import ChatWidget from './Pages/ChatWidget';
 import OrderDetail from './Pages/OrderDetail';
 import Wishlist from './Pages/Wishlist';
 import LuckyWheel from './Pages/LuckyWheel';
-
+import { checkEnvironment } from './utils/envChecker';
 // =======================
 // 4. IMPORT ADMIN PAGES
 // =======================
@@ -141,7 +141,11 @@ const MainLayout: React.FC<MainLayoutProps> = ({
 function App() {
     const navigate = useNavigate();
     const location = useLocation();
-
+ useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      checkEnvironment();
+    }
+  }, []);
     // =======================
     // USER STATE
     // =======================
