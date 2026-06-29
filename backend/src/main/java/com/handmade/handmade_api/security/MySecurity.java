@@ -77,6 +77,9 @@ public class MySecurity {
                         // Health check
                         .requestMatchers("/api/health").permitAll()
 
+                        // Error endpoint
+                        .requestMatchers("/error").permitAll()
+
                         // Authentication endpoints
                         .requestMatchers("/api/auth/**").permitAll()
 
