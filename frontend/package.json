@@ -3,6 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "proxy": "http://localhost:8080",
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=9.0.0"
+  },
   "dependencies": {
     "@babel/core": "^7.16.0",
     "@fortawesome/fontawesome-free": "^7.1.0",
@@ -88,7 +92,8 @@
     "//--- API COMMAND (CHẠY RIÊNG SERVER) ---": "",
     "api": "npm run db:merge && concurrently -n \"WATCH,SERVER,OPEN\" -c \"magenta,blue,green\" \"npm run db:watch-data\" \"npm run db:server\" \"npx wait-on tcp:5000 && npx open-cli http://localhost:5000\"",
     "//--- FULL DEV COMMAND (CHẠY TẤT CẢ) ---": "",
-    "dev": " concurrently -n \"REACT,API_SYSTEM\" -c \"bgBlue.bold,bgMagenta.bold\" \"npm start\" \"npm run api\""
+    "dev": "concurrently -n \"REACT,API_SYSTEM\" -c \"bgBlue.bold,bgMagenta.bold\" \"npm start\" \"npm run api\"",
+    "postinstall": "npx update-browserslist-db@latest"
   },
   "eslintConfig": {
     "extends": [
@@ -184,6 +189,7 @@
     "nodemon": "^3.1.11",
     "open-cli": "^8.0.0",
     "react-scripts": "^5.0.1",
-    "wait-on": "^9.0.3"
+    "wait-on": "^9.0.3",
+    "yaml": "^2.9.0"
   }
 }
