@@ -1,10 +1,7 @@
+// src/setupProxy.js
 const { createProxyMiddleware } = require('http-proxy-middleware');
 
-/**
- * Proxy /api -> Spring Boot (tránh lỗi CORS khi dev).
- * Chạy: backend port 8080, frontend port 3000.
- */
-module.exports = function (app) {
+module.exports = function(app) {
   app.use(
     '/api',
     createProxyMiddleware({
