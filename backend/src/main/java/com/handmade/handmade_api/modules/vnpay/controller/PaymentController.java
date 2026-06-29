@@ -97,7 +97,7 @@ public class PaymentController {
      * 3. SỬA ĐỔI HOÀN THIỆN: API Callback tiếp nhận kết quả phản hồi từ VNPay công khai
      * Tích hợp đồng thời: Xác thực bảo mật -> Trừ kho tồn kho -> Dọn dẹp giỏ hàng.
      */
-    @GetMapping("/vnpay-callback")
+    @GetMapping("/vnpay/return")
     @Transactional(rollbackFor = Exception.class) // Đảm bảo lỗi bất kỳ trong cụm xử lý sẽ Rollback toàn bộ dữ liệu sạch sẽ
     public ResponseEntity<?> vnpayCallback(@RequestParam Map<String, String> fields) {
         try {

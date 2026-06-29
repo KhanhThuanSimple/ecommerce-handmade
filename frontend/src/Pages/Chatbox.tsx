@@ -1,7 +1,7 @@
 // src/Pages/ChatBox.tsx
 import React, { useState, useRef, useEffect } from 'react';
 import { User } from '../types/model';
-import { renderMessageWithLinks, formatChatTime } from '../untils/renderMessage';
+import { renderMessageWithLinks, formatChatTime } from '../utils/renderMessage';
 import { useChat } from '../hooks/useChat';
 import '../Styles/chatbox.css';
 import '../Styles/chatWidget.css';

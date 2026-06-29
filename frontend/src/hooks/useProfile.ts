@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { User } from '../types/model';
 import { updateUserEmail, updateUserPassword } from '../services/AuthService';
-import { filterVouchersForUser } from '../untils/voucherUtils';
+import { filterVouchersForUser } from '../utils/voucherUtils';
 
 export const useProfile = (currentUser: User | null, onLogout: () => void) => {
     const navigate = useNavigate();

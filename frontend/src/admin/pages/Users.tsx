@@ -75,7 +75,7 @@ const Users: React.FC = () => {
     // Cơ chế kết nối và lắng nghe dữ liệu thời gian thực qua WebSockets
     useEffect(() => {
         // Dùng biến môi trường nếu có, fallback về localhost dev
-        const wsBaseUrl = process.env.REACT_APP_WS_URL || 'http://localhost:8080';
+        const wsBaseUrl = process.env.REACT_APP_WS_URL || process.env.REACT_APP_BACKEND_URL || 'http://localhost:8080';
         const socket = new SockJS(`${wsBaseUrl}/ws`);
         const stompClient = new Client({
             webSocketFactory: () => socket,

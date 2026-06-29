@@ -4,7 +4,7 @@ import api from '../services/api';
 import { getProducts } from '../services/ProductService';
 import { User } from '../types/model';
 import { useCart } from '../context/CartContext';
-import { filterVouchersForUser } from '../untils/voucherUtils';
+import { filterVouchersForUser } from '../utils/voucherUtils';
 import { processOnlinePayment } from '../services/vnpayService';
 import DeliveryInfo from './DeliveryInfo';
 import '../Styles/checkout.css';
