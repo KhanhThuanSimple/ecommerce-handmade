@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User } from '../types/model';
-import api from '../services/api';
+import api, { getUserId } from '../services/api';
 import { useNotify } from '../components/NotificationContext';
 
 interface CartItem {
@@ -26,8 +26,9 @@ export const CartProvider = ({ children, currentUser }: { children: ReactNode; c
         const userString = localStorage.getItem('user');
         const localUser = userString ? JSON.parse(userString) : null;
         const activeUser = currentUser || localUser;
+        const userId = getUserId(activeUser);
 
-        if (!activeUser) {
+        if (!userId) {
             const localData = localStorage.getItem('guestCart');
             const items: CartItem[] = localData ? JSON.parse(localData) : [];
             const total = items.reduce((acc, item) => acc + item.quantity, 0);
@@ -36,7 +37,7 @@ export const CartProvider = ({ children, currentUser }: { children: ReactNode; c
         }
 
         try {
-            const res = await api.get<any[]>(`/carts/${activeUser.id}`);
+            const res = await api.get<any[]>(`/carts/${userId}`);
             const total = res.data.reduce((acc, item) => acc + item.quantity, 0);
             setCartCount(total);
         } catch (err) {
@@ -56,8 +57,9 @@ export const CartProvider = ({ children, currentUser }: { children: ReactNode; c
         const userString = localStorage.getItem('user');
         const localUser = userString ? JSON.parse(userString) : null;
         const activeUser = currentUser || localUser;
+        const userId = getUserId(activeUser);
 
-        if (!activeUser) {
+        if (!userId) {
             // --- LUỒNG CHƯA ĐĂNG NHẬP (GUEST) ---
             const localData = localStorage.getItem('guestCart');
             let items: CartItem[] = localData ? JSON.parse(localData) : [];
@@ -82,7 +84,7 @@ export const CartProvider = ({ children, currentUser }: { children: ReactNode; c
         // --- LUỒNG ĐÃ ĐĂNG NHẬP (SERVER) ---
         try {
             const payload = {
-                userId: Number(activeUser.id), // Đảm bảo ép kiểu số sạch chống lỗi Validation
+                userId: Number(userId), // Đảm bảo ép kiểu số sạch chống lỗi Validation
                 productId: Number(product.id),
                 quantity: 1
             };

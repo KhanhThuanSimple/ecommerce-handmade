@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import api from '../services/api';
+import api, { getUserId } from '../services/api';
 import { getProducts } from '../services/ProductService';
 import { User } from '../types/model';
 import { useCart } from '../context/CartContext';
@@ -105,9 +105,10 @@ const Checkout: React.FC<CheckoutProps> = ({ currentUser }) => {
           setDisplayItems([{ product: buyNowItem, quantity: 1 }]);
           setFinalTotal(Number(buyNowItem.price));
         } else if (selectedIds.length > 0) {
+          const userId = getUserId(currentUser);
           const [allProducts, cartRes] = await Promise.all([
             getProducts(),
-            api.get(`/carts?userId=${currentUser.id}`)
+            userId ? api.get(`/carts?userId=${userId}`) : Promise.resolve({ data: [] })
           ]);
           const cartItems = cartRes.data || [];
           const itemsToPay = cartItems
@@ -148,11 +149,14 @@ const Checkout: React.FC<CheckoutProps> = ({ currentUser }) => {
     
     // 2. Gọi lấy đơn hàng (Private - có thể lỗi nếu token hết hạn)
     let ordersData = [];
-    try {
-      const ordersRes = await api.get(`/orders?userId=${currentUser.id}`);
-      ordersData = ordersRes.data;
-    } catch (orderErr) {
-      console.warn("Không lấy được lịch sử đơn hàng, chỉ hiển thị voucher công khai.");
+    const userId = getUserId(currentUser);
+    if (userId) {
+      try {
+        const ordersRes = await api.get(`/orders?userId=${userId}`);
+        ordersData = ordersRes.data;
+      } catch (orderErr) {
+        console.warn("Không lấy được lịch sử đơn hàng, chỉ hiển thị voucher công khai.");
+      }
     }
 
     // 3. Lọc voucher an toàn
@@ -211,7 +215,7 @@ const Checkout: React.FC<CheckoutProps> = ({ currentUser }) => {
       : `${shippingDetails?.detailAddress}, ${shippingDetails?.ward}, ${shippingDetails?.district}, ${shippingDetails?.province}`;
     
     return {
-      userId: currentUser?.id,
+      userId: getUserId(currentUser),
       fullName: shippingDetails?.fullName || '',
       customerEmail: currentUser?.email || '',
       phone: shippingDetails?.phone || '',

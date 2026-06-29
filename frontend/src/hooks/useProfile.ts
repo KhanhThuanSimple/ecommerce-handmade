@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from '../services/api';
+import api, { getUserId } from '../services/api';
 import { User } from '../types/model';
 import { updateUserEmail, updateUserPassword } from '../services/AuthService';
 import { filterVouchersForUser } from '../utils/voucherUtils';
@@ -32,11 +32,12 @@ export const useProfile = (currentUser: User | null, onLogout: () => void) => {
     // Effect tải Voucher
     useEffect(() => {
         const loadMyVouchers = async () => {
-            if (activeSection === 'vouchers' && currentUser) {
+            const userId = getUserId(currentUser);
+            if (activeSection === 'vouchers' && userId) {
                 try {
                     const [vouchersRes, ordersRes] = await Promise.all([
                         api.get('/voucher'),
-                        api.get(`/orders?userId=${currentUser.id}`)
+                        api.get(`/orders?userId=${userId}`)
                     ]);
                     const filtered = filterVouchersForUser(vouchersRes.data, ordersRes.data, 999999999);
                     setMyVouchers(filtered);
@@ -59,7 +60,9 @@ export const useProfile = (currentUser: User | null, onLogout: () => void) => {
 
         try {
             setEmailLoading(true);
-            const updated = await updateUserEmail(currentUser!.id, trimmed);
+            const userId = getUserId(currentUser);
+            if (!userId) throw new Error("Không xác định được ID người dùng.");
+            const updated = await updateUserEmail(Number(userId), trimmed);
             localStorage.setItem('user', JSON.stringify(updated));
             setEmailMessage('Cập nhật email thành công. Trang sẽ tải lại.');
             setTimeout(() => window.location.reload(), 800);
@@ -78,7 +81,9 @@ export const useProfile = (currentUser: User | null, onLogout: () => void) => {
 
         try {
             setPasswordLoading(true);
-            await updateUserPassword(currentUser!.id, passwordValue);
+            const userId = getUserId(currentUser);
+            if (!userId) throw new Error("Không xác định được ID người dùng.");
+            await updateUserPassword(Number(userId), passwordValue);
             setPasswordMessage('Đổi mật khẩu thành công. Vui lòng đăng nhập lại.');
             setTimeout(() => onLogout(), 1000);
         } catch (err) {

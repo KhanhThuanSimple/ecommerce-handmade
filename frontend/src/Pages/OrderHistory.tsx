@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from '../services/api';
+import api, { getUserId } from '../services/api';
 import { User } from '../types/model';
 import '../Styles/orders.css';
 
@@ -14,9 +14,13 @@ const OrderHistory: React.FC<OrderHistoryProps> = ({ currentUser }) => {
     // 1. Fetch dữ liệu
     useEffect(() => {
         const fetchOrders = async () => {
-            if (!currentUser) return;
+            const userId = getUserId(currentUser);
+            if (!userId) {
+                setLoading(false);
+                return;
+            }
             try {
-                const res = await api.get(`/orders?userId=${currentUser.id}`);
+                const res = await api.get(`/orders?userId=${userId}`);
                 // Sắp xếp đơn mới nhất lên đầu dựa trên ID hoặc Date
                 const sortedOrders = res.data.sort((a: any, b: any) => b.id.localeCompare(a.id));
                 setOrders(sortedOrders);

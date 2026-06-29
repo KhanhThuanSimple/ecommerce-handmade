@@ -1,6 +1,6 @@
 import React, { FC, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from '../services/api';
+import api, { getUserId } from '../services/api';
 import { getProducts } from '../services/ProductService';
 import { User, Product } from '../types/model';
 import { useCart } from '../context/CartContext';
@@ -30,9 +30,10 @@ const Cart: FC<CartProps> = ({ currentUser }) => {
             try {
                 const allProducts = await getProducts();
                 setProducts(allProducts);
+                const userId = getUserId(activeUser);
 
-                if (activeUser) {
-                    const cartRes = await api.get(`/carts/${activeUser.id}`);
+                if (userId) {
+                    const cartRes = await api.get(`/carts/${userId}`);
                     setCartItems(cartRes.data || []);
                 } else {
                     const localData = localStorage.getItem('guestCart');
@@ -51,14 +52,15 @@ const Cart: FC<CartProps> = ({ currentUser }) => {
 
     // Xử lý Tăng số lượng (+1)
     const handleIncrease = async (pid: number) => {
-        if (activeUser) {
+        const userId = getUserId(activeUser);
+        if (userId) {
             try {
                 await api.post('/carts/add', {
-                    userId: activeUser.id,
+                    userId: userId,
                     productId: pid,
                     quantity: 1
                 });
-                const res = await api.get(`/carts/${activeUser.id}`);
+                const res = await api.get(`/carts/${userId}`);
                 setCartItems(res.data);
                 await refreshCart();
             } catch (err: any) {
@@ -87,14 +89,15 @@ const Cart: FC<CartProps> = ({ currentUser }) => {
     // Xử lý Giảm số lượng (-1)
     const handleDecrease = async (pid: number, currentQty: number) => {
         if (currentQty <= 1) return;
-        if (activeUser) {
+        const userId = getUserId(activeUser);
+        if (userId) {
             try {
                 await api.post('/carts/add', {
-                    userId: activeUser.id,
+                    userId: userId,
                     productId: pid,
                     quantity: -1
                 });
-                const res = await api.get(`/carts/${activeUser.id}`);
+                const res = await api.get(`/carts/${userId}`);
                 setCartItems(res.data);
                 await refreshCart();
             } catch (err) {
@@ -112,9 +115,10 @@ const Cart: FC<CartProps> = ({ currentUser }) => {
     const handleDelete = async (pid: number) => {
         if (window.confirm("Xóa sản phẩm này khỏi giỏ hàng?")) {
             try {
-                if (activeUser) {
-                    await api.delete(`/carts/remove?userId=${activeUser.id}&productId=${pid}`);
-                    const res = await api.get(`/carts/${activeUser.id}`);
+                const userId = getUserId(activeUser);
+                if (userId) {
+                    await api.delete(`/carts/remove?userId=${userId}&productId=${pid}`);
+                    const res = await api.get(`/carts/${userId}`);
                     setCartItems(res.data || []);
                 } else {
                     const newItems = cartItems.filter(i => i.productId !== pid);

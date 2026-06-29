@@ -21,6 +21,15 @@ const getStoredAccount = () => {
     return null;
 };
 
+export const getUserId = (user?: any): any => {
+    if (user) {
+        const id = user.id ?? user.userId ?? user.adminId ?? user.user?.id ?? user.admin?.id;
+        if (id) return id;
+    }
+    const account = getStoredAccount();
+    return account?.id ?? account?.userId ?? account?.adminId ?? account?.user?.id ?? account?.admin?.id;
+};
+
 const getTokenFromStorage = () => {
     const rawToken = localStorage.getItem('authHeader');
 
