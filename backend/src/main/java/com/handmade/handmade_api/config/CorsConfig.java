@@ -19,30 +19,32 @@ public class CorsConfig {
     public CorsFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
 
-        // Cho phép các origins phù hợp với pattern để hỗ trợ dev và deploy Railway
+        // ✅ Cho phép các origins phù hợp với pattern để hỗ trợ dev và deploy Railway
         config.setAllowedOriginPatterns(List.of(
+                "https://cheerful-rejoicing-production-8efa.up.railway.app",
+                "http://localhost:3000",
                 "http://localhost:[*]",
                 "https://*.up.railway.app"
         ));
 
-        // HTTP methods được phép
+        // ✅ HTTP methods được phép
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
 
-        // Headers được phép — bao gồm Authorization và adminId header custom
-        config.setAllowedHeaders(List.of(
-                "Authorization",
-                "Content-Type",
-                "Accept",
-                "adminId",
-                "X-Requested-With",
-                "Origin"
-        ));
+        // ✅ Cho phép tất cả headers
+        config.setAllowedHeaders(List.of("*"));
 
-        // Cho phép gửi credentials (cookie, Authorization header)
+        // ✅ Cho phép gửi credentials (cookie, Authorization header)
         config.setAllowCredentials(true);
 
-        // Pre-flight cache 30 phút
-        config.setMaxAge(1800L);
+        // ✅ Cache pre-flight 1 giờ
+        config.setMaxAge(3600L);
+
+        // ✅ Expose headers
+        config.setExposedHeaders(List.of(
+                "Authorization",
+                "Content-Disposition",
+                "X-Total-Count"
+        ));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
