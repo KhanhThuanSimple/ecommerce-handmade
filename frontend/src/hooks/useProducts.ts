@@ -13,7 +13,13 @@ export const useProducts = () => {
         setLoading(true);
         try {
             const data = await getProducts();
-            setProducts(data);
+            if (Array.isArray(data)) {
+                setProducts(data);
+            } else {
+                console.error("Lỗi: Dữ liệu tải về không phải là mảng sản phẩm hợp lệ:", data);
+                setProducts([]);
+                setError("Định dạng dữ liệu từ máy chủ không hợp lệ.");
+            }
         } catch (err) {
             console.error("Lỗi tải sản phẩm:", err);
             setError("Không thể tải danh sách sản phẩm.");

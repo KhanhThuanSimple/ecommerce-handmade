@@ -89,7 +89,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
             <div className="product-info">
                 <h3>{product.name}</h3>
-                <p className="product-price">{product.price.toLocaleString('vi-VN')} VNĐ</p>
+                <p className="product-price">{(product?.price ?? 0).toLocaleString('vi-VN')} VNĐ</p>
                 <p className="product-inventory">Còn lại: {stock} sản phẩm</p>
 
                 <div className="product-buttons">

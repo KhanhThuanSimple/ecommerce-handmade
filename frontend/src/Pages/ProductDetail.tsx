@@ -48,7 +48,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ currentUser }) => {
                 {/* BÊN PHẢI: THÔNG TIN */}
                 <div className="product-detail-info">
                     <h2 className="product-title">{product.name}</h2>
-                    <p className="product-price">{product.price.toLocaleString('vi-VN')} VNĐ</p>
+                    <p className="product-price">{(product?.price ?? 0).toLocaleString('vi-VN')} VNĐ</p>
 
                     <ProductPolicy />
 
