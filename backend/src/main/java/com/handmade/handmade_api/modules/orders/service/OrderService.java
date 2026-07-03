@@ -299,7 +299,7 @@ public class OrderService {
 
         if (order.getVoucherCode() != null && !order.getVoucherCode().isBlank()) {
             try {
-                voucherService.applyVoucherCode(order.getVoucherCode());
+                voucherService.applyVoucherCode(order.getVoucherCode(), order.getUserId());
             } catch (Exception ex) {
                 log.warn("Voucher '{}' áp dụng thất bại, bỏ qua voucher cho đơn {}: {}",
                         order.getVoucherCode(), order.getId(), ex.getMessage());
@@ -383,6 +383,7 @@ public class OrderService {
                 .voucherCode(order.getVoucherCode())
                 .paymentMethod(order.getPaymentMethod())
                 .status(order.getStatus())
+                .vnpayTranNo(order.getVnpayTranNo())
                 .date(displayDate)
                 .build();
     }

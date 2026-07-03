@@ -2,7 +2,8 @@
 import React, { useEffect } from 'react';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from '../services/cacheService';
-import '../services/apiInterceptor'; // Auto activate interceptor
+// apiInterceptor đã bị vô hiệu hoá — gây cache stale làm cộng dồn sản phẩm
+// import '../services/apiInterceptor';
 
 // Component wrapper - có thể wrap ở root hoặc không cũng được
 export const CacheProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {

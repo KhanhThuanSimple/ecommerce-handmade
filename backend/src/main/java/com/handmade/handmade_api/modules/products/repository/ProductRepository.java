@@ -15,7 +15,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     // 1. LẤY DANH SÁCH SẢN PHẨM CHO NGƯỜI DÙNG (Chỉ lấy 'active')
     @Query(value = "SELECT " +
             "    p.id AS id, p.name AS name, p.base_price AS price, c.name AS categoryName, " +
-            "    p.category_id AS categoryId, pi.image_url AS imageUrl, p.description AS description, " +
+            "    p.category_id AS categoryId, MAX(pi.image_url) AS imageUrl, p.description AS description, " +
             "    CAST(COALESCE(SUM(pv.inventory), 0) AS INTEGER) AS totalInventory, " +
             "    CAST(COALESCE(AVG(r.rating), 5.0) AS FLOAT) AS rating, " +
             "    CAST(COALESCE(COUNT(DISTINCT r.id), 0) AS INTEGER) AS commentCount, " +
@@ -26,14 +26,14 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             "LEFT JOIN product_variants pv ON p.id = pv.product_id " +
             "LEFT JOIN reviews r ON p.id = r.product_id " +
             "WHERE p.status = 'active' " +
-            "GROUP BY p.id, p.name, p.base_price, c.name, p.category_id, pi.image_url, p.description, p.status, p.sold_count",
+            "GROUP BY p.id, p.name, p.base_price, c.name, p.category_id, p.description, p.status, p.sold_count",
             nativeQuery = true)
     List<ProductProjection> findAllActiveProducts();
 
     // 2. LẤY CHI TIẾT 1 SẢN PHẨM (Chỉ lấy nếu sản phẩm vẫn đang 'active')
     @Query(value = "SELECT " +
             "    p.id AS id, p.name AS name, p.base_price AS price, c.name AS categoryName, " +
-            "    p.category_id AS categoryId, pi.image_url AS imageUrl, p.description AS description, " +
+            "    p.category_id AS categoryId, MAX(pi.image_url) AS imageUrl, p.description AS description, " +
             "    CAST(COALESCE(SUM(pv.inventory), 0) AS INTEGER) AS totalInventory, " +
             "    CAST(COALESCE(AVG(r.rating), 5.0) AS FLOAT) AS rating, " +
             "    CAST(COALESCE(COUNT(DISTINCT r.id), 0) AS INTEGER) AS commentCount, " +
@@ -44,7 +44,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             "LEFT JOIN product_variants pv ON p.id = pv.product_id " +
             "LEFT JOIN reviews r ON p.id = r.product_id " +
             "WHERE p.id = :id AND p.status = 'active' " +
-            "GROUP BY p.id, p.name, p.base_price, c.name, p.category_id, pi.image_url, p.description, p.status, p.sold_count",
+            "GROUP BY p.id, p.name, p.base_price, c.name, p.category_id, p.description, p.status, p.sold_count",
             nativeQuery = true)
     ProductProjection findProductDetailRawById(@Param("id") Long id);
 }

@@ -6,57 +6,57 @@
 
 :root {
   /* ── BRAND 10% ── */
-  --primary-red:        #b5341c;
-  --primary-red-hover:  #952a15;
-  --primary-red-light:  #fef0ed;
-  --primary-red-soft:   #fad9d2;
+  --primary-red:        #ee4d2d;
+  --primary-red-hover:  #d73c16;
+  --primary-red-light:  #fff5f2;
+  --primary-red-soft:   #ffdcd1;
 
-  --primary-gold:       #c8900c;
-  --primary-gold-hover: #a87309;
-  --primary-gold-light: #fef7e6;
-  --primary-gold-soft:  #f5dcaa;
+  --primary-gold:       #ffaa00;
+  --primary-gold-hover: #e69900;
+  --primary-gold-light: #fff9eb;
+  --primary-gold-soft:  #ffe09c;
 
-  --primary-orange:     #d96b1a;
+  --primary-orange:     #ee4d2d;
 
   /* Compat aliases (dùng trong nhiều file) */
-  --primary-red-dark:   #952a15;
-  --primary-gold-dark:  #a87309;
+  --primary-red-dark:   #d73c16;
+  --primary-gold-dark:  #e69900;
 
   /* ── NEUTRAL ── */
-  --gray-50:  #fafaf9;
-  --gray-100: #f5f3f0;
-  --gray-150: #eeebe7;
-  --gray-200: #e4dfd9;
-  --gray-300: #cfc8c1;
-  --gray-400: #b0a89f;
-  --gray-500: #877f77;
-  --gray-600: #5e574f;
-  --gray-700: #3b3530;
-  --gray-800: #231f1b;
-  --gray-900: #0f0d0b;
+  --gray-50:  #fafafa;
+  --gray-100: #f5f5f5;
+  --gray-150: #eeeeee;
+  --gray-200: #e8e8e8;
+  --gray-300: #d9d9d9;
+  --gray-400: #bfbfbf;
+  --gray-500: #8c8c8c;
+  --gray-600: #595959;
+  --gray-700: #262626;
+  --gray-800: #141414;
+  --gray-900: #000000;
 
   /* ── SEMANTIC ── */
   --success:        #2e7d32;
   --success-dark:   #1b5e20;
   --success-light:  #eaf4ea;
 
-  --warning:        #b45309;
-  --warning-dark:   #92400e;
-  --warning-light:  #fef3e2;
+  --warning:        #f5a623;
+  --warning-dark:   #d48806;
+  --warning-light:  #fffbe6;
 
-  --error:          #b91c1c;
-  --error-dark:     #991b1b;
-  --error-light:    #fef0ed;
+  --error:          #ff4d4f;
+  --error-dark:     #d9363e;
+  --error-light:    #fff2f0;
 
-  --info:           #1d4ed8;
-  --info-dark:      #1e3a8a;
-  --info-light:     #eff4ff;
+  --info:           #1890ff;
+  --info-dark:      #096dd9;
+  --info-light:     #e6f7ff;
 
   /* ── SURFACE (60% + 30%) ── */
-  --surface-page:   #f6f2ee;   /* 60% — nền admin content */
+  --surface-page:   #f6f6f6;   /* 60% — nền admin content */
   --surface-card:   #ffffff;   /* 30% — card, panel */
-  --surface-sunken: #ede8e3;   /* row hover, input background */
-  --border-color:   #ddd5cc;
+  --surface-sunken: #fafafa;   /* row hover, input background */
+  --border-color:   #e8e8e8;
 
   /* ── FONT ── */
   --font-sans:    'Be Vietnam Pro', -apple-system, BlinkMacSystemFont,

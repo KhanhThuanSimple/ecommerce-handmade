@@ -103,31 +103,26 @@ api.interceptors.request.use(
 
 /**
  * =========================
- * RESPONSE INTERCEPTOR (FIX CACHED + CANCEL ERROR)
+ * RESPONSE INTERCEPTOR
  * =========================
  */
 api.interceptors.response.use(
     (response) => response,
     (error) => {
-        // 🔥 CHẶN TRIỆT ĐỂ CANCELED ERROR (NGUYÊN NHÂN CHÍNH)
+        // Bỏ qua lỗi cancel do user navigate đi — không crash UI
         if (
             error?.code === 'ERR_CANCELED' ||
-            error?.name === 'CanceledError' ||
-            error?.message?.toLowerCase?.().includes('cached') ||
-            error?.message?.toLowerCase?.().includes('canceled')
+            error?.name === 'CanceledError'
         ) {
-            console.warn('🚫 Ignored cached/canceled request:', error.message);
-
-            // KHÔNG THROW ERROR → tránh crash React
-            return new Promise(() => {});
+            // Trả về null thay vì treo promise — component tự handle
+            return Promise.resolve(null);
         }
 
-        // 🔐 Unauthorized — xóa toàn bộ auth data để tránh phantom token
+        // 🔐 Unauthorized — xóa auth data
         if (error?.response?.status === 401) {
             localStorage.removeItem('user');
             localStorage.removeItem('authHeader');
             localStorage.removeItem('userEmail');
-            // Không redirect ở đây để tránh vòng lặp nếu trang public — để App.tsx xử lý
         }
 
         return Promise.reject(error);

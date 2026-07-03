@@ -34,4 +34,10 @@ public class VoucherController {
     public ResponseEntity<Voucher> updateVoucher(@PathVariable String id, @RequestBody Map<String, Object> updates) {
         return ResponseEntity.ok(voucherService.updateVoucher(id, updates));
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteVoucher(@PathVariable String id) {
+        voucherService.deleteVoucher(id);
+        return ResponseEntity.noContent().build();
+    }
 }

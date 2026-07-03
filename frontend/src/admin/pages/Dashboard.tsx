@@ -1,6 +1,6 @@
 // src/admin/pages/SuperDashboard.tsx
 import React from 'react';
-import { Line, Bar, Pie } from 'react-chartjs-2';
+import { Line, Pie } from 'react-chartjs-2';
 import {
     Chart as ChartJS,
     CategoryScale,

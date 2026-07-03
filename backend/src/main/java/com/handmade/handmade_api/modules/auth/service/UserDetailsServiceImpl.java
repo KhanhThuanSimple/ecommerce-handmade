@@ -14,9 +14,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     private UserRepository userRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        // Tìm user theo email (vì hệ thống của bạn dùng email để đăng nhập)
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
+    public UserDetails loadUserByUsername(String usernameOrEmail) throws UsernameNotFoundException {
+        // Tìm user linh hoạt theo email hoặc theo username (định danh trong JWT)
+        return userRepository.findByEmail(usernameOrEmail)
+                .or(() -> userRepository.findByUsername(usernameOrEmail))
+                .orElseThrow(() -> new UsernameNotFoundException("Không tìm thấy người dùng với email hoặc tài khoản: " + usernameOrEmail));
     }
 }

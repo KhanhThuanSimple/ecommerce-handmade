@@ -112,21 +112,7 @@ const LuckyWheel: React.FC<LuckyWheelProps> = ({ currentUser }) => {
         <div className="wheel-section">
           <div className="wheel-header">
             <h2><span className="icon">🎡</span> Vòng Quay May Mắn</h2>
-            <p className="subtitle">Quay ngay để nhận ưu đãi độc quyền</p>
-            
-            <div className="spin-info">
-              <div className="spin-counter">
-                <div className="counter-icon">🔄</div>
-                <div className="counter-text">
-                  <span className="count">{spinsLeft}</span>
-                  <span className="label">lượt quay còn lại</span>
-                </div>
-              </div>
-              <div className="spin-rule">
-                <span className="rule-icon">📋</span>
-                <span>1 lượt/quý cho thành viên VIP</span>
-              </div>
-            </div>
+            <p className="subtitle">Quay ngay để nhận ưu đãi độc quyền hôm nay</p>
           </div>
 
           <div className="wheel-box">
@@ -139,158 +125,119 @@ const LuckyWheel: React.FC<LuckyWheelProps> = ({ currentUser }) => {
             
             <div className="pointer-container">
               <div className="pointer-triangle"></div>
-              <div className="pointer-circle"></div>
             </div>
-            
-            <div className="wheel-controls">
-              {/* Hiển thị dòng thông báo nhỏ phía trên nút nếu cần */}
-              {!currentUser && (
-                <p className="status-msg warning">⚠️ Đăng nhập để nhận lượt quay free!</p>
+          </div>
+
+          <div className="wheel-controls">
+            {!currentUser && (
+              <p className="status-msg warning">⚠️ Đăng nhập để quay miễn phí mỗi ngày!</p>
+            )}
+            {currentUser && !canSpin && !spinning && (
+              <p className="status-msg info">📅 Bạn đã quay hôm nay. Hẹn gặp lại ngày mai!</p>
+            )}
+            {currentUser && canSpin && !spinning && (
+              <p className="status-msg info">🎉 Bạn có 1 lượt quay miễn phí hôm nay!</p>
+            )}
+            <button 
+              onClick={() => {
+                if (!currentUser) {
+                  navigate('/login');
+                } else {
+                  spin();
+                }
+              }} 
+              disabled={spinning || (currentUser !== null && spinsLeft <= 0)}
+              className="spin-button"
+            >
+              {!currentUser ? (
+                "🔐 ĐĂNG NHẬP ĐỂ QUAY"
+              ) : spinning ? (
+                <>
+                  <span className="spinner"></span>
+                  <span>Đang quay...</span>
+                </>
+              ) : spinsLeft <= 0 ? (
+                <>
+                  <span className="icon">⏳</span>
+                  <span>Hết lượt hôm nay</span>
+                </>
+              ) : (
+                <>
+                  <span className="icon">🎯</span>
+                  <span>QUAY NGAY</span>
+                </>
               )}
-              {currentUser && !canSpin && !spinning && (
-                <p className="status-msg info">📅 Bạn đã hết lượt. Hẹn gặp lại ngày mai!</p>
-              )}
-              <button 
-                onClick={spin} 
-                disabled={spinning || spinsLeft <= 0}
-                className="spin-button"
-              >{!currentUser ? (
-              "🔐 ĐĂNG NHẬP ĐỂ QUAY"
-      )
-                :spinning ? (
-                  <>
-                    <span className="spinner"></span>
-                    <span>Đang quay...</span>
-                  </>
-                ) : spinsLeft <= 0 ? (
-                  <>
-                    <span className="icon">⏳</span>
-                    <span>Đã hết lượt</span>
-                  </>
-                ) : (
-                  <>
-                    <span className="icon">🎯</span>
-                    <span>QUAY NGAY</span>
-                  </>
-                )}
-              </button>
-            </div>
+            </button>
           </div>
         </div>
 
         {/* Phần bên phải: Danh sách giải thưởng & Kết quả */}
         <div className="prize-section">
-          {/* Kết quả nổi bật */}
           {result && showResult ? (
             <div className="result-highlight">
               <div className="highlight-header">
                 <h3><span className="icon">🎉</span> Chúc mừng!</h3>
-                <p>Bạn đã trúng giải thưởng</p>
+                <p>Bạn đã trúng giải thưởng đặc quyền</p>
               </div>
               
-              <div 
-                className="highlight-prize"
-                style={{ 
-                  background: `linear-gradient(135deg, ${result.color}22, ${result.color}44)`,
-                  borderColor: result.color
-                }}
-              >
-                <div className="prize-icon-large">{result.icon}</div>
-                <div className="prize-info">
-                  <h4 style={{ color: result.color }}>{result.name}</h4>
-                  <p className="prize-description">{result.description}</p>
-                  {result.value && (
-                    <div className="prize-value">
-                      <span>Giá trị:</span>
-                      <strong>
-                        {result.type === 'discount' ? ` ${result.value}%` : 
-                         result.type === 'points' ? ` ${result.value} điểm` : 
-                         ` ${result.value.toLocaleString()}đ`}
-                      </strong>
-                    </div>
-                  )}
-                </div>
-              </div>
+              <div className="prize-icon-large">{result.icon}</div>
+              <h4>{result.name}</h4>
+              <p className="prize-description">{result.description}</p>
               
               <div className="highlight-actions">
-                <button className="btn-primary" onClick={() => navigate('/products')}>
+                <button className="btn-primary" onClick={() => navigate('/')}>
                   <span className="icon">🛒</span> Tiếp tục mua sắm
                 </button>
                 <button className="btn-secondary" onClick={() => navigate('/profile')}>
-                  <span className="icon">📱</span> Xem voucher
+                  <span className="icon">🎟️</span> Xem voucher của tôi
                 </button>
               </div>
               
               <div className="highlight-note">
-                <p><span className="icon">✅</span> Quà đã được thêm vào tài khoản của bạn</p>
-                <p className="small">Kiểm tra trong mục "Ưu đãi của tôi"</p>
+                Voucher đã được thêm vào "Voucher của tôi"
               </div>
             </div>
           ) : (
             <div className="prize-list">
               <div className="list-header">
-                <h3><span className="icon">🏆</span> Giải thưởng</h3>
-                <p className="subtitle">Có thể nhận ngay sau khi quay</p>
+                <h3><span className="icon">🏆</span> Cơ cấu giải thưởng</h3>
+                <p className="subtitle">Danh sách quà tặng có thể nhận được</p>
               </div>
               
               <div className="prize-grid">
-                {prizes.map(prize => (
+                {prizes.map((prize, index) => (
                   <div 
                     key={prize.id} 
-                    className={`prize-card ${highlightedPrize === prizes.indexOf(prize) ? 'highlighted' : ''}`}
-                    style={{ 
-                      borderColor: prize.color,
-                      boxShadow: highlightedPrize === prizes.indexOf(prize) ? 
-                        `0 0 20px ${prize.color}40` : 'none'
+                    className={`prize-card ${highlightedPrize === index ? 'highlighted' : ''}`}
+                    style={{
+                      borderLeft: `4px solid ${prize.color}`
                     }}
                   >
-                    <div className="card-header" style={{ background: prize.color }}>
-                      <span className="prize-icon">{prize.icon}</span>
-                      <h4 style={{ color: prize.textColor }}>{prize.name}</h4>
-                    </div>
-                    <div className="card-body">
-                      <p className="prize-description">{prize.description}</p>
-                      {prize.value && (
-                        <div className="prize-value">
-                          <span>Giá trị:</span>
-                          <strong style={{ color: prize.color }}>
-                            {prize.type === 'discount' ? ` ${prize.value}%` : 
-                             prize.type === 'points' ? ` ${prize?.value}đ` : 
-                             ` ${prize.value.toLocaleString()}đ`}
-                          </strong>
-                        </div>
-                      )}
+                    <div className="prize-icon">{prize.icon}</div>
+                    <div className="prize-card-info">
+                      <h4>{prize.name}</h4>
+                      <p>{prize.description}</p>
                     </div>
                   </div>
                 ))}
               </div>
+
+              <div className="game-info">
+                <div className="info-item">
+                  <span className="info-icon">🎁</span>
+                  <strong>Mỗi ngày 1 lượt</strong>
+                </div>
+                <div className="info-item">
+                  <span className="info-icon">⚡</span>
+                  <strong>100% trúng thưởng</strong>
+                </div>
+                <div className="info-item">
+                  <span className="info-icon">📅</span>
+                  <strong>Hạn dùng 30 ngày</strong>
+                </div>
+              </div>
             </div>
           )}
-          
-          {/* Thông tin thêm */}
-          <div className="game-info">
-            <div className="info-item">
-              <span className="info-icon">📅</span>
-              <div>
-                <strong>Thời gian áp dụng:</strong>
-                <p>Từ 01/01 đến 2026</p>
-              </div>
-            </div>
-            <div className="info-item">
-              <span className="info-icon">👥</span>
-              <div>
-                <strong>Điều kiện tham gia:</strong>
-                <p>Thành viên từ Level 1 trở lên</p>
-              </div>
-            </div>
-            <div className="info-item">
-              <span className="info-icon">⚡</span>
-              <div>
-                <strong>Lưu ý:</strong>
-                <p>Voucher có hiệu lực trong 30 ngày</p>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>

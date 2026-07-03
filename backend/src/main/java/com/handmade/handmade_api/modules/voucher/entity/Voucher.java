@@ -40,6 +40,21 @@ public class Voucher {
     @Column(name = "used_count")
     private Integer usedCount;
 
+    @Column(name = "user_id")
+    private Long userId;
+
+    @Column(name = "target")
+    private String target;
+
+    @Column(name = "status")
+    private String status;
+
+    @Column(name = "start_date")
+    private String startDate;
+
+    @Column(name = "expired_at")
+    private String expiredAt;
+
     @JsonProperty("type")
     public String getType() {
         return voucherType;
@@ -70,23 +85,28 @@ public class Voucher {
         return usedCount == null ? 0 : usedCount;
     }
 
+    @JsonProperty("userId")
+    public Long getUserId() {
+        return userId;
+    }
+
     @JsonProperty("status")
     public String getStatus() {
-        return "ACTIVE";
+        return status != null ? status : "ACTIVE";
     }
 
     @JsonProperty("target")
     public String getTarget() {
-        return "ALL";
+        return target != null ? target : "ALL";
     }
 
     @JsonProperty("startDate")
     public String getStartDate() {
-        return "2000-01-01T00:00:00.000Z";
+        return startDate != null ? startDate : "2000-01-01T00:00:00.000Z";
     }
 
     @JsonProperty("expiredAt")
     public String getExpiredAt() {
-        return "2099-12-31T23:59:59.000Z";
+        return expiredAt != null ? expiredAt : "2099-12-31T23:59:59.000Z";
     }
 }

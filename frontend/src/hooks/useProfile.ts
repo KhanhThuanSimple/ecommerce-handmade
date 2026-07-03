@@ -38,7 +38,7 @@ export const useProfile = (currentUser: User | null, onLogout: () => void) => {
                         api.get('/voucher'),
                         api.get(`/orders?userId=${currentUser.id}`)
                     ]);
-                    const filtered = filterVouchersForUser(vouchersRes.data, ordersRes.data, 999999999);
+                    const filtered = filterVouchersForUser(vouchersRes.data, ordersRes.data, 999999999, currentUser.id);
                     setMyVouchers(filtered);
                 } catch (err) {
                     console.error("Lỗi tải voucher cá nhân:", err);

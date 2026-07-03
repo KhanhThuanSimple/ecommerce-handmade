@@ -21,6 +21,7 @@ public class OrderResponse {
     private String voucherCode;
     private String paymentMethod;
     private String status;
+    private String vnpayTranNo;
     private String date;
     private LocalDateTime createdAt;
     private List<OrderHistoryResponse> history;

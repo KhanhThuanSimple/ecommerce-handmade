@@ -62,15 +62,17 @@ export const CartProvider = ({ children, currentUser }: { children: ReactNode; c
             const localData = localStorage.getItem('guestCart');
             let items: CartItem[] = localData ? JSON.parse(localData) : [];
 
-            const existingItem = items.find((i) => i.productId === product.id);
+            const existingItem = items.find(i => Number(i.productId) === Number(product.id));
+
             if (existingItem) {
-                if (existingItem.quantity >= stock) {
-                    notify.warning(`Sản phẩm này chỉ còn tối đa ${stock} chiếc trong kho!`);
+                const maxStock = product.total_inventory !== undefined ? product.total_inventory : (product as any).inventory ?? 0;
+                if (existingItem.quantity >= maxStock) {
+                    notify.warning(`Sản phẩm này chỉ còn tối đa ${maxStock} chiếc!`);
                     return;
                 }
                 existingItem.quantity += 1;
             } else {
-                items.push({ productId: product.id, quantity: 1 });
+                items.push({ productId: Number(product.id), quantity: 1 });
             }
 
             localStorage.setItem('guestCart', JSON.stringify(items));
@@ -81,6 +83,17 @@ export const CartProvider = ({ children, currentUser }: { children: ReactNode; c
 
         // --- LUỒNG ĐÃ ĐĂNG NHẬP (SERVER) ---
         try {
+            const cartRes = await api.get<any[]>(`/carts/${activeUser.id}`);
+            const userCartItems = cartRes.data || [];
+            const existingItem = userCartItems.find(i => Number(i.productId) === Number(product.id));
+            const currentQty = existingItem ? existingItem.quantity : 0;
+            const maxStock = product.total_inventory !== undefined ? product.total_inventory : (product as any).inventory ?? 0;
+
+            if (currentQty + 1 > maxStock) {
+                notify.warning(`Sản phẩm này chỉ còn tối đa ${maxStock} chiếc!`);
+                return;
+            }
+
             const payload = {
                 userId: Number(activeUser.id), // Đảm bảo ép kiểu số sạch chống lỗi Validation
                 productId: Number(product.id),

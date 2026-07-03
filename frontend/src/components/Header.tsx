@@ -65,7 +65,7 @@ const Header: React.FC<HeaderProps> = ({ currentUser, onLogout }) => {
               >
                 <span>{item.name}</span>
                 <span className="price">
-                  {item.price.toLocaleString("vi-VN")}₫
+                  {item.price.toLocaleString("vi-VN")} VNĐ
                 </span>
               </div>
             ))}

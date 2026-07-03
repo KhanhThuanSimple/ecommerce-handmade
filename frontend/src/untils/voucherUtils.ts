@@ -1,58 +1,48 @@
- 
- export const filterVouchersForUser = (
-  allVouchers: any[], 
-  userOrders: any[], 
-  currentTotal: number
+export const filterVouchersForUser = (
+    allVouchers: any[],
+    userOrders: any[],
+    currentTotal: number,
+    // userId giữ lại để callers (useProfile, Checkout) gọi đúng 4 args
+    // hiện tại chưa dùng trong logic nhưng signature phải khớp
+    _userId?: number | string
 ) => {
-  const now = new Date();
-  
-  // 1. Lấy thứ trong tuần để check voucher cuối tuần (Weekend)
-  // Lưu ý: getDay() trả về 0 cho Chủ Nhật, 6 cho Thứ Bảy
-  const dayIndex = now.getDay();
-  const isWeekend = dayIndex === 0 || dayIndex === 6;
+    const now = new Date();
 
-  // 2. Tính số lượng đơn hàng THÀNH CÔNG của User (không tính đơn Đã hủy)
-  const completedOrdersCount = userOrders.filter(
-    order => order.status !== "Đã hủy"
-  ).length;
+    // Thứ trong tuần: 0 = Chủ Nhật, 6 = Thứ Bảy
+    const dayIndex  = now.getDay();
+    const isWeekend = dayIndex === 0 || dayIndex === 6;
 
-  return allVouchers.filter((v) => {
-    // --- KIỂM TRA ĐIỀU KIỆN CỨNG ---
-    if (v.status !== 'ACTIVE') return false;
-    if (v.used >= v.quantity) return false;
-    
-    // Kiểm tra thời hạn (StartDate & ExpiredAt)
-    const start = new Date(v.startDate);
-    const end = new Date(v.expiredAt);
-    if (now < start || now > end) return false;
+    // Số đơn hàng thành công (không tính đơn đã hủy)
+    const completedOrdersCount = userOrders.filter(
+        o => o.status !== 'Đã hủy'
+    ).length;
 
-    // Kiểm tra giá trị đơn hàng tối thiểu
-    if (currentTotal < v.minOrder) return false;
+    return allVouchers.filter((v) => {
+        // ── Điều kiện cứng ──────────────────────────────────
+        if (v.status !== 'ACTIVE')          return false;
+        if (v.used >= v.quantity)           return false;
 
-    // --- KIỂM TRA ĐIỀU KIỆN ĐẶC BIỆT ---
-    
-    // Kiểm tra ngày cuối tuần (Cho voucher VC005)
-    if (v.validDays && v.validDays.includes("SATURDAY") && !isWeekend) {
-        return false;
-    }
+        // Kiểm tra thời hạn
+        if (v.startDate && now < new Date(v.startDate)) return false;
+        if (v.expiredAt && now > new Date(v.expiredAt)) return false;
 
-    // --- KIỂM TRA ĐỐI TƯỢNG (TARGET) ---
-    switch (v.target) {
-      case 'NEW_USER':
-        // Chỉ hiện nếu chưa từng mua hàng thành công
-        return completedOrdersCount === 0;
+        // Kiểm tra đơn tối thiểu
+        if (currentTotal < (v.minOrder ?? 0)) return false;
 
-      case 'LOYAL_USER':
-        // Ví dụ: Đã mua từ 5 đơn (dựa trên minOrderCount trong JSON của bạn)
-        return completedOrdersCount >= (v.minOrderCount || 5);
+        // ── Voucher cuối tuần ────────────────────────────────
+        if (v.validDays?.includes('SATURDAY') && !isWeekend) return false;
 
-      case 'VIP_USER':
-        // Ví dụ: Đã mua từ 20 đơn
-        return completedOrdersCount >= (v.minOrderCount || 20);
-
-      case 'ALL':
-      default:
-        return true;
-    }
-  });
+        // ── Đối tượng áp dụng ───────────────────────────────
+        switch (v.target) {
+            case 'NEW_USER':
+                return completedOrdersCount === 0;
+            case 'LOYAL_USER':
+                return completedOrdersCount >= (v.minOrderCount ?? 5);
+            case 'VIP_USER':
+                return completedOrdersCount >= (v.minOrderCount ?? 20);
+            case 'ALL':
+            default:
+                return true;
+        }
+    });
 };

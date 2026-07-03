@@ -16,35 +16,41 @@ const VNPayReturn: React.FC = () => {
         isProcessed.current = true;
 
         const handleResult = async () => {
-            const orderId = searchParams.get('vnp_TxnRef');
+            const orderId     = searchParams.get('vnp_TxnRef');
             const queryString = searchParams.toString();
 
             if (!orderId || !queryString) {
-                notify.error("Không tìm thấy mã đơn hàng từ VNPay");
-                navigate('/profile');
+                notify.error('Không tìm thấy mã đơn hàng từ VNPay');
+                navigate('/orders');
                 return;
             }
 
             try {
-                // ĐÃ SỬA: Sửa lại đường dẫn chuẩn khớp với @RequestMapping("/api/payment") của Backend
+                // Gọi đúng endpoint backend: /api/payment/vnpay/return
                 const res = await api.get(`/payment/vnpay/return?${queryString}`);
-                const result = res.data;
+                const result = res?.data;
+
+                if (!result) {
+                    notify.error('Máy chủ không phản hồi, vui lòng kiểm tra lại đơn hàng.');
+                    setTimeout(() => navigate('/orders'), 2000);
+                    return;
+                }
 
                 if (result.success && result.signatureValid) {
                     await refreshCart();
-                    notify.success("Thanh toán VNPay thành công!");
+                    notify.success('Thanh toán VNPay thành công! Đơn hàng đã được xác nhận.');
+                    setTimeout(() => navigate(`/order-detail/${orderId}`), 1500);
                 } else if (!result.signatureValid) {
-                    notify.error("Giao dịch không hợp lệ (Chữ ký xác thực thất bại).");
+                    notify.error('Giao dịch không hợp lệ — chữ ký xác thực thất bại.');
+                    setTimeout(() => navigate('/orders'), 2000);
                 } else {
-                    notify.error("Thanh toán không thành công hoặc đã bị hủy.");
+                    notify.error('Thanh toán không thành công hoặc đã bị hủy.');
+                    setTimeout(() => navigate('/orders'), 2000);
                 }
             } catch (error) {
-                console.error("Lỗi kết nối API VNPay:", error);
-                notify.error("Có lỗi xảy ra khi xác nhận thanh toán với máy chủ");
-            } finally {
-                setTimeout(() => {
-                    navigate('/profile');
-                }, 1500);
+                console.error('Lỗi kết nối API VNPay:', error);
+                notify.error('Có lỗi xảy ra khi xác nhận thanh toán.');
+                setTimeout(() => navigate('/orders'), 2000);
             }
         };
 
@@ -52,9 +58,17 @@ const VNPayReturn: React.FC = () => {
     }, [searchParams, navigate, refreshCart, notify]);
 
     return (
-        <div className="loading" style={{ textAlign: 'center', padding: '40px' }}>
-            <h3>Đang xác nhận giao dịch với hệ thống...</h3>
-            <p>Vui lòng không đóng hoặc làm mới trình duyệt</p>
+        <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            minHeight: '60vh',
+            gap: '16px',
+        }}>
+            <div style={{ fontSize: '40px' }}>⏳</div>
+            <h3 style={{ margin: 0 }}>Đang xác nhận giao dịch...</h3>
+            <p style={{ color: '#757575', margin: 0 }}>Vui lòng không đóng hoặc làm mới trình duyệt</p>
         </div>
     );
 };

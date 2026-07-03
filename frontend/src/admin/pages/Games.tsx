@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
     GiftIcon,
     TrophyIcon,
@@ -10,8 +10,6 @@ import {
     ChartBarIcon,
     ArrowPathIcon,
     StarIcon,
-    TicketIcon,
-    XMarkIcon,
     CheckCircleIcon,
     ExclamationTriangleIcon,
     ShieldCheckIcon,
@@ -77,7 +75,7 @@ const Games: React.FC = () => {
     }, [notify]);
 
     // Fetch data
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         if (!isAdmin) return;
         
         setLoading(true);
@@ -105,13 +103,13 @@ const Games: React.FC = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [isAdmin, notify]);
 
     useEffect(() => {
         if (isAdmin) {
             fetchData();
         }
-    }, [isAdmin]);
+    }, [isAdmin, fetchData]);
 
     // Prize handlers
     const handleAddPrize = () => {

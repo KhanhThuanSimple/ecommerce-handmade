@@ -46,25 +46,35 @@ public class CartService {
 
         ProductResponse product = productService.getProductById(request.getProductId());
         Cart cart = getOrCreateCart(request.getUserId());
-        Optional<CartItem> existingItemOpt = cartItemRepository.findByCartIdAndProductId(cart.getId(), product.getId());
+        List<CartItem> existingItems = cartItemRepository.findByCartIdAndProductId(cart.getId(), product.getId());
 
         if (request.getQuantity() < 0) {
-            decreaseCartQuantity(cart, product, existingItemOpt, Math.abs(request.getQuantity()));
+            decreaseCartQuantity(cart, product, existingItems, Math.abs(request.getQuantity()));
             return;
         }
 
-        if (existingItemOpt.isPresent()) {
-            CartItem item = existingItemOpt.get();
-            int newQuantity = item.getQuantity() + request.getQuantity();
+        if (!existingItems.isEmpty()) {
+            CartItem mainItem = existingItems.get(0);
+            int totalExistingQty = existingItems.stream().mapToInt(CartItem::getQuantity).sum();
+            int newQuantity = totalExistingQty + request.getQuantity();
 
             if (newQuantity > product.getInventory()) {
-                throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.BAD_REQUEST, "Cửa hàng chỉ còn tối đa " + product.getInventory() + " sản phẩm!");
+                throw new org.springframework.web.server.ResponseStatusException(
+                        org.springframework.http.HttpStatus.BAD_REQUEST, "Cửa hàng chỉ còn tối đa " + product.getInventory() + " sản phẩm!");
             }
-            item.setQuantity(newQuantity);
-            cartItemRepository.save(item);
+            mainItem.setQuantity(newQuantity);
+            cartItemRepository.save(mainItem);
+
+            // Xóa sạch các phần tử trùng lặp khác nếu có
+            if (existingItems.size() > 1) {
+                for (int i = 1; i < existingItems.size(); i++) {
+                    cartItemRepository.delete(existingItems.get(i));
+                }
+            }
         } else {
             if (request.getQuantity() > product.getInventory()) {
-                throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.BAD_REQUEST, "Số lượng đặt hàng vượt quá tồn kho hiện tại!");
+                throw new org.springframework.web.server.ResponseStatusException(
+                        org.springframework.http.HttpStatus.BAD_REQUEST, "Số lượng đặt hàng vượt quá tồn kho hiện tại!");
             }
             CartItem newItem = CartItem.builder()
                     .cartId(cart.getId())
@@ -84,13 +94,20 @@ public class CartService {
         for (CartMergeRequest.ItemMerge guestItem : request.getItems()) {
             try {
                 ProductResponse product = productService.getProductById(guestItem.getProductId());
-                Optional<CartItem> userItemOpt = cartItemRepository.findByCartIdAndProductId(cart.getId(), product.getId());
+                List<CartItem> userItems = cartItemRepository.findByCartIdAndProductId(cart.getId(), product.getId());
 
-                if (userItemOpt.isPresent()) {
-                    CartItem userItem = userItemOpt.get();
-                    int mergedQty = userItem.getQuantity() + guestItem.getQuantity();
-                    userItem.setQuantity(Math.min(mergedQty, product.getInventory()));
-                    cartItemRepository.save(userItem);
+                if (!userItems.isEmpty()) {
+                    CartItem mainItem = userItems.get(0);
+                    int totalQty = userItems.stream().mapToInt(CartItem::getQuantity).sum() + guestItem.getQuantity();
+                    mainItem.setQuantity(Math.min(totalQty, product.getInventory()));
+                    cartItemRepository.save(mainItem);
+
+                    // Xóa các dòng trùng lặp khác
+                    if (userItems.size() > 1) {
+                        for (int i = 1; i < userItems.size(); i++) {
+                            cartItemRepository.delete(userItems.get(i));
+                        }
+                    }
                 } else {
                     CartItem newItem = CartItem.builder()
                             .cartId(cart.getId())
@@ -98,6 +115,7 @@ public class CartService {
                             .quantity(Math.min(guestItem.getQuantity(), product.getInventory()))
                             .build();
                     cartItemRepository.save(newItem);
+                    cartItemRepository.flush(); // Bắt buộc flush để vòng lặp sau tìm kiếm thấy
                 }
             } catch (Exception e) {
                 System.err.println("Bỏ qua gộp sản phẩm lỗi: " + guestItem.getProductId());
@@ -125,15 +143,23 @@ public class CartService {
             int quantity = entry.getValue() == null ? 0 : entry.getValue();
             if (quantity <= 0) continue;
 
-            cartItemRepository.findByCartIdAndProductId(cart.getId(), productId).ifPresent(item -> {
-                int remaining = item.getQuantity() - quantity;
+            List<CartItem> items = cartItemRepository.findByCartIdAndProductId(cart.getId(), productId);
+            if (!items.isEmpty()) {
+                int totalExistingQty = items.stream().mapToInt(CartItem::getQuantity).sum();
+                int remaining = totalExistingQty - quantity;
                 if (remaining <= 0) {
-                    cartItemRepository.delete(item);
+                    cartItemRepository.deleteAll(items);
                 } else {
-                    item.setQuantity(remaining);
-                    cartItemRepository.save(item);
+                    CartItem mainItem = items.get(0);
+                    mainItem.setQuantity(remaining);
+                    cartItemRepository.save(mainItem);
+                    if (items.size() > 1) {
+                        for (int i = 1; i < items.size(); i++) {
+                            cartItemRepository.delete(items.get(i));
+                        }
+                    }
                 }
-            });
+            }
         }
     }
 
@@ -178,22 +204,30 @@ public class CartService {
         existingByProduct.values().forEach(cartItemRepository::delete);
     }
 
-    private void decreaseCartQuantity(Cart cart, ProductResponse product, Optional<CartItem> existingItemOpt, int decreaseBy) {
-        if (existingItemOpt.isEmpty()) {
+    private void decreaseCartQuantity(Cart cart, ProductResponse product, List<CartItem> existingItems, int decreaseBy) {
+        if (existingItems.isEmpty()) {
             throw new org.springframework.web.server.ResponseStatusException(
                     org.springframework.http.HttpStatus.BAD_REQUEST, "Sản phẩm không có trong giỏ hàng");
         }
 
-        CartItem item = existingItemOpt.get();
-        int newQuantity = item.getQuantity() - decreaseBy;
+        CartItem mainItem = existingItems.get(0);
+        int totalExistingQty = existingItems.stream().mapToInt(CartItem::getQuantity).sum();
+        int newQuantity = totalExistingQty - decreaseBy;
 
         if (newQuantity <= 0) {
-            cartItemRepository.delete(item);
+            cartItemRepository.deleteAll(existingItems);
             return;
         }
 
-        item.setQuantity(newQuantity);
-        cartItemRepository.save(item);
+        mainItem.setQuantity(newQuantity);
+        cartItemRepository.save(mainItem);
+
+        // Xóa sạch các phần tử trùng lặp khác nếu có
+        if (existingItems.size() > 1) {
+            for (int i = 1; i < existingItems.size(); i++) {
+                cartItemRepository.delete(existingItems.get(i));
+            }
+        }
     }
 
     // Helper tạo giỏ tự động nếu chưa có

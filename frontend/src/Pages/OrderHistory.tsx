@@ -6,22 +6,42 @@ import '../Styles/orders.css';
 
 interface OrderHistoryProps { currentUser: User | null; }
 
+// ── Mapping trạng thái → badge CSS class ──────────────────
+const getStatusBadge = (status: string): { label: string; cls: string } => {
+    const s = (status ?? '').toLowerCase().trim();
+
+    if (['đã thanh toán', 'paid', 'completed', 'hoàn thành'].includes(s))
+        return { label: status, cls: 'paid' };
+
+    if (s === 'chờ thanh toán' || s === 'pending')
+        return { label: 'Chờ thanh toán', cls: 'pending' };
+
+    if (s === 'thanh toán khi nhận hàng' || s === 'cod')
+        return { label: 'Thanh toán khi nhận hàng', cls: 'cod' };
+
+    if (['thanh toán thất bại', 'failed', 'đã hủy'].includes(s))
+        return { label: status, cls: 'failed' };
+
+    return { label: status, cls: 'pending' };
+};
+
+// ── Component ─────────────────────────────────────────────
 const OrderHistory: React.FC<OrderHistoryProps> = ({ currentUser }) => {
     const [orders, setOrders] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
-    // 1. Fetch dữ liệu
     useEffect(() => {
         const fetchOrders = async () => {
             if (!currentUser) return;
             try {
                 const res = await api.get(`/orders?userId=${currentUser.id}`);
-                // Sắp xếp đơn mới nhất lên đầu dựa trên ID hoặc Date
-                const sortedOrders = res.data.sort((a: any, b: any) => b.id.localeCompare(a.id));
-                setOrders(sortedOrders);
+                const data = Array.isArray(res?.data) ? res.data : [];
+                // Sắp xếp đơn mới nhất lên đầu
+                data.sort((a: any, b: any) => b.id.localeCompare(a.id));
+                setOrders(data);
             } catch (err) {
-                console.error("Lỗi tải đơn hàng:", err);
+                console.error('Lỗi tải đơn hàng:', err);
             } finally {
                 setLoading(false);
             }
@@ -34,56 +54,68 @@ const OrderHistory: React.FC<OrderHistoryProps> = ({ currentUser }) => {
     return (
         <div className="order-mgmt-wrapper">
             <div className="order-mgmt-header">
-                <h2><i className="fa-solid fa-box-open"></i> Lịch Sử Đơn Hàng</h2>
-                <p>Bạn có tổng cộng <strong>{orders.length}</strong> đơn hàng đã thực hiện</p>
+                <h2>
+                    <i className="fa-solid fa-box-open" /> Lịch Sử Đơn Hàng
+                </h2>
+                <p>
+                    Bạn có tổng cộng <strong>{orders.length}</strong> đơn hàng
+                </p>
             </div>
 
             <div className="table-container">
                 <table className="order-dashboard-table">
                     <thead>
-                    <tr>
-                        <th style={{ width: '50px' }}>STT</th>
-                        <th>Mã Đơn</th>
-                        <th>Ngày Đặt</th>
-                        <th>Hình thức</th>
-                        <th>Tổng Tiền</th>
-                        <th>Trạng Thái</th>
-                        <th style={{ textAlign: 'center' }}>Thao Tác</th>
-                    </tr>
+                        <tr>
+                            <th style={{ width: 50 }}>STT</th>
+                            <th>Mã Đơn</th>
+                            <th>Ngày Đặt</th>
+                            <th>Hình thức</th>
+                            <th>Tổng Tiền</th>
+                            <th>Trạng Thái</th>
+                            <th style={{ textAlign: 'center' }}>Thao Tác</th>
+                        </tr>
                     </thead>
                     <tbody>
-                    {orders.length > 0 ? (
-                        orders.map((order, index) => (
-                            <tr key={order.id}>
-                                {/* STT đếm số thứ tự chuẩn */}
-                                <td>{index + 1}</td>
-                                <td className="order-id-cell">#{order.id.split('-')[1] || order.id}</td>
-                                <td>{order.date}</td>
-                                <td><span className={`pay-tag ${order.paymentMethod.toLowerCase()}`}>{order.paymentMethod}</span></td>
-
-                                <td className="price-cell">₫{order.totalAmount.toLocaleString('vi-VN')}</td>
-
-
-                                <td>
-                                        <span className={`status-badge ${order.status === 'Chờ thanh toán' ? 'pending' : 'completed'}`}>
-                                            {order.status}
+                        {orders.length > 0 ? orders.map((order, index) => {
+                            const badge = getStatusBadge(order.status);
+                            return (
+                                <tr key={order.id}>
+                                    <td>{index + 1}</td>
+                                    <td className="order-id-cell">
+                                        #{order.id?.split('-')[1] || order.id}
+                                    </td>
+                                    <td>{order.date}</td>
+                                    <td>
+                                        <span className={`pay-tag ${order.paymentMethod?.toLowerCase()}`}>
+                                            {order.paymentMethod}
                                         </span>
-                                </td>
-                                <td style={{ textAlign: 'center' }}>
-                                    <button
-                                        className="action-btn detail-btn"
-                                        onClick={() => navigate(`/order-detail/${order.id}`)}
-                                    >
-                                        Xem Chi Tiết
-                                    </button>
+                                    </td>
+                                    <td className="price-cell">
+                                        {(order.payableAmount ?? order.totalAmount)
+                                            ?.toLocaleString('vi-VN')} VNĐ
+                                    </td>
+                                    <td>
+                                        <span className={`status-badge ${badge.cls}`}>
+                                            {badge.label}
+                                        </span>
+                                    </td>
+                                    <td style={{ textAlign: 'center' }}>
+                                        <button
+                                            className="action-btn detail-btn"
+                                            onClick={() => navigate(`/order-detail/${order.id}`)}
+                                        >
+                                            Xem Chi Tiết
+                                        </button>
+                                    </td>
+                                </tr>
+                            );
+                        }) : (
+                            <tr>
+                                <td colSpan={7} className="no-data">
+                                    Bạn chưa có đơn hàng nào.
                                 </td>
                             </tr>
-                        ))
-                    ) : (
-                        <tr>
-                            <td colSpan={7} className="no-data">Bạn chưa có đơn hàng nào.</td>
-                        </tr>
-                    )}
+                        )}
                     </tbody>
                 </table>
             </div>

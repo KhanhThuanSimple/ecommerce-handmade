@@ -150,8 +150,8 @@ public class PaymentController {
             }
 
             if ("00".equals(responseCode)) {
-                // A. Cập nhật trạng thái hóa đơn tổng thành COMPLETED và lưu mã giao dịch VNPay đối soát
-                String updateOrderSql = "UPDATE orders SET status = 'COMPLETED', vnpay_tran_no = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?";
+                // A. Cập nhật trạng thái đơn thành "Đã thanh toán" và lưu mã giao dịch VNPay
+                String updateOrderSql = "UPDATE orders SET status = 'Đã thanh toán', vnpay_tran_no = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?";
                 int rows = jdbcTemplate.update(updateOrderSql, vnpayTranNo, orderId);
 
                 if (rows > 0) {
@@ -201,15 +201,143 @@ public class PaymentController {
                     return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Không tìm thấy mã đơn hàng hợp lệ trong cơ sở dữ liệu."));
                 }
             } else {
-                // Thanh toán thất bại hoặc người dùng tự động bấm nút hủy bỏ tại trang VNPay
-                String updateFailedSql = "UPDATE orders SET status = 'FAILED', updated_at = CURRENT_TIMESTAMP WHERE id = ?";
+                // Thanh toán thất bại hoặc người dùng hủy tại trang VNPay
+                String updateFailedSql = "UPDATE orders SET status = 'Thanh toán thất bại', updated_at = CURRENT_TIMESTAMP WHERE id = ?";
                 jdbcTemplate.update(updateFailedSql, orderId);
                 return ResponseEntity.ok(Map.of("success", false, "message", "Giao dịch đã bị hủy hoặc gặp lỗi từ cổng thanh toán.", "code", responseCode));
             }
-
         } catch (Exception e) {
-            // Khi xảy ra lỗi trừ kho, hệ thống tự động trả lại toàn bộ trạng thái đơn hàng ban đầu
-            return ResponseEntity.internalServerError().body(Map.of("success", false, "message", "Lỗi nghiêm trọng trong quá trình xử lý Callback: " + e.getMessage()));
+            System.err.println("Lỗi xử lý callback từ VNPay: " + e.getMessage());
+            return ResponseEntity.status(500).body(Map.of("success", false, "message", "Lỗi máy chủ nội bộ: " + e.getMessage()));
+        }
+    }
+
+    /**
+     * 4. Endpoint FE hứng kết quả return từ VNPay (alias của vnpay-callback, trả thêm signatureValid)
+     * FE gọi: GET /api/payment/vnpay/return?{vnpay_params}
+     */
+    @GetMapping("/vnpay/return")
+    @Transactional(rollbackFor = Exception.class)
+    public ResponseEntity<?> vnpayReturn(@RequestParam Map<String, String> fields) {
+        try {
+            // Lấy HashSecret từ DB
+            String sqlConfig = "SELECT config_json FROM payment_methods WHERE code = 'VNPAY'";
+            String configJson = jdbcTemplate.queryForObject(sqlConfig, String.class);
+            Map<String, String> config = objectMapper.readValue(configJson, Map.class);
+            String vnp_HashSecret = config.get("vnp_HashSecret");
+
+            // Tách SecureHash
+            String vnp_SecureHash = fields.get("vnp_SecureHash");
+            Map<String, String> signFields = new HashMap<>(fields);
+            signFields.remove("vnp_SecureHash");
+            signFields.remove("vnp_SecureHashType");
+
+            // Tái dựng chuỗi ký
+            List<String> fieldNames = new ArrayList<>(signFields.keySet());
+            Collections.sort(fieldNames);
+            StringBuilder hashData = new StringBuilder();
+            Iterator<String> itr = fieldNames.iterator();
+            while (itr.hasNext()) {
+                String fieldName = itr.next();
+                String fieldValue = signFields.get(fieldName);
+                if (fieldValue != null && !fieldValue.isEmpty()) {
+                    hashData.append(fieldName).append('=').append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
+                    if (itr.hasNext()) hashData.append('&');
+                }
+            }
+
+            // Xác thực chữ ký
+            String signValue = VNPayConfig.hmacSHA512(vnp_HashSecret, hashData.toString());
+            boolean signatureValid = signValue.equalsIgnoreCase(vnp_SecureHash);
+
+            if (!signatureValid) {
+                return ResponseEntity.ok(Map.of(
+                    "success", false,
+                    "signatureValid", false,
+                    "message", "Chữ ký bảo mật không hợp lệ"
+                ));
+            }
+
+            String responseCode = fields.get("vnp_ResponseCode");
+            String orderId      = fields.get("vnp_TxnRef");
+            String vnpayTranNo  = fields.get("vnp_TransactionNo");
+
+            // Kiểm tra trạng thái hiện tại tránh xử lý trùng
+            String checkSql = "SELECT status FROM orders WHERE id = ?";
+            String currentStatus = jdbcTemplate.queryForObject(checkSql, String.class, orderId);
+            boolean alreadyProcessed = !"Chờ thanh toán".equalsIgnoreCase(currentStatus)
+                                    && !"PENDING".equalsIgnoreCase(currentStatus);
+
+            if (alreadyProcessed) {
+                boolean isPaid = "Đã thanh toán".equalsIgnoreCase(currentStatus);
+                return ResponseEntity.ok(Map.of(
+                    "success", isPaid,
+                    "signatureValid", true,
+                    "message", "Đơn hàng đã được xử lý trước đó.",
+                    "orderId", orderId
+                ));
+            }
+
+            if ("00".equals(responseCode)) {
+                // Cập nhật thành "Đã thanh toán"
+                String updateSql = "UPDATE orders SET status = 'Đã thanh toán', vnpay_tran_no = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?";
+                int rows = jdbcTemplate.update(updateSql, vnpayTranNo, orderId);
+
+                if (rows > 0) {
+                    // Trừ kho
+                    String sqlItems = "SELECT product_id, quantity FROM order_items WHERE order_id = ?";
+                    List<Map<String, Object>> items = jdbcTemplate.queryForList(sqlItems, orderId);
+                    for (Map<String, Object> item : items) {
+                        Long productId = ((Number) item.get("product_id")).longValue();
+                        Integer quantity = (Integer) item.get("quantity");
+                        String updateStockSql = "UPDATE product_variants SET inventory = inventory - ? WHERE product_id = ? AND inventory >= ?";
+                        int stockRows = jdbcTemplate.update(updateStockSql, quantity, productId, quantity);
+                        if (stockRows == 0) {
+                            throw new RuntimeException("Sản phẩm " + productId + " không đủ tồn kho!");
+                        }
+                    }
+
+                    // Dọn giỏ hàng
+                    try {
+                        Long userId = jdbcTemplate.queryForObject("SELECT user_id FROM orders WHERE id = ?", Long.class, orderId);
+                        if (userId != null && !items.isEmpty()) {
+                            Long cartId = jdbcTemplate.queryForObject("SELECT id FROM carts WHERE user_id = ?", Long.class, userId);
+                            if (cartId != null) {
+                                for (Map<String, Object> item : items) {
+                                    Long pid = ((Number) item.get("product_id")).longValue();
+                                    jdbcTemplate.update("DELETE FROM cart_items WHERE cart_id = ? AND product_id = ?", cartId, pid);
+                                }
+                            }
+                        }
+                    } catch (Exception cartEx) {
+                        System.err.println("Cảnh báo dọn giỏ hàng thất bại: " + cartEx.getMessage());
+                    }
+
+                    return ResponseEntity.ok(Map.of(
+                        "success", true,
+                        "signatureValid", true,
+                        "message", "Thanh toán thành công!",
+                        "orderId", orderId
+                    ));
+                }
+                return ResponseEntity.badRequest().body(Map.of("success", false, "signatureValid", true, "message", "Không tìm thấy đơn hàng."));
+            } else {
+                // Thanh toán thất bại / bị hủy
+                jdbcTemplate.update("UPDATE orders SET status = 'Thanh toán thất bại', updated_at = CURRENT_TIMESTAMP WHERE id = ?", orderId);
+                return ResponseEntity.ok(Map.of(
+                    "success", false,
+                    "signatureValid", true,
+                    "message", "Giao dịch bị hủy hoặc lỗi.",
+                    "code", responseCode,
+                    "orderId", orderId
+                ));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(Map.of(
+                "success", false,
+                "signatureValid", false,
+                "message", "Lỗi xử lý thanh toán: " + e.getMessage()
+            ));
         }
     }
 }

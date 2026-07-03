@@ -1,112 +1,122 @@
-import { useMemo, useEffect } from 'react';
+import { useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Product } from '../types/model';
 
-
 export const PRICE_RANGES = [
-    { id: 'under-100', label: 'Dưới 100k', min: 0, max: 100000 },
-    { id: '100-500', label: '100k - 500k', min: 100000, max: 500000 },
-    { id: 'over-500', label: 'Trên 500k', min: 500000, max: Infinity },
+    { id: 'under-100', label: 'Dưới 100k',   min: 0,      max: 100000   },
+    { id: '100-500',   label: '100k - 500k',  min: 100000, max: 500000   },
+    { id: 'over-500',  label: 'Trên 500k',    min: 500000, max: Infinity },
 ];
 
-export const useProductFeatures = ({ products, itemsPerPage = 9 }: { products: Product[] | null, itemsPerPage?: number }) => {
+export const useProductFeatures = ({
+    products,
+    itemsPerPage = 8,
+}: {
+    products: Product[] | null;
+    itemsPerPage?: number;
+}) => {
     const [searchParams, setSearchParams] = useSearchParams();
 
-    const selectedCategoryId = searchParams.get('cat') || 'all';
+    // ── Đọc state từ URL (single source of truth) ──
+    const selectedCategoryId = searchParams.get('cat')    || 'all';
     const selectedPriceRange = searchParams.getAll('price');
-    const sortOption = searchParams.get('sort') || 'default';
-    const currentPage = parseInt(searchParams.get('page') || '1');
-    const searchQuery = searchParams.get('search') || '';
+    const sortOption         = searchParams.get('sort')   || 'default';
+    const searchQuery        = searchParams.get('search') || '';
+    const rawPage            = Number(searchParams.get('page') || '1');
 
-    // 1. Lọc sản phẩm
+    // ── 1. Lọc ──
     const filteredProducts = useMemo(() => {
         let result = products ?? [];
-        
-        // Lọc theo Search Query - Tìm kiếm trong nhiều trường
+
         if (searchQuery.trim()) {
-            const query = searchQuery.trim().toLowerCase();
-            result = result.filter(p => {
-                const nameMatch = p.name.toLowerCase().includes(query);
-                const descMatch = p.description.toLowerCase().includes(query);
-                const categoryMatch = p.category.toLowerCase().includes(query);
-                const priceMatch = !isNaN(Number(query)) && 
-                    p.price.toString().includes(query.replace(/[^\d]/g, ''));
-                const idMatch = !isNaN(Number(query)) && 
-                    p.id.toString().includes(query.replace(/[^\d]/g, ''));
-                return nameMatch || descMatch || categoryMatch || priceMatch || idMatch;
-            });
+            const q = searchQuery.trim().toLowerCase();
+            result = result.filter(p =>
+                p.name.toLowerCase().includes(q)        ||
+                p.description.toLowerCase().includes(q) ||
+                p.category.toLowerCase().includes(q)
+            );
         }
-        
+
         if (selectedCategoryId !== 'all') {
-            result = result.filter(p => p.categoryId.toString() === selectedCategoryId);
+            result = result.filter(
+                p => p.categoryId.toString() === selectedCategoryId
+            );
         }
+
         if (selectedPriceRange.length > 0) {
-            result = result.filter(product =>
-                selectedPriceRange.some(rangeId => {
-                    const range = PRICE_RANGES.find(r => r.id === rangeId);
-                    return range ? (product.price >= range.min && product.price < range.max) : false;
+            result = result.filter(p =>
+                selectedPriceRange.some(rid => {
+                    const range = PRICE_RANGES.find(r => r.id === rid);
+                    return range ? p.price >= range.min && p.price < range.max : false;
                 })
             );
         }
+
         return result;
     }, [products, searchQuery, selectedCategoryId, selectedPriceRange]);
 
-    // 2. Sắp xếp
+    // ── 2. Sắp xếp ──
     const sortedProducts = useMemo(() => {
-        const sorted = [...filteredProducts];
-        if (sortOption === 'price-asc') sorted.sort((a, b) => a.price - b.price);
-        if (sortOption === 'price-desc') sorted.sort((a, b) => b.price - a.price);
-        if (sortOption === 'name-asc') sorted.sort((a, b) => a.name.localeCompare(b.name));
-        return sorted;
+        const arr = [...filteredProducts];
+        if (sortOption === 'price-asc')  arr.sort((a, b) => a.price - b.price);
+        if (sortOption === 'price-desc') arr.sort((a, b) => b.price - a.price);
+        if (sortOption === 'name-asc')   arr.sort((a, b) => a.name.localeCompare(b.name));
+        return arr;
     }, [filteredProducts, sortOption]);
 
+    // ── 3. Phân trang — tính thuần túy, không side effect ──
     const totalCount = filteredProducts.length;
-    const totalPages = Math.ceil(totalCount / itemsPerPage);
-    console.log({ totalCount, itemsPerPage, totalPages }); // Xem kết quả ở Console
+    const totalPages = Math.max(1, Math.ceil(totalCount / itemsPerPage));
 
-    console.log({ totalCount, itemsPerPage, totalPages }); // Xem kết quả ở Console
-    // 3. Cập nhật URL
-    const updateParams = (key: string, value: string | string[] | null) => {
-        const newParams = new URLSearchParams(searchParams);
-        newParams.delete(key);
+    // Clamp page vào [1, totalPages] — không bao giờ ra ngoài
+    const currentPage = Math.min(
+        Math.max(1, isNaN(rawPage) ? 1 : rawPage),
+        totalPages
+    );
+
+    const startIdx       = (currentPage - 1) * itemsPerPage;
+    const currentProducts = sortedProducts.slice(startIdx, startIdx + itemsPerPage);
+
+    // ── 4. Helpers cập nhật URL ──
+    /** Thay đổi 1 param và reset page = 1 */
+    const updateFilter = (key: string, value: string | string[] | null) => {
+        const p = new URLSearchParams(searchParams);
+        p.delete(key);
         if (value && value !== 'all') {
-            if (Array.isArray(value)) value.forEach(v => newParams.append(key, v));
-            else newParams.set(key, value);
+            if (Array.isArray(value)) value.forEach(v => p.append(key, v));
+            else p.set(key, value);
         }
-        newParams.set('page', '1');
-        setSearchParams(newParams);
+        p.set('page', '1');   // <-- luôn về trang 1 khi đổi filter
+        setSearchParams(p, { replace: false });
     };
 
-    // Reset về trang 1 khi search query thay đổi
-    useEffect(() => {
-        if (searchQuery) {
-            const newParams = new URLSearchParams(searchParams);
-            newParams.set('page', '1');
-            setSearchParams(newParams);
-        }
-    }, [searchQuery, searchParams, setSearchParams]);
+    const setCurrentPage = (page: number) => {
+        const p = new URLSearchParams(searchParams);
+        p.set('page', page.toString());
+        setSearchParams(p, { replace: false });
+    };
 
     return {
-        searchQuery,
-        currentProducts: sortedProducts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage),
+        // Dữ liệu đã cắt đúng 8 sp cho trang hiện tại
+        currentProducts,
         totalCount,
         totalPages,
         currentPage,
+        // Params hiện tại
+        searchQuery,
         selectedCategoryId,
         selectedPriceRange,
         sortOption,
-        handleCategoryChange: (id: string) => updateParams('cat', id),
+        // Handlers
+        handleCategoryChange: (id: string) => updateFilter('cat', id),
         handlePriceChange: (id: string) => {
-            const next = selectedPriceRange.includes(id) 
-                ? selectedPriceRange.filter(p => p !== id) 
+            const next = selectedPriceRange.includes(id)
+                ? selectedPriceRange.filter(p => p !== id)
                 : [...selectedPriceRange, id];
-            updateParams('price', next);
+            updateFilter('price', next);
         },
-        handleSortChange: (e: any) => updateParams('sort', e.target.value),
-        setCurrentPage: (page: number) => {
-            const newParams = new URLSearchParams(searchParams);
-            newParams.set('page', page.toString());
-            setSearchParams(newParams);
-        }
+        handleSortChange: (e: React.ChangeEvent<HTMLSelectElement>) =>
+            updateFilter('sort', e.target.value),
+        setCurrentPage,
     };
 };

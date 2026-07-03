@@ -156,7 +156,7 @@ const Checkout: React.FC<CheckoutProps> = ({ currentUser }) => {
     }
 
     // 3. Lọc voucher an toàn
-    const filtered = filterVouchersForUser(vouchersRes.data, ordersData, finalTotal);
+    const filtered = filterVouchersForUser(vouchersRes.data, ordersData, finalTotal, currentUser?.id);
     setVouchers(filtered);
 
     // 4. Áp dụng tự động
@@ -353,13 +353,13 @@ const token = userStr ? JSON.parse(userStr).token : null;
                     <div className="product-name">
                       <span>{item.product?.name || item.productName}</span>
                       <span className="product-price">
-                        ₫{(item.product?.price || item.productPrice).toLocaleString('vi-VN')}
+                        {(item.product?.price || item.productPrice).toLocaleString('vi-VN')} VNĐ
                       </span>
                     </div>
                     <div className="product-quantity">Số lượng: {item.quantity}</div>
                   </div>
                   <div className="item-subtotal">
-                    ₫{((item.product?.price || item.productPrice) * item.quantity).toLocaleString('vi-VN')}
+                    {((item.product?.price || item.productPrice) * item.quantity).toLocaleString('vi-VN')} VNĐ
                   </div>
                 </div>
               ))}
@@ -435,18 +435,18 @@ const token = userStr ? JSON.parse(userStr).token : null;
               <div className="checkout-total">
                 <div className="total-row">
                   <span>Tạm tính</span>
-                  <span>{finalTotal.toLocaleString('vi-VN')}₫</span>
+                  <span>{finalTotal.toLocaleString('vi-VN')} VNĐ</span>
                 </div>
                 {discount > 0 && (
                   <div className="total-row discount">
                     <span>Mã giảm giá</span>
-                    <span>-{discount.toLocaleString('vi-VN')}₫</span>
+                    <span>-{discount.toLocaleString('vi-VN')} VNĐ</span>
                   </div>
                 )}
                 <div className="total-divider"></div>
                 <div className="total-row final">
                   <span>Tổng thanh toán</span>
-                  <span>{payableTotal.toLocaleString('vi-VN')}₫</span>
+                  <span>{payableTotal.toLocaleString('vi-VN')} VNĐ</span>
                 </div>
               </div>
 

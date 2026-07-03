@@ -6,17 +6,18 @@ import api from '../services/api';
 export const useProducts = () => {
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
-    const [error, setError] = useState<string | null>(null);
+    const [error, setError]     = useState<string | null>(null);
 
-    // 1. Hàm tải dữ liệu (Dùng useCallback để tránh tạo lại hàm vô ích)
     const fetchProducts = useCallback(async () => {
         setLoading(true);
+        setError(null);
         try {
             const data = await getProducts();
+            // getProducts luôn trả về [] nếu lỗi → setProducts an toàn
             setProducts(data);
         } catch (err) {
-            console.error("Lỗi tải sản phẩm:", err);
-            setError("Không thể tải danh sách sản phẩm.");
+            console.error('Lỗi tải sản phẩm:', err);
+            setError('Không thể tải danh sách sản phẩm.');
         } finally {
             setLoading(false);
         }
@@ -26,69 +27,56 @@ export const useProducts = () => {
         fetchProducts();
     }, [fetchProducts]);
 
-    // 2. Hàm cập nhật lượt xem VÀ cập nhật UI ngay lập tức
+    // Cập nhật lượt xem
     const updateProductView = async (product: Product) => {
         try {
             const response = await api.patch(`/products/${product.id}`, {
-                viewCount: (product.viewCount || 0) + 1 
+                viewCount: (product.viewCount || 0) + 1,
             });
-
-            // CẬP NHẬT STATE CỤC BỘ ĐỂ RENDER LẠI UI
-            setProducts(prevProducts => 
-                prevProducts.map(p => p.id === product.id ? response.data : p)
-            );
-
-            return response.data; 
-        } catch (error) {
-            console.error("Lỗi cập nhật lượt xem:", error);
-            throw error; 
+            if (!response?.data) return product;
+            setProducts(prev => prev.map(p => p.id === product.id ? response.data : p));
+            return response.data;
+        } catch (err) {
+            console.error('Lỗi cập nhật lượt xem:', err);
+            throw err;
         }
     };
 
-    // 3. Hàm giả lập mua hàng (Giảm inventory)
+    // Giảm inventory sau mua
     const updateInventory = async (productId: number, newInventory: number) => {
         try {
             const response = await api.patch(`/products/${productId}`, {
-                inventory: newInventory
+                inventory: newInventory,
             });
-
-            // Cập nhật state để Home render lại danh sách theo inventory mới
-            setProducts(prevProducts => 
-                prevProducts.map(p => p.id === productId ? response.data : p)
-            );
-        } catch (error) {
-            console.error("Lỗi cập nhật kho hàng:", error);
+            if (!response?.data) return;
+            setProducts(prev => prev.map(p => p.id === productId ? response.data : p));
+        } catch (err) {
+            console.error('Lỗi cập nhật kho hàng:', err);
         }
     };
 
-    return { 
-        products, 
-        loading, 
-        error, 
-        updateProductView, 
-        updateInventory, 
-        refreshProducts: fetchProducts 
+    return {
+        products,
+        loading,
+        error,
+        updateProductView,
+        updateInventory,
+        refreshProducts: fetchProducts,
     };
 };
 
-// --- CÁC HÀM HELPER GIỮ NGUYÊN ---
+// ── Helpers ──
 export const getTimeRemaining = (targetDate: Date) => {
-    const total = targetDate.getTime() - new Date().getTime();
-    const seconds = Math.max(Math.floor((total / 1000) % 60), 0);
-    const minutes = Math.max(Math.floor((total / 1000 / 60) % 60), 0);
-    const hours = Math.max(Math.floor((total / (1000 * 60 * 60)) % 24), 0);
-    const days = Math.max(Math.floor(total / (1000 * 60 * 60 * 24)), 0);
+    const total   = targetDate.getTime() - Date.now();
+    const seconds = Math.max(Math.floor((total / 1000)          % 60), 0);
+    const minutes = Math.max(Math.floor((total / 1000 / 60)     % 60), 0);
+    const hours   = Math.max(Math.floor((total / 3_600_000)     % 24), 0);
+    const days    = Math.max(Math.floor( total / 86_400_000),           0);
     return { total, days, hours, minutes, seconds };
 };
 
-export const calculateNewUserScore = (product: Product): number => {
-    // Inventory càng ít (bán chạy) thì điểm càng cao
-    const inventoryWeight = Math.max(0, 100 - (product.inventory || 0)); 
-    return (inventoryWeight * 2) ;
-};
+export const calculateNewUserScore = (product: Product): number =>
+    Math.max(0, 100 - (product.inventory || 0)) * 2;
 
-export const calculateMemberScore = (product: Product): number => {
-    const views = product.viewCount || 0;
-    const rating = product.rating || 0;
-    return (views * 3) + (rating * 10);
-};
+export const calculateMemberScore = (product: Product): number =>
+    (product.viewCount || 0) * 3 + (product.rating || 0) * 10;
