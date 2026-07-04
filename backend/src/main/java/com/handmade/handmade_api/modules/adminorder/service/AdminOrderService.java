@@ -200,7 +200,8 @@ public class AdminOrderService {
     private void validateStatusTransition(String oldStatus, String newStatus) {
         // Define valid status transitions
         Map<String, List<String>> validTransitions = Map.of(
-                "Chờ thanh toán", List.of("Đang xử lý", "Đã hủy"),
+                "Chờ thanh toán", List.of("Đã thanh toán", "Đang xử lý", "Đã hủy"),
+                "Đã thanh toán", List.of("Đang xử lý", "Đang giao hàng", "Đã hủy"),
                 "Đang xử lý", List.of("Đang giao hàng", "Đã hủy"),
                 "Đang giao hàng", List.of("Hoàn thành", "Đã hủy"),
                 "Hoàn thành", List.of(),

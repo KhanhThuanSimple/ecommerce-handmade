@@ -40,7 +40,7 @@ const navigation = [
     { name: 'Đơn Hàng',       href: '/admin/orders',     icon: ShoppingCartIcon },
     { name: 'Người Dùng',     href: '/admin/users',      icon: UsersIcon },
     { name: 'Mini Game',      href: '/admin/games',      icon: PuzzlePieceIcon },
-    { name: 'Thống Kê',       href: '/admin/analytics',  icon: ChartBarIcon },
+    { name: 'Ưu Đãi & Thanh Toán',       href: '/admin/analytics',  icon: ChartBarIcon },
     { name: 'Chatbox',        href: '/admin/promotions', icon: TagIcon },
     { name: 'Cài Đặt',        href: '/admin/settings',   icon: CogIcon },
 ];

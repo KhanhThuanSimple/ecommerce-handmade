@@ -55,6 +55,9 @@ const Users: React.FC = () => {
     const [showDeleteRoleConfirm, setShowDeleteRoleConfirm] = useState<boolean>(false);
     const [selectedRoleIdToDelete, setSelectedRoleIdToDelete] = useState<string>(''); // Lưu ID vai trò được chọn từ dropdown
     
+    // State quản lý tab hiển thị
+    const [activeTab, setActiveTab] = useState<'users' | 'roles'>('users');
+
     // State dữ liệu Form Thêm người dùng mới
     const [newUser, setNewUser] = useState({
         username: '',
@@ -174,7 +177,14 @@ const Users: React.FC = () => {
     };
 
     return (
-        <div className="users-page">
+        <div className="users-page modern-theme">
+            {/* Vòng sáng trang trí nền */}
+            <div className="bg-shape bg-shape-1"></div>
+            <div className="bg-shape bg-shape-2"></div>
+            <div className="bg-shape bg-shape-3"></div>
+            
+            <div className="users-content-wrapper">
+
             {/* 1. Header Section */}
             <div className="users-header">
                 <div className="users-title-wrapper">
@@ -231,17 +241,29 @@ const Users: React.FC = () => {
                 </div>
             </div>
 
-            {/* 3. Panel quản lý vai trò đã chuyển vào Panel phải bên dưới */}
+            {/* 3. Tabs Navigation */}
+            <div className="tabs-container">
+                <button 
+                    className={`tab-item ${activeTab === 'users' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('users')}
+                >
+                    <UserCircleIcon className="w-5 h-5 inline-icon-tab" />
+                    <span>Thông tin người dùng</span>
+                </button>
+                <button 
+                    className={`tab-item ${activeTab === 'roles' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('roles')}
+                >
+                    <ShieldCheckIcon className="w-5 h-5 inline-icon-tab" />
+                    <span>Vai trò hệ thống</span>
+                </button>
+            </div>
 
-            {/* ══════════════════════════════════════════════════════
-                SINGLE-PANEL LAYOUT
-                - Block A (trên): Vai trò hệ thống
-                - Block B (dưới): Bảng thông tin người dùng + vai trò
-            ══════════════════════════════════════════════════════ */}
             <div className="users-single-panel">
 
                 {/* ─── BLOCK A: VAI TRÒ HỆ THỐNG ─── */}
-                <div className="usp-block usp-block--roles">
+                {activeTab === 'roles' && (
+                <div className="usp-block usp-block--roles fade-in">
                     <div className="usp-block-header">
                         <ShieldCheckIcon className="panel-header-icon" />
                         <div>
@@ -299,9 +321,11 @@ const Users: React.FC = () => {
                         </div>
                     </div>
                 </div>
+                )}
 
                 {/* ─── BLOCK B: BẢNG NGƯỜI DÙNG (vai trò gộp vào) ─── */}
-                <div className="usp-block usp-block--users">
+                {activeTab === 'users' && (
+                <div className="usp-block usp-block--users fade-in">
                     <div className="usp-block-header">
                         <UserCircleIcon className="panel-header-icon" />
                         <div>
@@ -481,8 +505,11 @@ const Users: React.FC = () => {
                         </div>
                     )}
                 </div>
+                )}
 
             </div>{/* end .users-single-panel */}
+            
+            </div>{/* end .users-content-wrapper */}
 
             {/* CỬA SỔ MODAL 1: Thêm Người Dùng Mới */}
             {showAddModal && (

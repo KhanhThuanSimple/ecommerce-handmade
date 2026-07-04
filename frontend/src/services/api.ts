@@ -62,7 +62,7 @@ const getAdminIdForRequest = () => {
  */
 const api = axios.create({
     baseURL: process.env.REACT_APP_API_URL || '/api',
-    timeout: 15000, // tăng timeout tránh false cancel
+    timeout: 60000, // Tăng lên 60s để AI local có đủ thời gian suy nghĩ
     headers: {
         'Content-Type': 'application/json',
     },

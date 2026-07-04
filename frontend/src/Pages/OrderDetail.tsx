@@ -46,13 +46,19 @@ const OrderDetail: React.FC = () => {
 
     if (!order) return <div className="loading">Đang tải...</div>;
 
+    const m = (order.paymentMethod ?? '').toUpperCase().trim();
+    const isVnPay = m === 'VNPAY' || m === 'VN PAY';
+
     // ── Payment status badge ──
     const renderPaymentStatus = () => {
+        if (isVnPay) {
+            return <span className="pill-status-btn paid">✓ Đã thanh toán VNPay</span>;
+        }
         if (isPaidStatus(order.status)) {
             return <span className="pill-status-btn paid">✓ Đã thanh toán</span>;
         }
         if (isCodStatus(order.status)) {
-            return <span className="pill-status-btn cod">Thanh toán khi nhận hàng</span>;
+            return <span className="pill-status-btn cod">Thanh toán COD</span>;
         }
         if (isFailedStatus(order.status)) {
             return (
@@ -87,6 +93,13 @@ const OrderDetail: React.FC = () => {
 
     // ── Order status badge ──
     const renderOrderStatus = () => {
+        if (isVnPay) {
+            return (
+                <span className={`pill-status-btn status-sync paid-style`}>
+                    Đã thanh toán VNPay
+                </span>
+            );
+        }
         const cfg = STATUS_CONFIG[order.status];
         const label    = cfg?.label    ?? order.status;
         const cssClass = cfg?.cssClass ?? 'pending';

@@ -7,17 +7,24 @@ import '../Styles/orders.css';
 interface OrderHistoryProps { currentUser: User | null; }
 
 // ── Mapping trạng thái → badge CSS class ──────────────────
-const getStatusBadge = (status: string): { label: string; cls: string } => {
+const getStatusBadge = (status: string, method: string): { label: string; cls: string } => {
     const s = (status ?? '').toLowerCase().trim();
+    const m = (method ?? '').toUpperCase().trim();
 
-    if (['đã thanh toán', 'paid', 'completed', 'hoàn thành'].includes(s))
-        return { label: status, cls: 'paid' };
+    // Ưu tiên hiển thị Đã thanh toán VNPay cho mọi đơn VNPAY
+    if (m === 'VNPAY' || m === 'VN PAY') {
+        return { label: 'Đã thanh toán VNPay', cls: 'paid' };
+    }
+
+    if (['đã thanh toán', 'paid', 'completed', 'hoàn thành'].includes(s)) {
+        return { label: 'Đã thanh toán', cls: 'paid' };
+    }
 
     if (s === 'chờ thanh toán' || s === 'pending')
         return { label: 'Chờ thanh toán', cls: 'pending' };
 
     if (s === 'thanh toán khi nhận hàng' || s === 'cod')
-        return { label: 'Thanh toán khi nhận hàng', cls: 'cod' };
+        return { label: 'Thanh toán COD', cls: 'cod' };
 
     if (['thanh toán thất bại', 'failed', 'đã hủy'].includes(s))
         return { label: status, cls: 'failed' };
@@ -77,14 +84,19 @@ const OrderHistory: React.FC<OrderHistoryProps> = ({ currentUser }) => {
                     </thead>
                     <tbody>
                         {orders.length > 0 ? orders.map((order, index) => {
-                            const badge = getStatusBadge(order.status);
+                            const badge = getStatusBadge(order.status, order.paymentMethod);
                             return (
                                 <tr key={order.id}>
                                     <td>{index + 1}</td>
                                     <td className="order-id-cell">
                                         #{order.id?.split('-')[1] || order.id}
                                     </td>
-                                    <td>{order.date}</td>
+                                    <td className="date-cell">
+                                        {new Date(order.date).toLocaleString('vi-VN', {
+                                            day: '2-digit', month: '2-digit', year: 'numeric',
+                                            hour: '2-digit', minute: '2-digit'
+                                        })}
+                                    </td>
                                     <td>
                                         <span className={`pay-tag ${order.paymentMethod?.toLowerCase()}`}>
                                             {order.paymentMethod}

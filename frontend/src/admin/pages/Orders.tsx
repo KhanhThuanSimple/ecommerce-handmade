@@ -127,7 +127,7 @@ const PaymentMethodBadge: React.FC<{ method: string }> = ({ method }) => {
     const normalized = method?.toUpperCase() || '';
     
     if (normalized === 'COD') return { label: 'COD - Thanh toán khi nhận', icon: '💵', class: 'method-cod' };
-    if (normalized === 'VNPAY') return { label: 'VNPay', icon: '🏦', class: 'method-vnpay' };
+    if (normalized === 'VNPAY') return { label: 'VNPay-Đã thanh toán', icon: '🏦', class: 'method-vnpay' };
     if (normalized.includes('MOMO')) return { label: 'MoMo', icon: '📱', class: 'method-momo' };
     
     return { label: method || 'Khác', icon: '💳', class: 'method-default' };
@@ -153,7 +153,7 @@ const UpdateStatusModal: React.FC<{
   const [loading, setLoading] = useState(false);
 
   const STATUS_OPTIONS = [
-    'Chờ thanh toán', 'Đã thanh toán', 'Đang xử lý', 'Đang giao hàng', 'Hoàn thành'
+    'Đã thanh toán', 'Đang xử lý', 'Đang giao hàng', 'Hoàn thành'
   ];
 
   if (!isOpen || !order) return null;
@@ -509,7 +509,6 @@ const Orders: React.FC = () => {
         {summary ? (
           <>
             <div className="stat-card"><div className="stat-value">{summary.totalOrders ?? 0}</div><div className="stat-label">Tổng đơn</div></div>
-            <div className="stat-card"><div className="stat-value">{summary.totalRevenue != null ? formatCurrency(summary.totalRevenue) : '0 ₫'}</div><div className="stat-label">Doanh thu</div></div>
             <div className="stat-card"><div className="stat-value">{summary.pendingOrders ?? 0}</div><div className="stat-label">Chờ thanh toán</div></div>
             <div className="stat-card"><div className="stat-value">{summary.processingOrders ?? 0}</div><div className="stat-label">Đang xử lý</div></div>
             <div className="stat-card"><div className="stat-value">{summary.completedOrders ?? 0}</div><div className="stat-label">Hoàn thành</div></div>

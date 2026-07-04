@@ -3,6 +3,7 @@
 /* FLOAT BUTTON */
 .chat-float-btn {
   position: fixed;
+  margin-bottom: 120px;
   bottom: var(--sp-10);
   right: var(--sp-6);
   width: 54px; height: 54px;

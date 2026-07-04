@@ -12,20 +12,20 @@
 
 :root {
   /* ══════════════════════════════════════════
-     BRAND — 10% điểm nhấn
-     Đỏ gạch truyền thống + vàng đồng mỹ nghệ
+     BRAND — 10% điểm nhấn (Chủ đề Trung Thu)
+     Đêm thu (Deep Navy) + Vàng trăng rằm (Amber)
   ══════════════════════════════════════════ */
-  --brand-primary:        #b5341c;   /* đỏ gạch — chủ đạo */
-  --brand-primary-hover:  #952a15;   /* hover đậm hơn */
-  --brand-primary-light:  #fef0ed;   /* tint nhạt background */
-  --brand-primary-soft:   #fad9d2;   /* soft tint cho border/tag */
+  --brand-primary:        #2b4162;   /* Đêm thu (Deep Navy) — chủ đạo */
+  --brand-primary-hover:  #1b264f;   /* hover đậm hơn */
+  --brand-primary-light:  #f0f4f8;   /* tint nhạt background */
+  --brand-primary-soft:   #d9e2ec;   /* soft tint cho border/tag */
 
-  --brand-accent:         #c8900c;   /* vàng đồng */
-  --brand-accent-hover:   #a87309;
-  --brand-accent-light:   #fef7e6;
-  --brand-accent-soft:    #f5dcaa;
+  --brand-accent:         #f59e0b;   /* Vàng trăng rằm (Amber) */
+  --brand-accent-hover:   #d97706;
+  --brand-accent-light:   #fef3c7;
+  --brand-accent-soft:    #fde68a;
 
-  --brand-orange:         #d96b1a;   /* cam ấm — phụ trợ */
+  --brand-orange:         #ea580c;   /* Đèn lồng (Orange) — phụ trợ */
 
   /* ══════════════════════════════════════════
      NEUTRAL 60% + 30% — nền & bề mặt

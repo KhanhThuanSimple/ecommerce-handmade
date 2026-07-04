@@ -2,9 +2,7 @@
 
 .order-mgmt-wrapper {
   width: 100%;
-  max-width: var(--container-xl);
-  margin: var(--sp-10) auto;
-  padding: 0 var(--sp-6);
+  max-width: 100%;
 }
 
 .order-mgmt-header {
@@ -38,24 +36,25 @@
 .order-dashboard-table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 640px;
+  table-layout: auto;
 }
 
 .order-dashboard-table th {
   background: var(--gray-50);
-  padding: var(--sp-3) var(--sp-4);
+  padding: var(--sp-3) var(--sp-2);
   text-align: left;
   color: var(--text-muted);
   font-size: var(--text-xs);
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.07em;
+  letter-spacing: 0.05em;
   border-bottom: 1.5px solid var(--border-color);
-  white-space: nowrap;
+  white-space: normal;
+  word-break: break-word;
 }
 
 .order-dashboard-table td {
-  padding: var(--sp-4);
+  padding: var(--sp-3) var(--sp-2);
   border-bottom: 1px solid var(--border-color);
   vertical-align: middle;
   font-size: var(--text-sm);
@@ -100,8 +99,10 @@
   border-radius: var(--r-full);
   font-size: var(--text-xs);
   font-weight: 700;
-  white-space: nowrap;
+  white-space: normal;
+  text-align: center;
   min-width: 88px;
+  line-height: 1.4;
 }
 
 .status-badge.pending {
@@ -109,14 +110,21 @@
   color: var(--color-warning);
 }
 
-.status-badge.completed {
+.status-badge.completed,
+.status-badge.paid {
   background: var(--color-success-bg);
   color: var(--color-success);
 }
 
-.status-badge.cancelled {
+.status-badge.cancelled,
+.status-badge.failed {
   background: var(--color-error-bg);
   color: var(--color-error);
+}
+
+.status-badge.cod {
+  background: var(--color-info-bg);
+  color: var(--color-info);
 }
 
 .detail-btn {
@@ -144,6 +152,21 @@
   padding: var(--sp-10) !important;
   color: var(--text-muted);
   font-style: italic;
+}
+
+@media (max-width: 768px) {
+  .order-dashboard-table {
+    min-width: 100%;
+  }
+  .order-dashboard-table th, .order-dashboard-table td {
+    padding: var(--sp-2) var(--sp-1);
+    font-size: 0.75rem;
+  }
+  .status-badge {
+    padding: 4px 8px;
+    font-size: 0.7rem;
+    min-width: 0;
+  }
 }
 
 @media (max-width: 640px) {

@@ -136,7 +136,7 @@ const LuckyWheel: React.FC<LuckyWheelProps> = ({ currentUser }) => {
               <p className="status-msg info">📅 Bạn đã quay hôm nay. Hẹn gặp lại ngày mai!</p>
             )}
             {currentUser && canSpin && !spinning && (
-              <p className="status-msg info">🎉 Bạn có 1 lượt quay miễn phí hôm nay!</p>
+              <p className="status-msg info">🎉 Bạn có 1 lượt quay miễn phí mỗi ngày!</p>
             )}
             <button 
               onClick={() => {
@@ -171,75 +171,80 @@ const LuckyWheel: React.FC<LuckyWheelProps> = ({ currentUser }) => {
           </div>
         </div>
 
-        {/* Phần bên phải: Danh sách giải thưởng & Kết quả */}
+        {/* Phần bên phải: Danh sách giải thưởng */}
         <div className="prize-section">
-          {result && showResult ? (
-            <div className="result-highlight">
-              <div className="highlight-header">
-                <h3><span className="icon">🎉</span> Chúc mừng!</h3>
-                <p>Bạn đã trúng giải thưởng đặc quyền</p>
+          <div className="prize-list">
+            <div className="list-header">
+              <h3><span className="icon">🏆</span> Cơ cấu giải thưởng</h3>
+              <p className="subtitle">Danh sách quà tặng có thể nhận được</p>
+            </div>
+            
+            <div className="prize-grid">
+              {prizes.map((prize, index) => (
+                <div 
+                  key={prize.id} 
+                  className={`prize-card ${highlightedPrize === index ? 'highlighted' : ''}`}
+                  style={{
+                    borderLeft: `4px solid ${prize.color}`
+                  }}
+                >
+                  <div className="prize-icon">{prize.icon}</div>
+                  <div className="prize-card-info">
+                    <h4>{prize.name}</h4>
+                    <p>{prize.description}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="game-info">
+              <div className="info-item">
+                <span className="info-icon">🎁</span>
+                <strong>Mỗi ngày 1 lượt</strong>
               </div>
-              
-              <div className="prize-icon-large">{result.icon}</div>
+              <div className="info-item">
+                <span className="info-icon">⚡</span>
+                <strong>100% trúng thưởng</strong>
+              </div>
+              <div className="info-item">
+                <span className="info-icon">📅</span>
+                <strong>Voucher cá nhân</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Modal Kết Quả (Popup style Shopee/Lazada) */}
+      {result && showResult && (
+        <div className="lucky-modal-overlay">
+          <div className="lucky-modal-content">
+            <div className="lucky-modal-header">
+              <h3><span className="icon">🎉</span> Chúc mừng bạn!</h3>
+              <button className="lucky-modal-close" onClick={closeResult}>&times;</button>
+            </div>
+            <div className="lucky-modal-body">
+              <div className="prize-icon-huge">{result.icon}</div>
               <h4>{result.name}</h4>
               <p className="prize-description">{result.description}</p>
               
-              <div className="highlight-actions">
-                <button className="btn-primary" onClick={() => navigate('/')}>
-                  <span className="icon">🛒</span> Tiếp tục mua sắm
-                </button>
+              <div className="highlight-note">
+                {result.type === 'points' ? 'Điểm đã được cộng vào tài khoản của bạn.' : 'Voucher đã được thêm vào "Voucher của tôi" và chỉ dành riêng cho bạn.'}
+              </div>
+            </div>
+            <div className="lucky-modal-footer">
+              <button className="btn-primary" onClick={() => navigate('/')}>
+                <span className="icon">🛒</span> Tiếp tục mua sắm
+              </button>
+              {result.type !== 'points' && (
                 <button className="btn-secondary" onClick={() => navigate('/profile')}>
                   <span className="icon">🎟️</span> Xem voucher của tôi
                 </button>
-              </div>
-              
-              <div className="highlight-note">
-                Voucher đã được thêm vào "Voucher của tôi"
-              </div>
+              )}
             </div>
-          ) : (
-            <div className="prize-list">
-              <div className="list-header">
-                <h3><span className="icon">🏆</span> Cơ cấu giải thưởng</h3>
-                <p className="subtitle">Danh sách quà tặng có thể nhận được</p>
-              </div>
-              
-              <div className="prize-grid">
-                {prizes.map((prize, index) => (
-                  <div 
-                    key={prize.id} 
-                    className={`prize-card ${highlightedPrize === index ? 'highlighted' : ''}`}
-                    style={{
-                      borderLeft: `4px solid ${prize.color}`
-                    }}
-                  >
-                    <div className="prize-icon">{prize.icon}</div>
-                    <div className="prize-card-info">
-                      <h4>{prize.name}</h4>
-                      <p>{prize.description}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="game-info">
-                <div className="info-item">
-                  <span className="info-icon">🎁</span>
-                  <strong>Mỗi ngày 1 lượt</strong>
-                </div>
-                <div className="info-item">
-                  <span className="info-icon">⚡</span>
-                  <strong>100% trúng thưởng</strong>
-                </div>
-                <div className="info-item">
-                  <span className="info-icon">📅</span>
-                  <strong>Hạn dùng 30 ngày</strong>
-                </div>
-              </div>
-            </div>
-          )}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

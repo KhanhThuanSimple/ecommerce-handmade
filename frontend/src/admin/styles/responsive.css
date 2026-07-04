@@ -42,7 +42,7 @@
 /* HIGH CONTRAST */
 @media (prefers-contrast: high) {
   :root {
-    --primary-red: #cc0000;
+    --primary-red: #1a237e;
     --border-color: #888;
     --gray-200: #ccc;
   }

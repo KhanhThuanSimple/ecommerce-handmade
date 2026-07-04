@@ -1,35 +1,52 @@
-/* ── LUCKY WHEEL ── */
+/* ── LUCKY WHEEL (FESTIVE E-COMMERCE STYLE) ── */
 
 .lucky-wheel-game {
-  max-width: 1400px;
-  margin: 0 auto;
+  width: 100%;
+  min-height: calc(100vh - 80px);
   padding: var(--sp-8) var(--sp-6);
   font-family: var(--font-sans);
+  background: radial-gradient(circle at center, #8e0000 0%, #4a0000 100%);
+  position: relative;
+  overflow: hidden;
 }
 
-/* LAYOUT */
+/* Add some floating festive elements (lights/confetti) */
+.lucky-wheel-game::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image: 
+    radial-gradient(circle at 15% 20%, rgba(255, 215, 0, 0.15) 0%, transparent 20%),
+    radial-gradient(circle at 85% 80%, rgba(255, 215, 0, 0.15) 0%, transparent 20%);
+  pointer-events: none;
+}
+
 .wheel-container {
   display: flex;
-  gap: var(--sp-10);
+  gap: var(--sp-8);
   align-items: flex-start;
-  min-height: 660px;
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
 }
 
 .wheel-section {
-  flex: 1;
+  flex: 1.2;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: var(--sp-8);
-  background: var(--surface-card);
-  border-radius: var(--r-2xl);
-  border: 1px solid var(--border-color);
-  box-shadow: var(--shadow-md);
+  padding: var(--sp-10) var(--sp-8);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: var(--r-3xl);
+  border: 4px solid rgba(255, 215, 0, 0.5); /* Gold border */
+  box-shadow: 0 20px 40px rgba(0,0,0,0.4), inset 0 0 20px rgba(255, 215, 0, 0.2);
 }
 
 .prize-section {
-  flex: 1;
+  flex: 0.8;
   display: flex;
   flex-direction: column;
   gap: var(--sp-6);
@@ -125,14 +142,14 @@
   margin: var(--sp-5) 0;
 }
 
-canvas {
+.wheel-box canvas {
   border-radius: var(--r-full);
   background: transparent;
   transition: box-shadow var(--ease-base);
   box-shadow: var(--shadow-xl), 0 0 0 4px var(--brand-accent-light);
 }
 
-canvas.spinning {
+.wheel-box canvas.spinning {
   animation: wheelGlow 1.5s ease-in-out infinite;
 }
 
@@ -394,11 +411,12 @@ canvas.spinning {
 
 /* PRIZE LIST */
 .prize-list {
-  background: var(--surface-card);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
   border-radius: var(--r-2xl);
-  padding: var(--sp-6);
-  border: 1px solid var(--border-color);
-  box-shadow: var(--shadow-sm);
+  padding: var(--sp-8);
+  border: 4px solid rgba(255, 215, 0, 0.5); /* Gold border */
+  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
 }
 
 .list-header {
@@ -426,87 +444,102 @@ canvas.spinning {
 }
 
 .prize-card {
-  background: var(--surface-card);
+  background: #ffffff;
   border-radius: var(--r-xl);
-  border: 2px solid;
+  border: 1px solid var(--border-color);
   overflow: hidden;
   transition: all var(--ease-spring);
+  display: flex;
+  align-items: center;
+  padding: var(--sp-3) var(--sp-4);
+  gap: var(--sp-3);
 }
 
 .prize-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
 .prize-card.highlighted {
   animation: highlightPrize 1.5s ease-in-out infinite;
   position: relative;
   z-index: 2;
+  border-color: var(--brand-primary);
 }
 
 @keyframes highlightPrize {
   0%, 100% { transform: translateY(0); box-shadow: var(--shadow-md); }
-  50%       { transform: translateY(-6px); box-shadow: var(--shadow-xl); }
+  50%       { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
 }
 
-.card-header {
-  padding: var(--sp-5);
-  text-align: center;
+.prize-icon {
+  font-size: 2rem;
+  line-height: 1;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+}
+
+.prize-card-info {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: var(--sp-2);
 }
 
-.card-header .prize-icon { font-size: 2rem; }
-
-.card-header h4 {
-  font-size: var(--text-base);
+.prize-card-info h4 {
+  font-size: var(--text-sm);
   font-weight: 700;
-  margin: 0;
+  margin: 0 0 2px 0;
   color: var(--text-primary);
+  line-height: 1.2;
 }
 
-.card-body { padding: var(--sp-5); }
+.prize-card-info p {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
 
 /* GAME INFO */
 .game-info {
-  background: var(--surface-card);
-  border-radius: var(--r-2xl);
-  padding: var(--sp-6);
-  border: 1px solid var(--border-color);
-  box-shadow: var(--shadow-sm);
+  margin-top: var(--sp-6);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: var(--r-xl);
+  padding: var(--sp-4);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  gap: var(--sp-2);
 }
 
 .info-item {
   display: flex;
-  align-items: flex-start;
-  gap: var(--sp-4);
-  padding: var(--sp-4) 0;
-  border-bottom: 1px solid var(--border-color);
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--sp-2);
 }
 
-.info-item:last-child { border-bottom: none; }
-
 .info-item .info-icon {
-  font-size: 1.4rem;
-  color: var(--brand-primary);
-  flex-shrink: 0;
+  font-size: 1.5rem;
+  background: #fff;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--r-full);
+  box-shadow: var(--shadow-sm);
 }
 
 .info-item strong {
   display: block;
   color: var(--text-primary);
-  margin-bottom: var(--sp-1);
-  font-size: var(--text-sm);
+  font-size: 11px;
   font-weight: 700;
-}
-
-.info-item p {
-  color: var(--text-muted);
-  font-size: var(--text-sm);
-  margin: 0;
-  line-height: 1.5;
+  text-transform: uppercase;
 }
 
 /* RESPONSIVE */
@@ -525,7 +558,7 @@ canvas.spinning {
   .prize-grid { grid-template-columns: repeat(2, 1fr); }
   .highlight-prize { flex-direction: column; text-align: center; }
   .wheel-box { width: 300px; height: 300px; }
-  canvas { width: 300px !important; height: 300px !important; }
+  .wheel-box canvas { width: 300px !important; height: 300px !important; }
   .highlight-actions { flex-direction: column; }
   .pointer-container { left: 83%; }
 }
@@ -533,5 +566,105 @@ canvas.spinning {
 @media (max-width: 480px) {
   .prize-grid { grid-template-columns: 1fr; }
   .wheel-box { width: 280px; height: 280px; }
-  canvas { width: 280px !important; height: 280px !important; }
 }
+
+/* MODAL KẾT QUẢ SHOPEE/LAZADA STYLE */
+.lucky-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.lucky-modal-content {
+  background: #fff;
+  border-radius: var(--r-2xl);
+  width: 90%;
+  max-width: 480px;
+  overflow: hidden;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.lucky-modal-header {
+  background: linear-gradient(135deg, var(--brand-primary), var(--brand-orange));
+  padding: var(--sp-6) var(--sp-8);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #fff;
+}
+
+.lucky-modal-header h3 {
+  margin: 0;
+  font-size: var(--text-2xl);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.lucky-modal-close {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 2rem;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+  line-height: 1;
+}
+
+.lucky-modal-close:hover {
+  opacity: 1;
+}
+
+.lucky-modal-body {
+  padding: var(--sp-8);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-4);
+}
+
+.prize-icon-huge {
+  font-size: 5rem;
+  line-height: 1;
+  margin-bottom: var(--sp-2);
+  filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));
+  animation: bounce 2s infinite;
+}
+
+.lucky-modal-body h4 {
+  font-size: var(--text-xl);
+  color: var(--text-primary);
+  margin: 0;
+  font-weight: 700;
+}
+
+.lucky-modal-footer {
+  padding: var(--sp-6) var(--sp-8);
+  background: var(--surface-sunken);
+  display: flex;
+  gap: var(--sp-4);
+  justify-content: center;
+}
+
+@keyframes popIn {
+  from { transform: scale(0.8); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(-5%); }
+  50% { transform: translateY(5%); }
+}
+

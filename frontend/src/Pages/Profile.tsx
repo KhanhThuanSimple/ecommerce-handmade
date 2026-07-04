@@ -118,8 +118,7 @@ const Profile: React.FC<ProfileProps> = ({ currentUser, onLogout }) => {
 
                     {/* Section Đơn hàng */}
                     {activeSection === 'orders' && (
-                        <div className="profile-card">
-                            <h3 className="section-title">Lịch sử đơn hàng</h3>
+                        <div className="profile-card" style={{ padding: 'var(--sp-6)' }}>
                             <OrderHistory currentUser={currentUser} />
                         </div>
                     )}

@@ -55,12 +55,15 @@ public class ChatController {
         // Lấy hoặc tạo session
         ChatSession session = chatService.getOrCreateSession(userId);
 
+        // Lấy lịch sử chat (những câu đã nói trước đó)
+        java.util.List<com.handmade.handmade_api.modules.chatbox.entity.ChatMessage> history = chatService.getChatHistory(session.getId());
+
         // Lưu user message
         chatService.saveMessage(session.getId(), "USER", request.getMessage());
 
         // Lấy ngữ cảnh & Gọi AI
         String context = aiChatService.getContextData(request.getMessage());
-        String botResponse = aiChatService.generateResponse(request.getMessage(), context);
+        String botResponse = aiChatService.generateResponse(request.getMessage(), context, history);
 
         // Lưu bot message
         chatService.saveMessage(session.getId(), "BOT", botResponse);

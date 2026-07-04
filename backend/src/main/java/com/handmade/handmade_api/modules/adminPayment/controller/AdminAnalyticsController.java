@@ -36,11 +36,11 @@ public class AdminAnalyticsController {
             }
 
             // A. Tính toán doanh thu thực tế dựa trên khoảng thời gian
-            String sqlRevenue = "SELECT COALESCE(SUM(payable_amount), 0) FROM orders " + timeCondition + " AND status = 'COMPLETED'";
+            String sqlRevenue = "SELECT COALESCE(SUM(payable_amount), 0) FROM orders " + timeCondition + " AND status IN ('COMPLETED', 'Hoàn thành', 'Đã thanh toán', 'Thanh toán khi nhận hàng')";
             Double totalRevenue = jdbcTemplate.queryForObject(sqlRevenue, Double.class);
 
             // B. Tổng số đơn thành công trong kỳ
-            String sqlSuccessOrders = "SELECT COUNT(*) FROM orders " + timeCondition + " AND status = 'COMPLETED'";
+            String sqlSuccessOrders = "SELECT COUNT(*) FROM orders " + timeCondition + " AND status IN ('COMPLETED', 'Hoàn thành', 'Đã thanh toán', 'Thanh toán khi nhận hàng')";
             Integer successOrdersCount = jdbcTemplate.queryForObject(sqlSuccessOrders, Integer.class);
 
             // C. Tổng số đơn phát sinh (để tính toán tỷ lệ vận hành)
@@ -48,7 +48,7 @@ public class AdminAnalyticsController {
             Integer totalOrdersCount = jdbcTemplate.queryForObject(sqlTotalOrders, Integer.class);
 
             // D. Số lượng khách mua thực tế (Active Customers)
-            String sqlActiveCustomers = "SELECT COUNT(DISTINCT user_id) FROM orders " + timeCondition + " AND status = 'COMPLETED'";
+            String sqlActiveCustomers = "SELECT COUNT(DISTINCT user_id) FROM orders " + timeCondition + " AND status IN ('COMPLETED', 'Hoàn thành', 'Đã thanh toán', 'Thanh toán khi nhận hàng')";
             Integer activeCustomers = jdbcTemplate.queryForObject(sqlActiveCustomers, Integer.class);
 
             // E. Tổng thành viên hệ thống (Không lọc thời gian để giữ số quy mô tổng)
@@ -56,7 +56,7 @@ public class AdminAnalyticsController {
             Integer totalUsers = jdbcTemplate.queryForObject(sqlTotalUsers, Integer.class);
 
             // F. Đếm số đơn hủy / lỗi
-            String sqlCanceledOrders = "SELECT COUNT(*) FROM orders " + timeCondition + " AND status IN ('CANCELED', 'FAILED')";
+            String sqlCanceledOrders = "SELECT COUNT(*) FROM orders " + timeCondition + " AND status IN ('CANCELED', 'FAILED', 'Đã hủy', 'Thanh toán thất bại')";
             Integer canceledOrdersCount = jdbcTemplate.queryForObject(sqlCanceledOrders, Integer.class);
 
             // --- TÍNH TOÁN CÁC CHỈ SỐ KINH DOANH SÂU ---
@@ -88,7 +88,7 @@ public class AdminAnalyticsController {
                     "SUM(oi.quantity) as total_quantity_sold, " +
                     "SUM(oi.price * oi.quantity) as total_revenue_generated " +
                     "FROM order_items oi JOIN orders o ON oi.order_id = o.id " +
-                    "WHERE o.status = 'COMPLETED' " +
+                    "WHERE o.status IN ('COMPLETED', 'Hoàn thành', 'Đã thanh toán', 'Thanh toán khi nhận hàng') " +
                     "GROUP BY oi.product_id, oi.product_name " +
                     "ORDER BY total_revenue_generated DESC LIMIT 5";
 
@@ -125,7 +125,7 @@ public class AdminAnalyticsController {
         try {
             String sql = "SELECT DATE(created_at) as date_label, COALESCE(SUM(payable_amount), 0) as daily_revenue " +
                     "FROM orders " +
-                    "WHERE status = 'COMPLETED' AND created_at >= CURRENT_DATE - INTERVAL '30 days' " +
+                    "WHERE status IN ('COMPLETED', 'Hoàn thành', 'Đã thanh toán', 'Thanh toán khi nhận hàng') AND created_at >= CURRENT_DATE - INTERVAL '30 days' " +
                     "GROUP BY DATE(created_at) " +
                     "ORDER BY date_label ASC";
 
@@ -151,7 +151,7 @@ public class AdminAnalyticsController {
                     "  SELECT u.id, COUNT(o.id) as order_count " +
                     "  FROM users u " +
                     "  JOIN user_roles ur ON u.id = ur.user_id " +
-                    "  LEFT JOIN orders o ON u.id = o.user_id AND o.status = 'COMPLETED' " +
+                    "  LEFT JOIN orders o ON u.id = o.user_id AND o.status IN ('COMPLETED', 'Hoàn thành', 'Đã thanh toán', 'Thanh toán khi nhận hàng') " +
                     "  WHERE ur.role_id = 4 " +
                     "  GROUP BY u.id" +
                     ") as user_order_stats";
@@ -212,6 +212,238 @@ public class AdminAnalyticsController {
             return ResponseEntity.ok(metrics);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Lỗi phân tích dữ liệu giỏ hàng rác: " + e.getMessage());
+        }
+    }
+
+    // ==============================================================================
+    // HANDMADE DASHBOARD APIs (Mới nhất)
+    // ==============================================================================
+
+    @GetMapping("/handmade-kpi")
+    public ResponseEntity<?> getHandmadeKpi() {
+        try {
+            String sqlUsers = "SELECT COUNT(*) FROM users u JOIN user_roles ur ON u.id = ur.user_id WHERE ur.role_id = 4";
+            Integer totalUsers = jdbcTemplate.queryForObject(sqlUsers, Integer.class);
+
+            String sqlProducts = "SELECT COUNT(*) FROM products WHERE status = 'active'";
+            Integer totalProducts = jdbcTemplate.queryForObject(sqlProducts, Integer.class);
+
+            String sqlOrders = "SELECT COUNT(*) FROM orders";
+            Integer totalOrders = jdbcTemplate.queryForObject(sqlOrders, Integer.class);
+
+            String sqlRevenue = "SELECT COALESCE(SUM(payable_amount), 0) FROM orders WHERE status IN ('COMPLETED', 'Hoàn thành', 'Đã thanh toán', 'Thanh toán khi nhận hàng')";
+            Double totalRevenue = jdbcTemplate.queryForObject(sqlRevenue, Double.class);
+
+            Integer totalReviews = 0;
+            try {
+                totalReviews = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM reviews", Integer.class);
+            } catch (Exception e) {}
+
+            Integer totalWishlists = 0;
+            try {
+                totalWishlists = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM user_wishlist_items", Integer.class);
+            } catch (Exception e) {}
+
+            String sqlTodayOrders = "SELECT COUNT(*) FROM orders WHERE DATE(created_at) = CURRENT_DATE";
+            Integer todayOrders = jdbcTemplate.queryForObject(sqlTodayOrders, Integer.class);
+
+            String sqlCanceled = "SELECT COUNT(*) FROM orders WHERE status IN ('CANCELED', 'FAILED', 'Đã hủy', 'Thanh toán thất bại')";
+            Integer canceledOrders = jdbcTemplate.queryForObject(sqlCanceled, Integer.class);
+
+            Map<String, Object> data = new LinkedHashMap<>();
+            data.put("totalUsers", Map.of("value", totalUsers != null ? totalUsers : 0, "label", "Tổng người dùng"));
+            data.put("totalProducts", Map.of("value", totalProducts != null ? totalProducts : 0, "label", "Sản phẩm handmade"));
+            data.put("totalOrders", Map.of("value", totalOrders != null ? totalOrders : 0, "label", "Tổng đơn hàng"));
+            data.put("totalRevenue", Map.of("value", totalRevenue != null ? totalRevenue : 0, "label", "Tổng doanh thu"));
+            data.put("totalReviews", Map.of("value", totalReviews != null ? totalReviews : 0, "label", "Tổng đánh giá"));
+            data.put("totalWishlists", Map.of("value", totalWishlists != null ? totalWishlists : 0, "label", "SP Yêu thích"));
+            data.put("todayOrders", Map.of("value", todayOrders != null ? todayOrders : 0, "label", "Đơn hôm nay"));
+            data.put("canceledOrders", Map.of("value", canceledOrders != null ? canceledOrders : 0, "label", "Đơn bị hủy"));
+
+            return ResponseEntity.ok(data);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Error KPI: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/revenue-chart")
+    public ResponseEntity<?> getRevenueChartRange(@RequestParam(defaultValue = "30days") String range) {
+        try {
+            String timeCondition = " created_at >= CURRENT_DATE - INTERVAL '30 days'";
+            if ("today".equals(range)) {
+                timeCondition = " DATE(created_at) = CURRENT_DATE";
+            } else if ("7days".equals(range)) {
+                timeCondition = " created_at >= CURRENT_DATE - INTERVAL '7 days'";
+            } else if ("year".equals(range)) {
+                timeCondition = " created_at >= CURRENT_DATE - INTERVAL '1 year'";
+            }
+
+            String sql = "SELECT DATE(created_at) as date_label, COALESCE(SUM(payable_amount), 0) as daily_revenue " +
+                    "FROM orders " +
+                    "WHERE status IN ('COMPLETED', 'Hoàn thành', 'Đã thanh toán', 'Thanh toán khi nhận hàng') AND " + timeCondition + " " +
+                    "GROUP BY DATE(created_at) ORDER BY date_label ASC";
+
+            List<Map<String, Object>> trendData = jdbcTemplate.queryForList(sql);
+            return ResponseEntity.ok(trendData);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Error Revenue Chart: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/order-statuses")
+    public ResponseEntity<?> getOrderStatusChart() {
+        try {
+            String sql = "SELECT status as name, COUNT(*) as value FROM orders GROUP BY status";
+            List<Map<String, Object>> data = jdbcTemplate.queryForList(sql);
+            return ResponseEntity.ok(data);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/top-handmade-products")
+    public ResponseEntity<?> getTopHandmadeProducts() {
+        try {
+            String sql = "SELECT p.name, c.name as category_name, " +
+                    "(SELECT image_url FROM product_images pi WHERE pi.product_id = p.id LIMIT 1) as image_url, " +
+                    "SUM(oi.quantity) as sold, SUM(oi.price * oi.quantity) as revenue " +
+                    "FROM order_items oi JOIN orders o ON oi.order_id = o.id " +
+                    "JOIN products p ON oi.product_id = p.id " +
+                    "LEFT JOIN categories c ON p.category_id = c.id " +
+                    "WHERE o.status IN ('COMPLETED', 'Hoàn thành', 'Đã thanh toán', 'Thanh toán khi nhận hàng') " +
+                    "GROUP BY p.id, p.name, c.name " +
+                    "ORDER BY revenue DESC LIMIT 5";
+            List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql);
+            return ResponseEntity.ok(rows);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/top-categories")
+    public ResponseEntity<?> getTopCategories() {
+        try {
+            String sql = "SELECT c.name, SUM(oi.quantity) as sold, SUM(oi.price * oi.quantity) as revenue " +
+                    "FROM order_items oi JOIN orders o ON oi.order_id = o.id " +
+                    "JOIN products p ON oi.product_id = p.id " +
+                    "JOIN categories c ON p.category_id = c.id " +
+                    "WHERE o.status IN ('COMPLETED', 'Hoàn thành', 'Đã thanh toán', 'Thanh toán khi nhận hàng') " +
+                    "GROUP BY c.name " +
+                    "ORDER BY sold DESC LIMIT 5";
+            List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql);
+            return ResponseEntity.ok(rows);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/recent-orders")
+    public ResponseEntity<?> getRecentOrders() {
+        try {
+            String sql = "SELECT id as order_id, full_name as customer_name, payable_amount as total_value, status, created_at " +
+                    "FROM orders ORDER BY created_at DESC LIMIT 5";
+            return ResponseEntity.ok(jdbcTemplate.queryForList(sql));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/new-users")
+    public ResponseEntity<?> getNewUsers() {
+        try {
+            String sql = "SELECT u.full_name, u.email, u.created_at " +
+                    "FROM users u ORDER BY u.created_at DESC LIMIT 5";
+            return ResponseEntity.ok(jdbcTemplate.queryForList(sql));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/recent-reviews")
+    public ResponseEntity<?> getRecentReviews() {
+        try {
+            String sql = "SELECT r.rating as stars, r.comment as content, u.full_name as customer_name, r.created_at " +
+                    "FROM reviews r JOIN users u ON r.user_id = u.id " +
+                    "ORDER BY r.created_at DESC LIMIT 5";
+            return ResponseEntity.ok(jdbcTemplate.queryForList(sql));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/recent-activities")
+    public ResponseEntity<?> getRecentActivities() {
+        try {
+            List<Map<String, Object>> activities = new ArrayList<>();
+            
+            List<Map<String, Object>> orders = jdbcTemplate.queryForList("SELECT id as order_id, full_name, created_at FROM orders ORDER BY created_at DESC LIMIT 5");
+            for (Map<String, Object> o : orders) {
+                Map<String, Object> act = new HashMap<>();
+                act.put("time", o.get("created_at"));
+                act.put("content", "Khách " + o.get("full_name") + " đặt đơn #" + o.get("order_id"));
+                act.put("type", "order");
+                activities.add(act);
+            }
+
+            List<Map<String, Object>> users = jdbcTemplate.queryForList("SELECT full_name, created_at FROM users ORDER BY created_at DESC LIMIT 5");
+            for (Map<String, Object> u : users) {
+                Map<String, Object> act = new HashMap<>();
+                act.put("time", u.get("created_at"));
+                act.put("content", "Khách " + u.get("full_name") + " vừa đăng ký mới");
+                act.put("type", "user");
+                activities.add(act);
+            }
+
+            try {
+                List<Map<String, Object>> reviews = jdbcTemplate.queryForList("SELECT u.full_name, r.rating, r.created_at FROM reviews r JOIN users u ON r.user_id = u.id ORDER BY r.created_at DESC LIMIT 5");
+                for (Map<String, Object> r : reviews) {
+                    Map<String, Object> act = new HashMap<>();
+                    act.put("time", r.get("created_at"));
+                    act.put("content", "Khách " + r.get("full_name") + " đánh giá " + r.get("rating") + "⭐");
+                    act.put("type", "review");
+                    activities.add(act);
+                }
+            } catch (Exception e) {} 
+
+            activities.sort((a, b) -> {
+                Object ta = a.get("time");
+                Object tb = b.get("time");
+                if (ta != null && tb != null) {
+                    return tb.toString().compareTo(ta.toString()); // Simple string comparison for standard ISO formats
+                }
+                return 0;
+            });
+
+            return ResponseEntity.ok(activities.stream().limit(10).collect(java.util.stream.Collectors.toList()));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/notifications")
+    public ResponseEntity<?> getNotifications() {
+        try {
+            List<Map<String, Object>> notifications = new ArrayList<>();
+            
+            String sqlPending = "SELECT COUNT(*) FROM orders WHERE status IN ('Chờ xác nhận', 'Chờ xử lý', 'PENDING')";
+            Integer pendingOrders = jdbcTemplate.queryForObject(sqlPending, Integer.class);
+            if (pendingOrders != null && pendingOrders > 0) {
+                notifications.add(Map.of("message", "Có " + pendingOrders + " đơn hàng chờ xác nhận", "type", "warning"));
+            }
+            
+            String sqlLowStock = "SELECT COUNT(*) FROM product_variants WHERE inventory <= 5";
+            Integer lowStock = jdbcTemplate.queryForObject(sqlLowStock, Integer.class);
+            if (lowStock != null && lowStock > 0) {
+                notifications.add(Map.of("message", "Có " + lowStock + " sản phẩm sắp hết hàng", "type", "error"));
+            }
+
+            if (notifications.isEmpty()) {
+                notifications.add(Map.of("message", "Hệ thống hoạt động ổn định", "type", "success"));
+            }
+            
+            return ResponseEntity.ok(notifications);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }
 }

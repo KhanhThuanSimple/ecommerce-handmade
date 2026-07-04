@@ -3,6 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { User } from '../types/model';
 import { renderMessageWithLinks, formatChatTime } from '../untils/renderMessage';
 import { useChat } from '../hooks/useChat';
+import { useProducts } from '../hooks/useProducts';
 import '../Styles/chatbox.css';
 import '../Styles/chatWidget.css';
 
@@ -14,6 +15,7 @@ interface ChatboxProps {
 const ChatBox: React.FC<ChatboxProps> = ({ currentUser, onClose }) => {
     const [input, setInput] = useState<string>('');
     const { messages, isTyping, onSend } = useChat({ currentUser });
+    const { products } = useProducts();
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -64,7 +66,7 @@ const ChatBox: React.FC<ChatboxProps> = ({ currentUser, onClose }) => {
                     >
                         <div className="chat-bubble">
                             <div className="msg-text">
-                                {renderMessageWithLinks(msg.content)}
+                                {renderMessageWithLinks(msg.content, products)}
                             </div>
                             <span className="chat-time">
                                 {formatChatTime(msg.createdAt)}

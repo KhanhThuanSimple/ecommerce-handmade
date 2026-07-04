@@ -30,19 +30,35 @@ public class AiChatService {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private OllamaService ollamaService;
+
     @SuppressWarnings("unchecked")
-    public String generateResponse(String userMsg, String context) {
+    public String generateResponse(String userMsg, String context, List<com.handmade.handmade_api.modules.chatbox.entity.ChatMessage> history) {
+        String systemPrompt = configService.getConfig("SYSTEM_PROMPT",
+                "Bạn là trợ lý ảo của HandMade Shop, chuyên bán đồ thủ công mỹ nghệ Việt Nam. Luôn trả lời bằng tiếng Việt, thân thiện, ngắn gọn (2-4 câu). Dùng emoji phù hợp. Không bịa thông tin.");
+
+        // ── 1. THỬ OLLAMA LOCAL TRƯỚC (nếu ollama.enabled=true) ──
+        if (ollamaService.isEnabled()) {
+            String ollamaReply = ollamaService.chat(userMsg, context, history);
+            if (ollamaReply != null && !ollamaReply.isBlank()) {
+                return ollamaReply;
+            }
+            // Ollama không chạy → fallthrough sang Groq
+        }
+
+        // ── 2. THỬ GROQ CLOUD ──
         try {
             String apiKey = configService.getConfig("GROQ_API_KEY", "");
 
             if (apiKey.isEmpty()) {
-                logger.warn("GROQ_API_KEY is not configured");
+                // ── 3. FALLBACK FAQ KEYWORD ──
+                logger.info("GROQ_API_KEY không có — dùng FAQ fallback");
                 return getFallbackResponse(userMsg);
             }
 
             String model = configService.getConfig("AI_MODEL", "llama-3.1-8b-instant");
-            String systemPrompt = configService.getConfig("SYSTEM_PROMPT",
-                    "Bạn là trợ lý ảo của HandMade Shop. Hãy trả lời lịch sự, chuyên nghiệp.");
+            // systemPrompt đã được lấy ở trên
             Double temperature = Double.parseDouble(
                     configService.getConfig("TEMPERATURE", "0.7")
             );
@@ -65,6 +81,15 @@ public class AiChatService {
             systemMessage.put("role", "system");
             systemMessage.put("content", systemPrompt + "\n\nThông tin tham khảo:\n" + faqContext + "\n\nNgữ cảnh: " + context);
             messages.add(systemMessage);
+
+            if (history != null) {
+                for (com.handmade.handmade_api.modules.chatbox.entity.ChatMessage msg : history) {
+                    Map<String, String> hm = new HashMap<>();
+                    hm.put("role", msg.getSenderType().equals("USER") ? "user" : "assistant");
+                    hm.put("content", msg.getContent());
+                    messages.add(hm);
+                }
+            }
 
             Map<String, String> userMessage = new HashMap<>();
             userMessage.put("role", "user");

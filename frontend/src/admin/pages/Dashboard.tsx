@@ -1,6 +1,6 @@
-// src/admin/pages/SuperDashboard.tsx
+// src/admin/pages/Dashboard.tsx
 import React from 'react';
-import { Line, Pie } from 'react-chartjs-2';
+import { Line, Doughnut, Bar } from 'react-chartjs-2';
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -8,318 +8,377 @@ import {
     PointElement,
     LineElement,
     BarElement,
+    ArcElement,
     Title,
     Tooltip,
     Legend,
-    ArcElement,
     Filler,
 } from 'chart.js';
 import {
-    CurrencyDollarIcon,
-    ShoppingBagIcon,
-    UsersIcon,
-    ArrowPathIcon,
-    ExclamationTriangleIcon,
-    CreditCardIcon,
-    ChartBarIcon,
-    TruckIcon,
+    UsersIcon, ShoppingBagIcon, ShoppingCartIcon, CurrencyDollarIcon,
+    StarIcon, HeartIcon, CalendarDaysIcon, XCircleIcon, ArrowPathIcon,
+    ArrowRightIcon, ClockIcon, BellAlertIcon, CheckCircleIcon,
+    ExclamationTriangleIcon
 } from '@heroicons/react/24/outline';
 import { useSuperDashboard } from '../../services/useSuperDashboard';
 import '../styles/dashboard.css';
 
-// Register ChartJS
-ChartJS.register(
-    CategoryScale,
-    LinearScale,
-    PointElement,
-    LineElement,
-    BarElement,
-    Title,
-    Tooltip,
-    Legend,
-    ArcElement,
-    Filler
-);
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Title, Tooltip, Legend, Filler);
 
-// Helper
 const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
 };
 
-const getStatusClass = (status: string) => {
-    const map: Record<string, string> = {
-        'Hoàn thành': '#10b981',
-        'Đang xử lý': '#3b82f6',
-        'Chờ thanh toán': '#f59e0b',
-        'Đã hủy': '#ef4444',
-    };
-    return map[status] || '#6b7280';
+const mapStatusColor = (status: string) => {
+    if (!status) return '#9ca3af';
+    const lower = status.toLowerCase();
+    if (lower.includes('hoàn thành') || lower.includes('đã thanh toán') || lower.includes('completed')) return '#10b981';
+    if (lower.includes('đang giao') || lower.includes('shipping')) return '#3b82f6';
+    if (lower.includes('chờ') || lower.includes('pending') || lower.includes('nhận hàng')) return '#f59e0b';
+    if (lower.includes('hủy') || lower.includes('thất bại') || lower.includes('failed') || lower.includes('canceled')) return '#ef4444';
+    return '#8b5cf6';
 };
 
 const Dashboard: React.FC = () => {
     const { data, loading, error, dateRange, setDateRange, refresh } = useSuperDashboard();
 
-    // Chart data
+    if (loading) {
+        return (
+            <div className="super-dashboard loading-container">
+                <div className="spinner"></div>
+                <p>Đang tải dữ liệu Trung tâm điều khiển...</p>
+            </div>
+        );
+    }
+
+    if (error || !data) {
+        return (
+            <div className="super-dashboard error-container">
+                <ExclamationTriangleIcon className="w-12 h-12 text-red-500" />
+                <h3>{error || 'Lỗi tải dữ liệu'}</h3>
+                <button onClick={refresh} className="refresh-btn">Thử lại</button>
+            </div>
+        );
+    }
+
+    // 1. Line Chart: Revenue
+    const revenueLabels = data.revenueTrend.map(t => t.date_label);
+    const revenueValues = data.revenueTrend.map(t => t.daily_revenue);
     const lineChartData = {
-        labels: data.revenueTrend.map(item => item.date_label),
+        labels: revenueLabels,
         datasets: [{
-            label: 'Doanh thu (VNĐ)',
-            data: data.revenueTrend.map(item => item.daily_revenue),
-            borderColor: '#c41e3a',
-            backgroundColor: 'rgba(196, 30, 58, 0.05)',
+            label: 'Doanh thu (VND)',
+            data: revenueValues,
+            borderColor: '#8b5cf6',
+            backgroundColor: 'rgba(139, 92, 246, 0.1)',
             fill: true,
-            tension: 0.3,
-            pointRadius: 0,
-            borderWidth: 2,
-        }],
+            tension: 0.4,
+            pointBackgroundColor: '#8b5cf6',
+            pointBorderColor: '#fff',
+            pointHoverBackgroundColor: '#fff',
+            pointHoverBorderColor: '#8b5cf6',
+            pointRadius: 4,
+            pointHoverRadius: 6,
+        }]
     };
-
-    const userPieData = {
-        labels: data.userDistribution.map(item => item.name),
-        datasets: [{
-            data: data.userDistribution.map(item => item.value),
-            backgroundColor: data.userDistribution.map(item => item.color || '#94a3b8'),
-            borderWidth: 0,
-        }],
-    };
-
     const lineOptions = {
         responsive: true,
         maintainAspectRatio: false,
-        plugins: { legend: { position: 'top' as const, labels: { boxWidth: 12 } } },
-        scales: { y: { ticks: { callback: (v: any) => formatCurrency(v) } } },
+        plugins: { legend: { display: false }, tooltip: { mode: 'index' as const, intersect: false } },
+        scales: {
+            x: { grid: { display: false } },
+            y: { border: { dash: [4, 4] }, grid: { color: '#e5e7eb' }, beginAtZero: true }
+        },
+        interaction: { mode: 'nearest' as const, axis: 'x' as const, intersect: false }
     };
 
-    const pieOptions = {
+    // 2. Doughnut Chart: Order Status
+    const statusLabels = data.orderStatuses.map(s => s.name);
+    const statusValues = data.orderStatuses.map(s => s.value);
+    const statusColors = statusLabels.map(mapStatusColor);
+    const doughnutData = {
+        labels: statusLabels,
+        datasets: [{
+            data: statusValues,
+            backgroundColor: statusColors,
+            borderWidth: 0,
+            hoverOffset: 4
+        }]
+    };
+    const doughnutOptions = {
         responsive: true,
         maintainAspectRatio: false,
-        plugins: { legend: { position: 'bottom' as const, labels: { font: { size: 11 } } } },
+        plugins: { legend: { position: 'bottom' as const } },
+        cutout: '70%'
     };
 
-    if (loading) {
-        return (
-            <div className="super-dashboard">
-                <div className="dashboard-loading">
-                    <div className="loading-spinner-super"></div>
-                    <span>Đang tổng hợp dữ liệu toàn hệ thống...</span>
-                </div>
-            </div>
-        );
-    }
-
-    if (error) {
-        return (
-            <div className="super-dashboard">
-                <div className="dashboard-error">
-                    <ExclamationTriangleIcon className="w-12 h-12 mx-auto mb-3 text-red-500" />
-                    <h3>{error}</h3>
-                    <button onClick={refresh} className="refresh-btn mt-3">Thử lại</button>
-                </div>
-            </div>
-        );
-    }
+    // 3. Bar Chart: Top Categories
+    const catLabels = data.topCategories.map(c => c.name);
+    const catValues = data.topCategories.map(c => c.sold);
+    const barData = {
+        labels: catLabels,
+        datasets: [{
+            label: 'Số lượng đã bán',
+            data: catValues,
+            backgroundColor: 'rgba(59, 130, 246, 0.8)',
+            borderRadius: 6,
+            barThickness: 20
+        }]
+    };
+    const barOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: { x: { grid: { display: false } }, y: { beginAtZero: true, grid: { color: '#e5e7eb' } } }
+    };
 
     return (
-        <div className="super-dashboard">
+        <div className="super-dashboard handmade-dashboard">
             {/* Header */}
-            <div className="dashboard-header">
-                <div className="dashboard-title">
-                    <h1>📊 Super Dashboard · Tổng quan toàn hệ thống</h1>
-                    <p>Phân tích doanh thu, quản lý kho, cổng thanh toán & người dùng thời gian thực</p>
+            <div className="db-header">
+                <div className="db-welcome">
+                    <h1>👋 Xin chào, Admin</h1>
+                    <p>Chào mừng trở lại! Hôm nay là {new Date().toLocaleDateString('vi-VN')}</p>
                 </div>
-                <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                    <div className="date-range-selector">
-                        <button className={`range-btn ${dateRange === 'today' ? 'active' : ''}`} onClick={() => setDateRange('today')}>Hôm nay</button>
-                        <button className={`range-btn ${dateRange === 'month' ? 'active' : ''}`} onClick={() => setDateRange('month')}>30 ngày</button>
-                        <button className={`range-btn ${dateRange === 'year' ? 'active' : ''}`} onClick={() => setDateRange('year')}>Năm nay</button>
+                <div className="db-actions">
+                    <div className="date-filters">
+                        <button className={dateRange === 'today' ? 'active' : ''} onClick={() => setDateRange('today')}>Hôm nay</button>
+                        <button className={dateRange === '7days' ? 'active' : ''} onClick={() => setDateRange('7days')}>7 ngày</button>
+                        <button className={dateRange === '30days' ? 'active' : ''} onClick={() => setDateRange('30days')}>30 ngày</button>
+                        <button className={dateRange === 'year' ? 'active' : ''} onClick={() => setDateRange('year')}>Năm nay</button>
                     </div>
-                    <button className="refresh-btn" onClick={refresh}>
-                        <ArrowPathIcon className="w-4 h-4" /> Làm mới
+                    <button className="btn-refresh" onClick={refresh}>
+                        <ArrowPathIcon className="w-5 h-5" />
                     </button>
                 </div>
             </div>
 
-            {/* KPI Row */}
+            {/* Notification Banner */}
+            {data.notifications && data.notifications.length > 0 && (
+                <div className="db-notifications">
+                    {data.notifications.map((n, i) => (
+                        <div key={i} className={`notif-alert type-${n.type}`}>
+                            {n.type === 'error' ? <ExclamationTriangleIcon className="w-5 h-5" /> :
+                             n.type === 'warning' ? <BellAlertIcon className="w-5 h-5" /> :
+                             <CheckCircleIcon className="w-5 h-5" />}
+                            <span>{n.message}</span>
+                        </div>
+                    ))}
+                </div>
+            )}
+
+            {/* 1. KPI Cards */}
             {data.kpi && (
-                <div className="kpi-grid-super">
-                    <div className="kpi-card-super">
-                        <div className="kpi-header-super">
-                            <span className="kpi-label">{data.kpi.revenue.label}</span>
-                            <div className="kpi-icon-super" style={{ background: '#fee2e2' }}><CurrencyDollarIcon className="w-5 h-5 text-red-600" /></div>
+                <div className="db-kpi-grid">
+                    <div className="kpi-card color-users">
+                        <div className="kpi-icon"><UsersIcon className="w-6 h-6" /></div>
+                        <div className="kpi-info">
+                            <span className="kpi-label">{data.kpi.totalUsers.label}</span>
+                            <span className="kpi-val">{data.kpi.totalUsers.value}</span>
                         </div>
-                        <div className="kpi-value-super">{formatCurrency(data.kpi.revenue.value)}</div>
                     </div>
-                    <div className="kpi-card-super">
-                        <div className="kpi-header-super">
-                            <span className="kpi-label">{data.kpi.successOrders.label}</span>
-                            <div className="kpi-icon-super" style={{ background: '#e0f2fe' }}><ShoppingBagIcon className="w-5 h-5 text-blue-600" /></div>
+                    <div className="kpi-card color-products">
+                        <div className="kpi-icon"><ShoppingBagIcon className="w-6 h-6" /></div>
+                        <div className="kpi-info">
+                            <span className="kpi-label">{data.kpi.totalProducts.label}</span>
+                            <span className="kpi-val">{data.kpi.totalProducts.value}</span>
                         </div>
-                        <div className="kpi-value-super">{data.kpi.successOrders.value} đơn</div>
                     </div>
-                    <div className="kpi-card-super">
-                        <div className="kpi-header-super">
-                            <span className="kpi-label">{data.kpi.aov.label}</span>
-                            <div className="kpi-icon-super" style={{ background: '#dcfce7' }}><CurrencyDollarIcon className="w-5 h-5 text-green-600" /></div>
+                    <div className="kpi-card color-orders">
+                        <div className="kpi-icon"><ShoppingCartIcon className="w-6 h-6" /></div>
+                        <div className="kpi-info">
+                            <span className="kpi-label">{data.kpi.totalOrders.label}</span>
+                            <span className="kpi-val">{data.kpi.totalOrders.value}</span>
                         </div>
-                        <div className="kpi-value-super">{formatCurrency(data.kpi.aov.value)}</div>
                     </div>
-                    <div className="kpi-card-super">
-                        <div className="kpi-header-super">
-                            <span className="kpi-label">{data.kpi.conversionRate.label}</span>
-                            <div className="kpi-icon-super" style={{ background: '#f3e8ff' }}><UsersIcon className="w-5 h-5 text-purple-600" /></div>
+                    <div className="kpi-card color-revenue">
+                        <div className="kpi-icon"><CurrencyDollarIcon className="w-6 h-6" /></div>
+                        <div className="kpi-info">
+                            <span className="kpi-label">{data.kpi.totalRevenue.label}</span>
+                            <span className="kpi-val">{formatCurrency(data.kpi.totalRevenue.value)}</span>
                         </div>
-                        <div className="kpi-value-super">{data.kpi.conversionRate.value}%</div>
+                    </div>
+                    <div className="kpi-card color-reviews">
+                        <div className="kpi-icon"><StarIcon className="w-6 h-6" /></div>
+                        <div className="kpi-info">
+                            <span className="kpi-label">{data.kpi.totalReviews.label}</span>
+                            <span className="kpi-val">{data.kpi.totalReviews.value}</span>
+                        </div>
+                    </div>
+                    <div className="kpi-card color-wishlist">
+                        <div className="kpi-icon"><HeartIcon className="w-6 h-6" /></div>
+                        <div className="kpi-info">
+                            <span className="kpi-label">{data.kpi.totalWishlists.label}</span>
+                            <span className="kpi-val">{data.kpi.totalWishlists.value}</span>
+                        </div>
+                    </div>
+                    <div className="kpi-card color-today">
+                        <div className="kpi-icon"><CalendarDaysIcon className="w-6 h-6" /></div>
+                        <div className="kpi-info">
+                            <span className="kpi-label">{data.kpi.todayOrders.label}</span>
+                            <span className="kpi-val">{data.kpi.todayOrders.value}</span>
+                        </div>
+                    </div>
+                    <div className="kpi-card color-canceled">
+                        <div className="kpi-icon"><XCircleIcon className="w-6 h-6" /></div>
+                        <div className="kpi-info">
+                            <span className="kpi-label">{data.kpi.canceledOrders.label}</span>
+                            <span className="kpi-val">{data.kpi.canceledOrders.value}</span>
+                        </div>
                     </div>
                 </div>
             )}
 
-            {/* 2-column: Revenue Chart + Right Widgets */}
-            <div className="dashboard-two-columns">
-                {/* Biểu đồ doanh thu */}
-                <div className="chart-card-super">
-                    <div className="chart-title-super">
-                        <ChartBarIcon className="w-5 h-5 text-red-600" />
-                        Xu hướng doanh thu theo thời gian
-                    </div>
-                    <div className="chart-container-super" style={{ position: 'relative', height: '300px' }}>
-                        <Line data={lineChartData} options={lineOptions} />
-                    </div>
+            {/* 2. Charts Row */}
+            <div className="db-charts-row">
+                <div className="db-card chart-revenue">
+                    <h3>📈 Doanh thu ({dateRange})</h3>
+                    <div className="chart-wrapper"><Line data={lineChartData} options={lineOptions} /></div>
                 </div>
-
-                {/* Right side: Low stock + Payment methods */}
-                <div className="right-widgets">
-                    {/* Low stock alert */}
-                    <div className="widget-card">
-                        <div className="widget-title">
-                            <ExclamationTriangleIcon className="w-4 h-4 text-amber-600" />
-                            ⚠️ Cảnh báo tồn kho thấp (≤5)
-                        </div>
-                        <div className="low-stock-list">
-                            {data.lowStockAlerts.length === 0 ? (
-                                <div style={{ textAlign: 'center', padding: '20px', color: '#64748b' }}>✅ Hàng hóa dồi dào</div>
-                            ) : (
-                                data.lowStockAlerts.slice(0, 4).map(item => (
-                                    <div key={item.sku} className="low-stock-item">
-                                        <div>
-                                            <div style={{ fontWeight: 500, fontSize: '13px' }}>{item.product_name}</div>
-                                            <div style={{ fontSize: '10px', color: '#94a3b8' }}>{item.variant_name}</div>
-                                        </div>
-                                        <span className={`stock-badge-super ${item.inventory === 0 ? 'empty' : 'low'}`}>
-                                            {item.inventory === 0 ? 'Hết hàng' : `Còn ${item.inventory}`}
-                                        </span>
-                                    </div>
-                                ))
-                            )}
-                        </div>
-                    </div>
-
-                    {/* Payment methods status */}
-                    <div className="widget-card">
-                        <div className="widget-title">
-                            <CreditCardIcon className="w-4 h-4 text-green-600" />
-                            Trạng thái cổng thanh toán
-                        </div>
-                        <div className="payment-methods-list">
-                            {data.paymentMethods.slice(0, 4).map(method => (
-                                <div key={method.code} className="payment-method-item">
-                                    <span>
-                                        <span className={`method-status ${method.is_active ? 'active' : 'inactive'}`}></span>
-                                        {method.name}
-                                    </span>
-                                    <span style={{ fontSize: '11px', color: method.is_active ? '#10b981' : '#ef4444' }}>
-                                        {method.is_active ? '● Hoạt động' : '○ Tạm dừng'}
-                                    </span>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
+                <div className="db-card chart-status">
+                    <h3>🍩 Trạng thái đơn hàng</h3>
+                    <div className="chart-wrapper"><Doughnut data={doughnutData} options={doughnutOptions} /></div>
                 </div>
             </div>
 
-            {/* 3-column: Top products + User distribution + Abandoned cart */}
-            <div className="dashboard-three-columns">
-                {/* Top products */}
-                <div className="table-card">
-                    <div className="widget-title">🏆 Top sản phẩm theo doanh thu</div>
-                    <table className="simple-table">
-                        <thead>
-                            <tr><th>#</th><th>Sản phẩm</th><th>Doanh thu</th><th>%</th></tr>
-                        </thead>
-                        <tbody>
-                            {data.topProducts.slice(0, 4).map((p, idx) => (
-                                <tr key={p.id}>
-                                    <td className="product-rank-cell">#{idx+1}</td>
-                                    <td style={{ maxWidth: '140px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.name}</td>
-                                    <td>{formatCurrency(p.revenue)}</td>
-                                    <td>
-                                        <div className="revenue-bar-cell">
-                                            <div style={{ width: '50px', background: '#e2e8f0', borderRadius: '3px' }}>
-                                                <div className="revenue-bar-fill-super" style={{ width: `${p.percentage}%` }}></div>
-                                            </div>
-                                            <span style={{ fontSize: '11px' }}>{p.percentage}%</span>
-                                        </div>
-                                    </td>
+            {/* 3. Top Products & Categories Row */}
+            <div className="db-grid-2">
+                <div className="db-card">
+                    <div className="card-header">
+                        <h3>🏆 Sản phẩm Handmade Bán Chạy</h3>
+                        <button className="view-all">Xem thêm <ArrowRightIcon className="w-4 h-4" /></button>
+                    </div>
+                    <div className="table-responsive">
+                        <table className="db-table">
+                            <thead>
+                                <tr>
+                                    <th>Sản phẩm</th>
+                                    <th>Danh mục</th>
+                                    <th>Đã bán</th>
+                                    <th>Doanh thu</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-
-                {/* User distribution */}
-                <div className="table-card">
-                    <div className="widget-title"><UsersIcon className="w-4 h-4 text-blue-600" /> Phân bố người dùng</div>
-                    <div className="user-dist-list">
-                        {data.userDistribution.length > 0 ? (
-                            <>
-                                <div className="chart-container-super" style={{ height: '160px', position: 'relative' }}>
-                                    <Pie data={userPieData} options={pieOptions} />
-                                </div>
-                                {data.userDistribution.map((item, idx) => (
-                                    <div key={idx} className="user-dist-item">
-                                        <div className="dist-color" style={{ background: item.color }}></div>
-                                        <span className="dist-name">{item.name}</span>
-                                        <span className="dist-value">{item.value}</span>
-                                    </div>
+                            </thead>
+                            <tbody>
+                                {data.topProducts.map((p, i) => (
+                                    <tr key={i}>
+                                        <td className="td-product">
+                                            {p.image_url ? <img src={p.image_url} alt={p.name} /> : <div className="no-img"></div>}
+                                            <span>{p.name}</span>
+                                        </td>
+                                        <td>{p.category_name || 'Khác'}</td>
+                                        <td><strong>{p.sold}</strong></td>
+                                        <td className="text-purple">{formatCurrency(p.revenue)}</td>
+                                    </tr>
                                 ))}
-                            </>
-                        ) : (
-                            <div style={{ padding: '20px', textAlign: 'center', color: '#94a3b8' }}>Chưa có dữ liệu</div>
-                        )}
+                                {data.topProducts.length === 0 && <tr><td colSpan={4} className="text-center">Chưa có dữ liệu</td></tr>}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 
-                {/* Abandoned cart + Recent orders quick view */}
-                <div className="table-card">
-                    <div className="widget-title"><TruckIcon className="w-4 h-4 text-amber-600" /> Giỏ hàng bỏ dở & Đơn gần đây</div>
-                    {data.abandonedCart && (
-                        <div className="abandoned-alert" style={{ margin: '12px 16px', padding: '12px', borderRadius: '12px' }}>
-                            <div className="alert-content">
-                                <ExclamationTriangleIcon className="w-8 h-8 text-amber-500" />
-                                <div className="alert-text">
-                                    <strong>{data.abandonedCart.abandonedCartsCount} giỏ hàng</strong> bỏ dở ·{' '}
-                                    <strong>{formatCurrency(data.abandonedCart.potentialLossValue)}</strong> cơ hội
-                                </div>
-                            </div>
-                        </div>
-                    )}
-                    <div className="scrollable-orders">
-                        <table className="simple-table">
-                            <thead><tr><th>Mã đơn</th><th>Khách hàng</th><th>Trạng thái</th><th>Tiền</th></tr></thead>
+                <div className="db-card">
+                    <h3>📊 Danh mục Bán Chạy Nhất</h3>
+                    <div className="chart-wrapper"><Bar data={barData} options={barOptions} /></div>
+                </div>
+            </div>
+
+            {/* 4. Recent Orders & Activities Row */}
+            <div className="db-grid-2">
+                <div className="db-card">
+                    <div className="card-header">
+                        <h3>🛒 Đơn hàng mới</h3>
+                        <button className="view-all">Xem tất cả <ArrowRightIcon className="w-4 h-4" /></button>
+                    </div>
+                    <div className="table-responsive">
+                        <table className="db-table">
+                            <thead>
+                                <tr>
+                                    <th>Mã</th>
+                                    <th>Khách hàng</th>
+                                    <th>Giá trị</th>
+                                    <th>Trạng thái</th>
+                                </tr>
+                            </thead>
                             <tbody>
-                                {data.recentOrders.map(order => (
-                                    <tr key={order.id}>
-                                        <td style={{ fontSize: '11px' }}>#{order.id.slice(-6)}</td>
-                                        <td>{order.fullName?.split(' ').pop()}</td>
-                                        <td>
-                                            <span className="order-status-badge-super" style={{ background: `${getStatusClass(order.status)}20`, color: getStatusClass(order.status) }}>
-                                                {order.status}
-                                            </span>
-                                        </td>
-                                        <td>{formatCurrency(order.payableAmount)}</td>
+                                {data.recentOrders.map((o, i) => (
+                                    <tr key={i}>
+                                        <td>#{o.order_id}</td>
+                                        <td>{o.customer_name}</td>
+                                        <td>{formatCurrency(o.total_value)}</td>
+                                        <td><span className="badge-status" style={{ backgroundColor: mapStatusColor(o.status) + '20', color: mapStatusColor(o.status) }}>{o.status}</span></td>
                                     </tr>
                                 ))}
                             </tbody>
                         </table>
+                    </div>
+                </div>
+
+                <div className="db-card">
+                    <h3>⚡ Hoạt động gần đây</h3>
+                    <div className="timeline">
+                        {data.activities.map((act, i) => (
+                            <div key={i} className="timeline-item">
+                                <div className={`timeline-icon type-${act.type}`}>
+                                    {act.type === 'order' && <ShoppingCartIcon className="w-4 h-4" />}
+                                    {act.type === 'user' && <UsersIcon className="w-4 h-4" />}
+                                    {act.type === 'review' && <StarIcon className="w-4 h-4" />}
+                                </div>
+                                <div className="timeline-content">
+                                    <p>{act.content}</p>
+                                    <span className="time"><ClockIcon className="w-3 h-3" /> {new Date(act.time).toLocaleString('vi-VN')}</span>
+                                </div>
+                            </div>
+                        ))}
+                        {data.activities.length === 0 && <p className="text-center text-gray-500">Chưa có hoạt động nào</p>}
+                    </div>
+                </div>
+            </div>
+
+            {/* 5. Lower Row: New Users, Low Stock, Reviews */}
+            <div className="db-grid-3">
+                <div className="db-card">
+                    <h3>🆕 Người dùng mới</h3>
+                    <div className="list-group">
+                        {data.newUsers.map((u, i) => (
+                            <div key={i} className="list-item">
+                                <div className="avatar">{u.full_name.charAt(0).toUpperCase()}</div>
+                                <div className="list-info">
+                                    <strong>{u.full_name}</strong>
+                                    <span>{u.email}</span>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                <div className="db-card">
+                    <h3>⚠️ Sản phẩm sắp hết</h3>
+                    <div className="list-group">
+                        {data.lowStock.map((s, i) => (
+                            <div key={i} className="list-item flex-between">
+                                <div className="list-info">
+                                    <strong>{s.product_name}</strong>
+                                    <span>SKU: {s.sku}</span>
+                                </div>
+                                <span className="badge-danger">{s.inventory} SP</span>
+                            </div>
+                        ))}
+                        {data.lowStock.length === 0 && <p className="text-center text-green-500 mt-4">Kho hàng an toàn</p>}
+                    </div>
+                </div>
+
+                <div className="db-card">
+                    <h3>⭐ Đánh giá mới</h3>
+                    <div className="list-group">
+                        {data.recentReviews.map((r, i) => (
+                            <div key={i} className="review-item">
+                                <div className="stars">
+                                    {Array(r.stars).fill(0).map((_, idx) => <StarIcon key={idx} className="w-4 h-4 fill-yellow text-yellow-400" />)}
+                                </div>
+                                <p>"{r.content}"</p>
+                                <span>- {r.customer_name}</span>
+                            </div>
+                        ))}
                     </div>
                 </div>
             </div>

@@ -21,116 +21,105 @@ const Home: React.FC<{ currentUser: any }> = ({ currentUser }) => {
             .filter(p => p.inventory > 0)
             .sort((a, b) => {
                 if (isLogged) {
-                    // Nếu đã đăng nhập: Sắp xếp theo viewCount & Rating
                     return calculateMemberScore(b) - calculateMemberScore(a);
                 } else {
-                    // Nếu là khách: Sắp xếp theo Inventory & Comments
                     return calculateNewUserScore(b) - calculateNewUserScore(a);
                 }
             })
-            .slice(0, 6); // Lấy top 6 sản phẩm phù hợp nhất
+            .slice(0, 6);
     }, [products, currentUser]);
 
-    // Tiêu đề động dựa trên đối tượng
     const sectionTitle = currentUser?.id 
         ? "Gợi Ý Riêng Cho Bạn" 
         : "Sản Phẩm Bán Chạy Nhất";
 
- const tetDate = new Date('2026-02-17T00:00:00'); 
-    const [timeLeft, setTimeLeft] = useState(getTimeRemaining(tetDate));
+    // Tết Trung Thu năm 2026: 25/09/2026
+    const midAutumnDate = new Date('2026-09-25T00:00:00'); 
+    const [timeLeft, setTimeLeft] = useState(getTimeRemaining(midAutumnDate));
 
     useEffect(() => {
         const timer = setInterval(() => {
-            setTimeLeft(getTimeRemaining(tetDate));
+            setTimeLeft(getTimeRemaining(midAutumnDate));
         }, 1000);
 
         return () => clearInterval(timer);
     }, []);
     return (
         <div className="home-container">
-            {/* HERO BANNER Tết Bính Ngọ */}
+            {/* HERO BANNER Tết Trung Thu */}
             <section className="hero-banner">
                 <div className="hero-overlay"></div>
-                <div className="horse-decoration">
-                    <div className="horse-silhouette"></div>
-                    <div className="horse-silhouette reverse"></div>
+                <div className="mid-autumn-decoration">
+                    <div className="rabbit-silhouette"></div>
+                    <div className="moon-silhouette">🌕</div>
                 </div>
-                <div className="firework firework-1"></div>
-                <div className="firework firework-2"></div>
-                <div className="firework firework-3"></div>
+                <div className="lantern firework-1">🏮</div>
+                <div className="lantern firework-2">🏮</div>
+                <div className="lantern firework-3">🏮</div>
                 
                 <div className="hero-content">
-                    <span className="hero-subtitle">Chào Xuân Bính Ngọ 2026</span>
-                    <h1>Mã Đáo Thành Công<br />An Khang Thịnh Vượng</h1>
-                    <p>Đón năm Ngựa vàng với bộ sưu tập gốm sứ cao cấp - Biểu tượng của sự sung túc, bền vững và thành công vượt bậc</p>
-                                            <div className="hero-actions">
-                        {/* Chuyển onClick ra thẻ button */}
+                    <span className="hero-subtitle">Mùa Trăng Yêu Thương 2026</span>
+                    <h1>Vui Tết Trung Thu<br />Đón Trăng Đoàn Viên</h1>
+                    <p>Đón Tết Trung Thu với bộ sưu tập quà tặng cao cấp - Gửi gắm lời chúc bình an, sum vầy và hạnh phúc trọn vẹn</p>
+                    <div className="hero-actions">
                         <button className="btn-white" onClick={() => navigate('/products')}>
-                            <span className="btn-gold-icon">🐎</span> Khám Phá Ngay
+                            <span className="btn-gold-icon">🥮</span> Khám Phá Ngay
                         </button>
 
                         <button className="btn-white" onClick={() => navigate('/games')}>
-                            <span className="btn-gold-icon">💰</span> Vòng quay may mắn
+                            <span className="btn-gold-icon">🎁</span> Vòng quay may mắn
                         </button>
-</div>
-                </div>
-                               <div className="countdown-tet">
-                <h4>Đếm ngược đến Giao Thừa</h4>
-
-                <div className="countdown-timer">
-                    <div className="countdown-item">
-                        <span className="countdown-number">{timeLeft.days}</span>
-                        <span className="countdown-label">Ngày</span>
-                    </div>
-
-                    <div className="countdown-separator">:</div>
-
-                    <div className="countdown-item">
-                        <span className="countdown-number">{timeLeft.hours}</span>
-                        <span className="countdown-label">Giờ</span>
-                    </div>
-
-                    <div className="countdown-separator">:</div>
-
-                    <div className="countdown-item">
-                        <span className="countdown-number">{timeLeft.minutes}</span>
-                        <span className="countdown-label">Phút</span>
-                    </div>
-
-                    <div className="countdown-separator">:</div>
-
-                    <div className="countdown-item">
-                        <span className="countdown-number">{timeLeft.seconds}</span>
-                        <span className="countdown-label">Giây</span>
                     </div>
                 </div>
-            </div>
+                <div className="countdown-tet">
+                    <h4>Đếm ngược đến Rằm Trung Thu</h4>
+                    <div className="countdown-timer">
+                        <div className="countdown-item">
+                            <span className="countdown-number">{timeLeft.days}</span>
+                            <span className="countdown-label">Ngày</span>
+                        </div>
+                        <div className="countdown-separator">:</div>
+                        <div className="countdown-item">
+                            <span className="countdown-number">{timeLeft.hours}</span>
+                            <span className="countdown-label">Giờ</span>
+                        </div>
+                        <div className="countdown-separator">:</div>
+                        <div className="countdown-item">
+                            <span className="countdown-number">{timeLeft.minutes}</span>
+                            <span className="countdown-label">Phút</span>
+                        </div>
+                        <div className="countdown-separator">:</div>
+                        <div className="countdown-item">
+                            <span className="countdown-number">{timeLeft.seconds}</span>
+                            <span className="countdown-label">Giây</span>
+                        </div>
+                    </div>
+                </div>
 
-                
                 <div className="tet-decoration">
-                    <div className="lantern lantern-left"></div>
-                    <div className="lantern lantern-right"></div>
-                    <div className="spring-flower spring-flower-1">🌸</div>
-                    <div className="spring-flower spring-flower-2">🏵️</div>
+                    <div className="lantern lantern-left">🏮</div>
+                    <div className="lantern lantern-right">🏮</div>
+                    <div className="spring-flower spring-flower-1">✨</div>
+                    <div className="spring-flower spring-flower-2">🐇</div>
                 </div>
             </section>
 
-            {/* SERVICE FEATURES với chủ đề Tết */}
+            {/* SERVICE FEATURES với chủ đề Trung Thu */}
             <section className="service-features">
                 <div className="feature-item">
-                    <div className="icon">🎁</div>
-                    <h3>Quà Tết Cao Cấp</h3>
-                    <p>Hộp quà Tết sang trọng, bọc lụa đỏ vàng, phù hợp biếu tặng đối tác, người thân</p>
+                    <div className="icon">🥮</div>
+                    <h3>Quà Trung Thu Cao Cấp</h3>
+                    <p>Hộp quà bánh Trung Thu sang trọng, hoa văn mạ vàng, phù hợp biếu tặng đối tác, người thân</p>
                 </div>
                 <div className="feature-item">
                     <div className="icon">🚚</div>
-                    <h3>Giao Hàng Tết</h3>
-                    <p>Miễn phí giao hàng toàn quốc đơn từ 1.5 triệu, đảm bảo nhận hàng trước 30 Tết</p>
+                    <h3>Giao Hàng Tốc Độ</h3>
+                    <p>Miễn phí giao hàng toàn quốc đơn từ 1.5 triệu, đảm bảo nhận hàng trước đêm Rằm</p>
                 </div>
                 <div className="feature-item">
                     <div className="icon">🎨</div>
                     <h3>Thiết Kế Độc Quyền</h3>
-                    <p>Họa tiết ngựa phong thủy, chữ Tết thư pháp độc bản, mang may mắn cả năm</p>
+                    <p>Họa tiết Thỏ Ngọc, Trăng Rằm độc bản, mang ý nghĩa sum vầy, đoàn viên</p>
                 </div>
                 <div className="feature-item">
                     <div className="icon">💝</div>
@@ -139,17 +128,16 @@ const Home: React.FC<{ currentUser: any }> = ({ currentUser }) => {
                 </div>
             </section>
 
-            {/* FEATURED PRODUCTS - Tết Bính Ngọ */}
+            {/* FEATURED PRODUCTS - Tết Trung Thu */}
             <section className="featured-section">
                 <div className="section-header">
                     <div className="horse-heading-decoration">
-                        <span className="horse-head">🐎</span>
+                        <span className="horse-head">🐰</span>
                         <h2>Sản Phẩm Đang Được Săn Đón</h2>
-                        <span className="horse-head reverse">🐎</span>
-                        
+                        <span className="horse-head reverse">🐰</span>
                     </div>
-                    <p>Bộ sưu tập giới hạn "Mã Đáo Thành Công" - Thiết kế riêng cho năm Ngựa vàng 2026</p>
-                    <div className="chinese-character">馬</div>
+                    <p>Bộ sưu tập giới hạn "Trăng Rằm Tỏa Sáng" - Thiết kế riêng cho mùa Thu 2026</p>
+                    <div className="chinese-character">秋</div>
                 </div>
                 
                 <div className="product-grid-limited">
@@ -164,33 +152,30 @@ const Home: React.FC<{ currentUser: any }> = ({ currentUser }) => {
                 
                 <div className="view-more-container">
                     <Link to="/products" className="btn-view-all">
-                        <span className="btn-horse-icon">🏇</span> Xem Tất Cả Sản Phẩm Tết
+                        <span className="btn-horse-icon">🏮</span> Xem Tất Cả Quà Tặng
                     </Link>
                 </div>
             </section>
 
-           
-            
-            {/* Tết Traditions Section */}
+            {/* Trung Thu Traditions Section */}
             <section className="tet-traditions">
                 <div className="tradition-content">
-                   
                     <div className="tradition-icons">
                         <div className="tradition-icon-item">
-                            <div className="icon-circle">🌺</div>
-                            <span>Mai Vàng</span>
+                            <div className="icon-circle">🥮</div>
+                            <span>Bánh Nướng</span>
                         </div>
                         <div className="tradition-icon-item">
-                            <div className="icon-circle">🍊</div>
-                            <span>Quất Cảnh</span>
+                            <div className="icon-circle">🌕</div>
+                            <span>Ngắm Trăng</span>
                         </div>
                         <div className="tradition-icon-item">
-                            <div className="icon-circle">📜</div>
-                            <span>Thư Pháp</span>
+                            <div className="icon-circle">🐰</div>
+                            <span>Thỏ Ngọc</span>
                         </div>
                         <div className="tradition-icon-item">
                             <div className="icon-circle">🏮</div>
-                            <span>Đèn Lồng</span>
+                            <span>Rước Đèn</span>
                         </div>
                     </div>
                 </div>

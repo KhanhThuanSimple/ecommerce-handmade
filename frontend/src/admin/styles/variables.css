@@ -5,22 +5,22 @@
    ================================================================ */
 
 :root {
-  /* ── BRAND 10% ── */
-  --primary-red:        #ee4d2d;
-  --primary-red-hover:  #d73c16;
-  --primary-red-light:  #fff5f2;
-  --primary-red-soft:   #ffdcd1;
+  /* ── BRAND 10% (Chủ đề Trung Thu) ── */
+  --primary-red:        #2b4162;   /* Đêm thu (Deep Navy) */
+  --primary-red-hover:  #1b264f;
+  --primary-red-light:  #f0f4f8;
+  --primary-red-soft:   #d9e2ec;
 
-  --primary-gold:       #ffaa00;
-  --primary-gold-hover: #e69900;
-  --primary-gold-light: #fff9eb;
-  --primary-gold-soft:  #ffe09c;
+  --primary-gold:       #f59e0b;   /* Vàng trăng rằm (Amber) */
+  --primary-gold-hover: #d97706;
+  --primary-gold-light: #fef3c7;
+  --primary-gold-soft:  #fde68a;
 
-  --primary-orange:     #ee4d2d;
+  --primary-orange:     #ea580c;
 
   /* Compat aliases (dùng trong nhiều file) */
-  --primary-red-dark:   #d73c16;
-  --primary-gold-dark:  #e69900;
+  --primary-red-dark:   #1b264f;
+  --primary-gold-dark:  #d97706;
 
   /* ── NEUTRAL ── */
   --gray-50:  #fafafa;
