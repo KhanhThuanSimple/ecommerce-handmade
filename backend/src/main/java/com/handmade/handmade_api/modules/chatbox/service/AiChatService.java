@@ -190,4 +190,21 @@ public class AiChatService {
     public void clearChatHistory(Long sessionId) {
         logger.info("Clearing chat history for session: {}", sessionId);
     }
+
+    public void generateStreamResponse(String userMsg, String context, List<com.handmade.handmade_api.modules.chatbox.entity.ChatMessage> history, java.util.function.Consumer<String> onNext, Runnable onComplete, java.util.function.Consumer<Throwable> onError) {
+        if (ollamaService.isEnabled()) {
+            ollamaService.streamChat(userMsg, context, history, onNext, onComplete, onError);
+        } else {
+            // Nếu dùng Groq thì fallback về đồng bộ rồi gửi luôn (giả lập stream)
+            new Thread(() -> {
+                try {
+                    String response = generateResponse(userMsg, context, history);
+                    onNext.accept(response);
+                    onComplete.run();
+                } catch (Exception e) {
+                    onError.accept(e);
+                }
+            }).start();
+        }
+    }
 }

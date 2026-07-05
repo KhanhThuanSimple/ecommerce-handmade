@@ -14,8 +14,8 @@ interface ChatboxProps {
 
 const ChatBox: React.FC<ChatboxProps> = ({ currentUser, onClose }) => {
     const [input, setInput] = useState<string>('');
-    const { messages, isTyping, onSend } = useChat({ currentUser });
     const { products } = useProducts();
+    const { messages, isTyping, onSend } = useChat({ currentUser, products });
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {

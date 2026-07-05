@@ -82,6 +82,63 @@ public class ChatController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping(value = "/ask/stream", produces = org.springframework.http.MediaType.TEXT_EVENT_STREAM_VALUE)
+    public org.springframework.web.servlet.mvc.method.annotation.SseEmitter askStream(
+            @RequestBody ChatRequest request,
+            HttpServletRequest httpRequest,
+            Principal principal) {
+
+        Long userId = userIdProvider.getUserId(httpRequest, request);
+        if (userId == null) {
+            if (allowAnonymous) userId = generateAnonymousUserId(httpRequest, request);
+            else throw new RuntimeException("Vui lòng đăng nhập để sử dụng chat!");
+        }
+
+        ChatSession session = chatService.getOrCreateSession(userId);
+        java.util.List<com.handmade.handmade_api.modules.chatbox.entity.ChatMessage> history = chatService.getChatHistory(session.getId());
+        chatService.saveMessage(session.getId(), "USER", request.getMessage());
+        
+        String context = aiChatService.getContextData(request.getMessage());
+        if (request.getMockContext() != null && !request.getMockContext().isEmpty()) {
+            context += "\n" + request.getMockContext();
+        }
+
+        org.springframework.web.servlet.mvc.method.annotation.SseEmitter emitter = new org.springframework.web.servlet.mvc.method.annotation.SseEmitter(120000L); // 2 mins timeout
+        
+        StringBuilder fullResponse = new StringBuilder();
+        
+        aiChatService.generateStreamResponse(
+            request.getMessage(), 
+            context, 
+            history,
+            // onNext
+            chunk -> {
+                try {
+                    fullResponse.append(chunk);
+                    emitter.send(org.springframework.web.servlet.mvc.method.annotation.SseEmitter.event().data(chunk));
+                } catch (Exception e) {
+                    emitter.completeWithError(e);
+                }
+            },
+            // onComplete
+            () -> {
+                try {
+                    chatService.saveMessage(session.getId(), "BOT", fullResponse.toString());
+                    emitter.send(org.springframework.web.servlet.mvc.method.annotation.SseEmitter.event().name("done").data("[DONE]"));
+                    emitter.complete();
+                } catch (Exception e) {
+                    emitter.completeWithError(e);
+                }
+            },
+            // onError
+            error -> {
+                emitter.completeWithError(error);
+            }
+        );
+
+        return emitter;
+    }
+
     @GetMapping("/history/{sessionId}")
     public ResponseEntity<?> getHistory(@PathVariable Long sessionId, Principal principal) {
         // Kiểm tra quyền xem history

@@ -106,6 +106,65 @@ public class OllamaService {
         }
     }
 
+    public void streamChat(String userMessage, String systemContext, List<com.handmade.handmade_api.modules.chatbox.entity.ChatMessage> history, java.util.function.Consumer<String> onNext, Runnable onComplete, java.util.function.Consumer<Throwable> onError) {
+        if (!enabled) {
+            onError.accept(new RuntimeException("Ollama is not enabled"));
+            return;
+        }
+
+        new Thread(() -> {
+            try {
+                HttpHeaders headers = new HttpHeaders();
+                headers.setContentType(MediaType.APPLICATION_JSON);
+
+                Map<String, Object> body = new HashMap<>();
+                body.put("model", model);
+                body.put("stream", true);
+
+                List<Map<String, String>> messages = new ArrayList<>();
+                messages.add(Map.of("role", "system", "content", buildSystemPrompt(systemContext)));
+
+                if (history != null) {
+                    for (com.handmade.handmade_api.modules.chatbox.entity.ChatMessage msg : history) {
+                        String role = msg.getSenderType().equals("USER") ? "user" : "assistant";
+                        messages.add(Map.of("role", role, "content", msg.getContent()));
+                    }
+                }
+                messages.add(Map.of("role", "user", "content", userMessage));
+                body.put("messages", messages);
+
+                org.springframework.web.client.RequestCallback requestCallback = restTemplate.httpEntityCallback(new HttpEntity<>(body, headers), Map.class);
+                org.springframework.web.client.ResponseExtractor<Void> responseExtractor = response -> {
+                    try (java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.InputStreamReader(response.getBody()))) {
+                        String line;
+                        com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+                        while ((line = reader.readLine()) != null) {
+                            if (line.trim().isEmpty()) continue;
+                            try {
+                                com.fasterxml.jackson.databind.JsonNode node = mapper.readTree(line);
+                                if (node.has("message") && node.get("message").has("content")) {
+                                    String content = node.get("message").get("content").asText();
+                                    if (content != null && !content.isEmpty()) {
+                                        onNext.accept(content);
+                                    }
+                                }
+                            } catch (Exception ex) {
+                                logger.error("JSON parse error: " + line, ex);
+                            }
+                        }
+                    }
+                    onComplete.run();
+                    return null;
+                };
+
+                restTemplate.execute(baseUrl + "/api/chat", HttpMethod.POST, requestCallback, responseExtractor);
+            } catch (Exception e) {
+                logger.error("Lỗi stream Ollama: ", e);
+                onError.accept(e);
+            }
+        }).start();
+    }
+
     /**
      * Kiểm tra Ollama có đang chạy không (health check).
      */

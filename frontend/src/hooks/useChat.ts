@@ -6,9 +6,10 @@ import { AIService } from '../services/aiService';
 interface UseChatProps {
     currentUser: any;
     sessionId?: number;
+    products?: any[];
 }
 
-export const useChat = ({ currentUser, sessionId: externalSessionId }: UseChatProps) => {
+export const useChat = ({ currentUser, sessionId: externalSessionId, products = [] }: UseChatProps) => {
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [isTyping, setIsTyping] = useState(false);
     const [currentSessionId, setCurrentSessionId] = useState<number | null>(externalSessionId || null);
@@ -45,43 +46,60 @@ export const useChat = ({ currentUser, sessionId: externalSessionId }: UseChatPr
         setIsTyping(true);
 
         try {
-            // Gửi request đến backend
             const userId = currentUser?.id;
             
-            const response = await ChatService.sendMessage({
-                message: content,
-                userId: userId,
-                sessionId: currentSessionId || undefined,
-                isAnonymous: !userId,
-                anonymousId: !userId ? ChatService.getAnonymousId() : undefined
-            });
-            
-            // Lưu sessionId từ response
-            if (response.sessionId && !currentSessionId) {
-                setCurrentSessionId(response.sessionId);
-            }
-            
-            // Thêm bot message
-            const botMessage: ChatMessage = {
-                sessionId: response.sessionId,
-                senderType: 'BOT',
-                content: response.reply,
-                createdAt: new Date().toISOString()
-            };
-            
-            setMessages(prev => [...prev, botMessage]);
-            
-        } catch (error) {
-            console.error('Send message error:', error);
-            // Thêm message lỗi
-            const errorMessage: ChatMessage = {
+            // Khởi tạo một message bot trống
+            const initialBotMessage: ChatMessage = {
                 sessionId: currentSessionId || 0,
                 senderType: 'BOT',
-                content: 'Xin lỗi, có lỗi xảy ra. Vui lòng thử lại sau!',
+                content: '',
                 createdAt: new Date().toISOString()
             };
-            setMessages(prev => [...prev, errorMessage]);
-        } finally {
+            
+            setMessages(prev => [...prev, initialBotMessage]);
+            setIsTyping(true); // Vẫn hiện typing mờ mờ ở dưới
+            
+            let accumulatedReply = '';
+            
+            const mockContextString = products.length > 0 
+                ? "THÔNG TIN SẢN PHẨM HIỆN CÓ: " + products.map(p => `${p.name} (Giá: ${p.price}đ)`).join(', ') 
+                : undefined;
+
+            await ChatService.sendStreamMessage(
+                {
+                    message: content,
+                    userId: userId,
+                    sessionId: currentSessionId || undefined,
+                    isAnonymous: !userId,
+                    anonymousId: !userId ? ChatService.getAnonymousId() : undefined,
+                    mockContext: mockContextString
+                },
+                (chunk) => {
+                    // Xóa typing khi bắt đầu nhận cục đầu tiên
+                    setIsTyping(false);
+                    accumulatedReply += chunk;
+                    
+                    setMessages(prev => {
+                        const newMsgs = [...prev];
+                        newMsgs[newMsgs.length - 1].content = accumulatedReply;
+                        return newMsgs;
+                    });
+                },
+                () => {
+                    setIsTyping(false);
+                },
+                (error) => {
+                    setIsTyping(false);
+                    setMessages(prev => {
+                        const newMsgs = [...prev];
+                        newMsgs[newMsgs.length - 1].content = 'Xin lỗi, có lỗi xảy ra. Vui lòng thử lại sau!';
+                        return newMsgs;
+                    });
+                }
+            );
+
+        } catch (error) {
+            console.error('Send message error:', error);
             setIsTyping(false);
         }
     }, [currentSessionId, currentUser]);

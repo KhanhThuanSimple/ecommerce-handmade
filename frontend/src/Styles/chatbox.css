@@ -86,24 +86,31 @@
 .chat-message.left  { justify-content: flex-start; }
 
 .chat-bubble {
-  max-width: 74%;
-  padding: var(--sp-3) var(--sp-4);
+  max-width: 78%;
+  padding: 12px 18px;
   border-radius: var(--r-2xl);
   word-wrap: break-word;
-  box-shadow: var(--shadow-xs);
+  position: relative;
+  transition: all 0.2s ease;
 }
 
 .chat-message.right .chat-bubble {
-  background: var(--brand-primary);
-  color: var(--text-inverse);
-  border-radius: var(--r-2xl) var(--r-2xl) var(--r-sm) var(--r-2xl);
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+  color: #ffffff;
+  border-radius: 20px 20px 4px 20px;
+  box-shadow: 0 4px 12px rgba(234, 88, 12, 0.25);
 }
 
 .chat-message.left .chat-bubble {
-  background: var(--surface-card);
-  color: var(--text-primary);
-  border: 1px solid var(--border-color);
-  border-radius: var(--r-2xl) var(--r-2xl) var(--r-2xl) var(--r-sm);
+  background: #ffffff;
+  color: #334155;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px 20px 20px 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+.chat-message:hover .chat-bubble {
+  transform: translateY(-2px);
 }
 
 .msg-text {

@@ -14,4 +14,7 @@ public class ChatRequest {
     // Thêm field cho anonymous chat
     private String anonymousId;
     private Boolean isAnonymous = false;
+
+    // Dùng để truyền mock data từ Frontend sang Backend
+    private String mockContext;
 }
