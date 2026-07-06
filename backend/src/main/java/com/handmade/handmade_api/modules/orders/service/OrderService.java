@@ -232,7 +232,7 @@ public class OrderService {
         String lower = normalized.toLowerCase();
 
         if (lower.equals("chờ thanh toán") || lower.equals("pending")) {
-            return "Chờ thanh toán";
+            return "Đã thanh toán qua VNpay";
         }
         if (lower.equals("thanh toán khi nhận hàng")
                 || lower.equals("cash_on_delivery")

@@ -248,7 +248,7 @@ const token = userStr ? JSON.parse(userStr).token : null;
     }
 
     const isVNPay = paymentMethod.toUpperCase() === 'VNPAY';
-    const orderData = prepareOrderData(isVNPay ? 'Chờ thanh toán' : 'Thanh toán khi nhận hàng');
+    const orderData = prepareOrderData(isVNPay ? 'Đã Thanh toán qua VNpay' : 'Thanh toán khi nhận hàng');
 
     try {
         setProcessingOrder(true);
