@@ -4,6 +4,7 @@ import { User } from '../types/model';
 import { useProfile } from '../hooks/useProfile'; 
 import '../Styles/profile.css';
 import OrderHistory from './OrderHistory';
+import MyReviews from '../components/profile/MyReviews';
 
 interface ProfileProps {
     currentUser: User | null;
@@ -59,6 +60,9 @@ const Profile: React.FC<ProfileProps> = ({ currentUser, onLogout }) => {
                     </div>
                     <div className={`menu-item ${activeSection === 'orders' ? 'active' : ''}`} onClick={() => setActiveSection('orders')}>
                         <i className="fa-solid fa-clock-rotate-left"></i> Lịch sử mua hàng
+                    </div>
+                    <div className={`menu-item ${activeSection === 'reviews' ? 'active' : ''}`} onClick={() => setActiveSection('reviews')}>
+                        <i className="fa-solid fa-star"></i> Đánh giá sản phẩm
                     </div>
                     <div className={`menu-item ${activeSection === 'vouchers' ? 'active' : ''}`} onClick={() => setActiveSection('vouchers')}>
                         <i className="fa-solid fa-ticket"></i> Voucher của tôi
@@ -121,6 +125,14 @@ const Profile: React.FC<ProfileProps> = ({ currentUser, onLogout }) => {
                         <div className="profile-card" style={{ padding: 'var(--sp-6)' }}>
                             <OrderHistory currentUser={currentUser} />
                         </div>
+                    )}
+
+                    {/* Section Đánh giá sản phẩm */}
+                    {activeSection === 'reviews' && (
+                        <section className="profile-card">
+                            <h3 className="section-title">Đánh giá sản phẩm</h3>
+                            <MyReviews currentUser={currentUser} />
+                        </section>
                     )}
 
                     {/* Section Cập nhật Email */}

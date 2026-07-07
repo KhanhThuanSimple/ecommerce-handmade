@@ -84,7 +84,10 @@ public class MySecurity {
                         .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/product-images/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/reviews/**").permitAll()
+                        // Reviews: public cho product reviews, private cho user-specific
+                        .requestMatchers(HttpMethod.GET, "/api/reviews/products/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/reviews/can-review").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/reviews/users/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/voucher/**").permitAll()
 
                         // Payment public

@@ -283,3 +283,80 @@ button:disabled {
     margin-top: var(--sp-6);
   }
 }
+
+/* ══════════════════════════════════════════════════
+   PRODUCT DETAIL — TABS SECTION
+══════════════════════════════════════════════════ */
+
+.pd-tabs-section {
+  margin-top: var(--sp-8);
+  background: var(--surface-card);
+  border-radius: var(--r-2xl);
+  border: 1px solid var(--border-default);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+/* Tab bar */
+.pd-tabs-header {
+  display: flex;
+  gap: 0;
+  background: var(--gray-50);
+  border-bottom: 2px solid var(--border-default);
+  padding: 0 var(--sp-2);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.pd-tabs-header::-webkit-scrollbar { display: none; }
+
+.pd-tab-btn {
+  padding: var(--sp-4) var(--sp-6);
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  white-space: nowrap;
+  transition: all var(--ease-fast);
+}
+
+.pd-tab-btn:hover {
+  color: var(--brand-primary);
+  background: rgba(43, 65, 98, 0.04);
+}
+
+.pd-tab-btn.active {
+  color: var(--brand-primary);
+  border-bottom-color: var(--brand-primary);
+  background: transparent;
+}
+
+/* Tab body */
+.pd-tab-body {
+  padding: var(--sp-8);
+}
+
+.pd-desc-content {
+  font-size: var(--text-base);
+  line-height: 1.8;
+  color: var(--text-secondary);
+  max-width: 760px;
+}
+
+.pd-specs-placeholder {
+  color: var(--text-muted);
+  font-style: italic;
+  font-size: var(--text-sm);
+  margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .pd-tab-btn { padding: var(--sp-3) var(--sp-4); font-size: var(--text-xs); }
+  .pd-tab-body { padding: var(--sp-5); }
+}

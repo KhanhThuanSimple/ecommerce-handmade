@@ -7,7 +7,7 @@ import { filterVouchersForUser } from '../untils/voucherUtils';
 
 export const useProfile = (currentUser: User | null, onLogout: () => void) => {
     const navigate = useNavigate();
-    const [activeSection, setActiveSection] = useState<'info' | 'email' | 'password' | 'orders' | 'games' | 'vouchers'>('info');
+    const [activeSection, setActiveSection] = useState<'info' | 'email' | 'password' | 'orders' | 'games' | 'vouchers' | 'reviews'>('info');
 
     // State cho Email
     const [emailValue, setEmailValue] = useState(currentUser?.email ?? '');

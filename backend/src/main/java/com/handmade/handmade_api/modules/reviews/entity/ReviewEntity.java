@@ -17,6 +17,14 @@ public class ReviewEntity {
     @Column(name = "product_id", nullable = false)
     private Long productId;
 
+    /** Liên kết đến order_item cụ thể — cho phép đánh giá mỗi lần mua theo đơn */
+    @Column(name = "order_item_id")
+    private Long orderItemId;
+
+    /** Lưu order_id để hiển thị trong UI */
+    @Column(name = "order_id")
+    private String orderId;
+
     @Column(nullable = false)
     private Integer rating;
 
@@ -26,75 +34,37 @@ public class ReviewEntity {
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
-    // Tự động gán thời gian hiện tại khi lưu vào Database
     @PrePersist
     protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
+        if (this.createdAt == null) {
+            this.createdAt = LocalDateTime.now();
+        }
     }
 
-    // =========================================
-    // CONSTRUCTORS
-    // =========================================
-    public ReviewEntity() {
-    }
+    public ReviewEntity() {}
 
-    public ReviewEntity(Long id, Long userId, Long productId, Integer rating, String comment, LocalDateTime createdAt) {
-        this.id = id;
-        this.userId = userId;
-        this.productId = productId;
-        this.rating = rating;
-        this.comment = comment;
-        this.createdAt = createdAt;
-    }
+    // Getters & Setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    // =========================================
-    // GETTERS AND SETTERS
-    // =========================================
-    public Long getId() {
-        return id;
-    }
+    public Long getUserId() { return userId; }
+    public void setUserId(Long userId) { this.userId = userId; }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public Long getProductId() { return productId; }
+    public void setProductId(Long productId) { this.productId = productId; }
 
-    public Long getUserId() {
-        return userId;
-    }
+    public Long getOrderItemId() { return orderItemId; }
+    public void setOrderItemId(Long orderItemId) { this.orderItemId = orderItemId; }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
+    public String getOrderId() { return orderId; }
+    public void setOrderId(String orderId) { this.orderId = orderId; }
 
-    public Long getProductId() {
-        return productId;
-    }
+    public Integer getRating() { return rating; }
+    public void setRating(Integer rating) { this.rating = rating; }
 
-    public void setProductId(Long productId) {
-        this.productId = productId;
-    }
+    public String getComment() { return comment; }
+    public void setComment(String comment) { this.comment = comment; }
 
-    public Integer getRating() {
-        return rating;
-    }
-
-    public void setRating(Integer rating) {
-        this.rating = rating;
-    }
-
-    public String getComment() {
-        return comment;
-    }
-
-    public void setComment(String comment) {
-        this.comment = comment;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 }

@@ -9,6 +9,7 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon
 } from '@heroicons/react/24/outline';
+import { useNotify } from '../../components/NotificationContext';
 
 // ==================== TYPES ====================
 interface OrderItemResponse {
@@ -380,6 +381,8 @@ const OrderDetailModal: React.FC<{
 
 // ==================== MAIN COMPONENT ====================
 const Orders: React.FC = () => {
+  const notify = useNotify();
+
   // State
   const [orders, setOrders] = useState<OrderResponse[]>([]);
   const [loading, setLoading] = useState(true);

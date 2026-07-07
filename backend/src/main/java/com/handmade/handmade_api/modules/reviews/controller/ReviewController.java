@@ -1,18 +1,15 @@
 package com.handmade.handmade_api.modules.reviews.controller;
 
+import com.handmade.handmade_api.modules.reviews.dto.*;
+import com.handmade.handmade_api.modules.reviews.service.ReviewService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.handmade.handmade_api.modules.reviews.dto.ReviewRequest;
-import com.handmade.handmade_api.modules.reviews.dto.ReviewResponse;
-import com.handmade.handmade_api.modules.reviews.service.ReviewService;
-
-import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/reviews")
-// Sử dụng originPatterns để linh hoạt và an toàn tuyệt đối với Spring Security khi allowCredentials = true
 @CrossOrigin(originPatterns = "*", allowCredentials = "true")
 public class ReviewController {
 
@@ -22,35 +19,62 @@ public class ReviewController {
         this.reviewService = reviewService;
     }
 
+    /**
+     * GET /api/reviews/products/{productId}?page=0&size=5
+     * Trả về statistics + paginated reviews cho ProductDetail tab.
+     */
+    @GetMapping("/products/{productId}")
+    public ResponseEntity<ProductReviewsPageDTO> getProductReviews(
+            @PathVariable Long productId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size) {
+
+        ProductReviewsPageDTO response = reviewService.getProductReviews(productId, page, size);
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * GET /api/reviews/can-review?userId=X&productId=Y
+     */
     @GetMapping("/can-review")
-    public ResponseEntity<java.util.Map<String, Boolean>> canReview(
+    public ResponseEntity<Map<String, Boolean>> canReview(
             @RequestParam Long userId,
             @RequestParam Long productId) {
         boolean allowed = reviewService.canUserReview(userId, productId);
-        return ResponseEntity.ok(java.util.Map.of("canReview", allowed));
+        return ResponseEntity.ok(Map.of("canReview", allowed));
     }
 
-    // 1. API Lấy danh sách Review theo Product ID
-    // Khớp URL FE gọi: /reviews/products/{productId}
-    @GetMapping("/products/{productId}")
-    public ResponseEntity<?> getReviewsByProductId(@PathVariable("productId") Long productId) {
-        
-        // Đã sửa thành getReviewsByProductId để khớp chuẩn xác với hàm trong ReviewService
-        List<ReviewResponse> reviews = reviewService.getReviewsByProductId(productId);
-        
-        // Giữ đúng logic: Nếu không có review, trả về 404 để kích hoạt catch(reviewErr) của FE 
-        // giúp đồng bộ setReviews([]) và setAlreadyReviewed(false).
-        if (reviews == null || reviews.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Chưa có lượt đánh giá nào.");
-        }
-        
-        return ResponseEntity.ok(reviews);
+    /**
+     * GET /api/reviews/users/{userId}/pending?page=0&size=5
+     * Danh sách sản phẩm đã mua (đơn hoàn thành) CHƯA đánh giá — có phân trang.
+     */
+    @GetMapping("/users/{userId}/pending")
+    public ResponseEntity<PagedResponse<PendingReviewItemDTO>> getPendingReviews(
+            @PathVariable Long userId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size) {
+        return ResponseEntity.ok(reviewService.getPendingReviews(userId, page, size));
     }
 
-    // 2. API Lưu bài Review mới
-    // Khớp URL FE gọi: /reviews
+    /**
+     * GET /api/reviews/users/{userId}/completed?page=0&size=5
+     * Danh sách review ĐÃ gửi của user — có phân trang.
+     */
+    @GetMapping("/users/{userId}/completed")
+    public ResponseEntity<PagedResponse<CompletedReviewItemDTO>> getCompletedReviews(
+            @PathVariable Long userId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size) {
+        return ResponseEntity.ok(reviewService.getCompletedReviews(userId, page, size));
+    }
+
+    /**
+     * POST /api/reviews
+     * Gửi đánh giá mới.
+     */
     @PostMapping
-    public ResponseEntity<ReviewResponse> submitReview(@RequestBody ReviewRequest reviewRequest) {
+    public ResponseEntity<ReviewResponse> submitReview(
+            @RequestBody ReviewRequest reviewRequest) {
         ReviewResponse response = reviewService.createReview(reviewRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }

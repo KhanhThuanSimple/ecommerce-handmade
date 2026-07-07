@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useCallback } from 'react';
+import React, { useRef, useEffect, useCallback, useState } from 'react';
 import { useLuckyWheel } from '../hooks/useLuckyWheel';
 import '../Styles/LuckyWheel.css';
 import { User } from '../types/model';
@@ -17,6 +17,33 @@ const LuckyWheel: React.FC<LuckyWheelProps> = ({ currentUser }) => {
   const radius = size / 2 - 10;
   const navigate = useNavigate();
 
+  // Countdown State for Mid-Autumn Festival
+  const [timeLeft, setTimeLeft] = useState({
+    days: 0, hours: 0, minutes: 0, seconds: 0
+  });
+
+  useEffect(() => {
+    // Target: Mid-Autumn Festival 2026 (approx Sep 25, 2026)
+    const targetDate = new Date('2026-09-25T00:00:00');
+    
+    const interval = setInterval(() => {
+      const now = new Date();
+      const difference = targetDate.getTime() - now.getTime();
+      
+      if (difference <= 0) {
+        clearInterval(interval);
+      } else {
+        setTimeLeft({
+          days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+          hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+          minutes: Math.floor((difference / 1000 / 60) % 60),
+          seconds: Math.floor((difference / 1000) % 60)
+        });
+      }
+    }, 1000);
+    
+    return () => clearInterval(interval);
+  }, []);
 
   // 2. Gọi Hook (Phải nằm trong hàm và nhận currentUser từ Props)
   const {
@@ -83,16 +110,16 @@ const LuckyWheel: React.FC<LuckyWheelProps> = ({ currentUser }) => {
       ctx.restore();
     });
 
-    // Logo tâm vòng quay
+    // Logo tâm vòng quay (Trăng rằm)
     ctx.beginPath();
     ctx.arc(center, center, 40, 0, 2 * Math.PI);
-    ctx.fillStyle = '#FFFFFF';
+    ctx.fillStyle = '#FFF8E1';
     ctx.fill();
-    ctx.strokeStyle = '#4F46E5';
+    ctx.strokeStyle = '#D82B2B';
     ctx.lineWidth = 3;
     ctx.stroke();
     
-    ctx.fillStyle = '#4F46E5';
+    ctx.fillStyle = '#D82B2B';
     ctx.font = 'bold 16px sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('QUAY', center, center + 5);
@@ -111,8 +138,18 @@ const LuckyWheel: React.FC<LuckyWheelProps> = ({ currentUser }) => {
         {/* Phần bên trái: Vòng quay */}
         <div className="wheel-section">
           <div className="wheel-header">
-            <h2><span className="icon">🎡</span> Vòng Quay May Mắn</h2>
-            <p className="subtitle">Quay ngay để nhận ưu đãi độc quyền hôm nay</p>
+            <h2><span className="icon">🏮</span> Vui Hội Trăng Rằm <span className="icon">🏮</span></h2>
+            <p className="subtitle">Quay lồng đèn - Rước ngàn ưu đãi Trung Thu</p>
+            
+            <div className="mid-autumn-countdown">
+              <div className="countdown-label">Sự kiện kết thúc sau:</div>
+              <div className="countdown-timer">
+                <div className="time-box"><span>{timeLeft.days.toString().padStart(2, '0')}</span><small>Ngày</small></div>
+                <div className="time-box"><span>{timeLeft.hours.toString().padStart(2, '0')}</span><small>Giờ</small></div>
+                <div className="time-box"><span>{timeLeft.minutes.toString().padStart(2, '0')}</span><small>Phút</small></div>
+                <div className="time-box"><span>{timeLeft.seconds.toString().padStart(2, '0')}</span><small>Giây</small></div>
+              </div>
+            </div>
           </div>
 
           <div className="wheel-box">
@@ -175,7 +212,7 @@ const LuckyWheel: React.FC<LuckyWheelProps> = ({ currentUser }) => {
         <div className="prize-section">
           <div className="prize-list">
             <div className="list-header">
-              <h3><span className="icon">🏆</span> Cơ cấu giải thưởng</h3>
+              <h3><span className="icon">🥮</span> Quà Tặng Đêm Trăng</h3>
               <p className="subtitle">Danh sách quà tặng có thể nhận được</p>
             </div>
             
@@ -220,7 +257,7 @@ const LuckyWheel: React.FC<LuckyWheelProps> = ({ currentUser }) => {
         <div className="lucky-modal-overlay">
           <div className="lucky-modal-content">
             <div className="lucky-modal-header">
-              <h3><span className="icon">🎉</span> Chúc mừng bạn!</h3>
+              <h3><span className="icon">🎊</span> Chúc mừng bạn!</h3>
               <button className="lucky-modal-close" onClick={closeResult}>&times;</button>
             </div>
             <div className="lucky-modal-body">
