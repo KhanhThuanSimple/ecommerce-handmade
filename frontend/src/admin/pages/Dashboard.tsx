@@ -22,6 +22,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { useSuperDashboard } from '../../services/useSuperDashboard';
 import '../styles/dashboard.css';
+import api from '../../services/api';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Title, Tooltip, Legend, Filler);
 
@@ -41,6 +42,16 @@ const mapStatusColor = (status: string) => {
 
 const Dashboard: React.FC = () => {
     const { data, loading, error, dateRange, setDateRange, refresh } = useSuperDashboard();
+
+    const handleExportReport = async () => {
+        window.dispatchEvent(new CustomEvent('global-toast', { detail: { msg: 'Yêu cầu đang gửi...', type: 'info' } }));
+        try {
+            const response = await api.get('/admin/analytics/export-report');
+            window.dispatchEvent(new CustomEvent('global-toast', { detail: { msg: response.data.message, type: 'info' } }));
+        } catch (err: any) {
+            window.dispatchEvent(new CustomEvent('global-toast', { detail: { msg: 'Lỗi gửi yêu cầu xuất báo cáo', type: 'error' } }));
+        }
+    };
 
     if (loading) {
         return (
@@ -147,6 +158,9 @@ const Dashboard: React.FC = () => {
                         <button className={dateRange === '30days' ? 'active' : ''} onClick={() => setDateRange('30days')}>30 ngày</button>
                         <button className={dateRange === 'year' ? 'active' : ''} onClick={() => setDateRange('year')}>Năm nay</button>
                     </div>
+                    <button className="btn-refresh bg-blue-600 text-white font-bold px-4 py-2 rounded flex items-center gap-2 hover:bg-blue-700 transition" onClick={handleExportReport} style={{border:'none', marginRight: '10px'}}>
+                        📥 Xuất báo cáo doanh thu
+                    </button>
                     <button className="btn-refresh" onClick={refresh}>
                         <ArrowPathIcon className="w-5 h-5" />
                     </button>

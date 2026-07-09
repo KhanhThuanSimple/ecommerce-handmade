@@ -4,6 +4,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+
+import org.springframework.security.core.context.SecurityContextHolder;
+import com.handmade.handmade_api.modules.adminPayment.service.AnalyticsReportService;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 @RestController
@@ -13,9 +23,46 @@ import java.util.*;
 public class AdminAnalyticsController {
 
     private final JdbcTemplate jdbcTemplate;
+    private final AnalyticsReportService analyticsReportService;
 
-    public AdminAnalyticsController(JdbcTemplate jdbcTemplate) {
+    public AdminAnalyticsController(JdbcTemplate jdbcTemplate, AnalyticsReportService analyticsReportService) {
         this.jdbcTemplate = jdbcTemplate;
+        this.analyticsReportService = analyticsReportService;
+    }
+
+    @GetMapping("/export-report")
+    public ResponseEntity<?> triggerExportReport() {
+        String currentUser = SecurityContextHolder.getContext().getAuthentication().getName();
+        System.out.println("[LUỒNG HTTP CHÍNH] Tên Thread: " + Thread.currentThread().getName());
+        System.out.println("[LUỒNG HTTP CHÍNH] Nhận yêu cầu từ: " + currentUser);
+
+        // Bắn tác vụ sang luồng ngầm
+        analyticsReportService.generateMasterReportAsync();
+
+        // Trả kết quả ngay lập tức
+        return ResponseEntity.ok(Map.of(
+            "status", "success",
+            "message", "Yêu cầu xuất báo cáo đã được tiếp nhận từ " + currentUser
+        ));
+    }
+
+    @GetMapping("/download-report/{fileName}")
+    public ResponseEntity<Resource> downloadReport(@PathVariable String fileName) {
+        try {
+            Path filePath = Paths.get("reports").resolve(fileName).normalize();
+            Resource resource = new UrlResource(filePath.toUri());
+
+            if (resource.exists()) {
+                return ResponseEntity.ok()
+                        .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+                        .body(resource);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
     /**

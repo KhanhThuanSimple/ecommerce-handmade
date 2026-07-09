@@ -33,6 +33,10 @@ public class AiChatService {
     @Autowired
     private OllamaService ollamaService;
 
+    @Autowired
+    @org.springframework.context.annotation.Lazy
+    private AsyncAiService asyncAiService;
+
     @SuppressWarnings("unchecked")
     public String generateResponse(String userMsg, String context, List<com.handmade.handmade_api.modules.chatbox.entity.ChatMessage> history) {
         String systemPrompt = configService.getConfig("SYSTEM_PROMPT",
@@ -191,20 +195,16 @@ public class AiChatService {
         logger.info("Clearing chat history for session: {}", sessionId);
     }
 
-    public void generateStreamResponse(String userMsg, String context, List<com.handmade.handmade_api.modules.chatbox.entity.ChatMessage> history, java.util.function.Consumer<String> onNext, Runnable onComplete, java.util.function.Consumer<Throwable> onError) {
-        if (ollamaService.isEnabled()) {
-            ollamaService.streamChat(userMsg, context, history, onNext, onComplete, onError);
-        } else {
-            // Nếu dùng Groq thì fallback về đồng bộ rồi gửi luôn (giả lập stream)
-            new Thread(() -> {
-                try {
-                    String response = generateResponse(userMsg, context, history);
-                    onNext.accept(response);
-                    onComplete.run();
-                } catch (Exception e) {
-                    onError.accept(e);
-                }
-            }).start();
-        }
+    /**
+     * Sinh stream response — uỷ thác cho AsyncAiService để chạy trên thread pool riêng.
+     * Không còn dùng new Thread() thủ công.
+     */
+    public void generateStreamResponse(String userMsg, String context,
+            List<com.handmade.handmade_api.modules.chatbox.entity.ChatMessage> history,
+            java.util.function.Consumer<String> onNext,
+            Runnable onComplete,
+            java.util.function.Consumer<Throwable> onError) {
+        // Uỷ thác cho @Async bean — Spring quản lý thread pool
+        asyncAiService.streamAiResponseAsync(userMsg, context, history, onNext, onComplete, onError);
     }
 }

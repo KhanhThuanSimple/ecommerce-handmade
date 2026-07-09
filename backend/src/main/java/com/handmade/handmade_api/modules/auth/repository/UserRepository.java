@@ -27,7 +27,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("SELECT COUNT(DISTINCT u) FROM User u JOIN u.roles r WHERE r.name = 'ROLE_ADMIN'")
     long countAdminUsers();
 
-    // BỘ LỌC CHUYÊN NGHIỆP: Phân trang + Tìm kiếm theo từ khóa + Lọc theo Tên quyền + Lọc trạng thái hoạt động
     @Query("SELECT DISTINCT u FROM User u LEFT JOIN u.roles r WHERE " +
             "(:search IS NULL OR LOWER(u.fullName) LIKE LOWER(CONCAT('%', :search, '%')) " +
             "OR LOWER(u.username) LIKE LOWER(CONCAT('%', :search, '%')) " +

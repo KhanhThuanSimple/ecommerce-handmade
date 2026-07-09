@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
+import org.springframework.scheduling.annotation.Async;
 import java.util.*;
 
 /**
@@ -106,14 +107,22 @@ public class OllamaService {
         }
     }
 
-    public void streamChat(String userMessage, String systemContext, List<com.handmade.handmade_api.modules.chatbox.entity.ChatMessage> history, java.util.function.Consumer<String> onNext, Runnable onComplete, java.util.function.Consumer<Throwable> onError) {
+    /**
+     * Stream response từ Ollama — chạy bất đồng bộ trên "aiExecutor" thread pool.
+     * @Async thay thế new Thread() thủ công cũ.
+     */
+    @Async("aiExecutor")
+    public void streamChat(String userMessage, String systemContext,
+            List<com.handmade.handmade_api.modules.chatbox.entity.ChatMessage> history,
+            java.util.function.Consumer<String> onNext,
+            Runnable onComplete,
+            java.util.function.Consumer<Throwable> onError) {
         if (!enabled) {
             onError.accept(new RuntimeException("Ollama is not enabled"));
             return;
         }
 
-        new Thread(() -> {
-            try {
+        try {
                 HttpHeaders headers = new HttpHeaders();
                 headers.setContentType(MediaType.APPLICATION_JSON);
 
@@ -162,7 +171,6 @@ public class OllamaService {
                 logger.error("Lỗi stream Ollama: ", e);
                 onError.accept(e);
             }
-        }).start();
     }
 
     /**

@@ -110,6 +110,8 @@ public class MySecurity {
                         // ===== TEST ENDPOINTS (Chỉ dùng cho development) =====
                         .requestMatchers("/api/test/**").permitAll()
                         .requestMatchers("/api/public/**").permitAll()
+                        .requestMatchers("/ws/**").permitAll()
+                        .requestMatchers("/api/admin/analytics/download-report/**").permitAll()
 
                         // ==================== CẤP ĐỘ 2: AUTHENTICATED - Cần đăng nhập ====================
                         // Lucky wheel authenticated endpoints
