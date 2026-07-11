@@ -13,30 +13,19 @@ import java.lang.reflect.Method;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadPoolExecutor;
 
-/**
- * Cấu hình Spring Async Processing.
- *
- * Kích hoạt @Async và @Scheduled toàn ứng dụng.
- * Thread pool riêng cho từng nhóm tác vụ:
- *   - "aiExecutor"      : gọi AI (Ollama/Groq) — tác vụ chậm, I/O bound
- *   - "taskExecutor"    : tác vụ bất đồng bộ chung
- */
+
 @Configuration
 @EnableAsync                 // kích hoạt @Async
 @EnableScheduling            // kích hoạt @Scheduled (ChatCleanupScheduler)
 public class AsyncConfig implements AsyncConfigurer {
-
-    /**
-     * Thread pool dành riêng cho việc gọi AI (Ollama / Groq).
-     * Gọi tên bean "aiExecutor" để dùng trong @Async("aiExecutor").
-     */
+//AsyncConfig là lớp cấu hình cho cơ chế xử lý bất đồng bộ của Spring Boot.
     @Bean(name = "aiExecutor")
     public Executor aiExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(2);         // 2 thread luôn sẵn sàng
-        executor.setMaxPoolSize(5);          // tối đa 5 thread đồng thời
-        executor.setQueueCapacity(20);       // hàng đợi nếu >5 request cùng lúc
-        executor.setThreadNamePrefix("ai-async-"); // dễ debug trong log
+        executor.setCorePoolSize(2);      
+        executor.setMaxPoolSize(5);       
+        executor.setQueueCapacity(20);       
+        executor.setThreadNamePrefix("ai-async-"); 
         executor.setKeepAliveSeconds(60);
         executor.initialize();
         return executor;
@@ -74,7 +63,7 @@ public class AsyncConfig implements AsyncConfigurer {
         
         executor.initialize();
         
-        return new DelegatingSecurityContextExecutor(executor);
+        return new DelegatingSecurityContextExecutor(executor); // sao chép SecurityContext từ thread gọi sang thread pool
     }
 
     @Override
@@ -82,7 +71,7 @@ public class AsyncConfig implements AsyncConfigurer {
         return new AsyncUncaughtExceptionHandler() {
             @Override
             public void handleUncaughtException(Throwable ex, Method method, Object... params) {
-                System.err.println("❌ LỖI TRONG LUỒNG NGẦM (ASYNC EXCEPTION) ❌");
+                System.err.println(" LỖI TRONG LUỒNG NGẦM (ASYNC EXCEPTION) ");
                 System.err.println("Tên hàm xảy ra lỗi: " + method.getName());
                 System.err.println("Chi tiết lỗi: " + ex.getMessage());
             }

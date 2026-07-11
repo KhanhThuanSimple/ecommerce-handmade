@@ -8,10 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 
-/**
- * JWT Service — secret key được đọc từ biến môi trường JWT_SECRET.
- * Fallback về giá trị mặc định chỉ dùng cho môi trường dev local (KHÔNG dùng production).
- */
+
 @Service
 public class JwtService {
 

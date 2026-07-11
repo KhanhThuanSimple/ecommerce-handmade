@@ -42,7 +42,7 @@ public class AuthService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @Autowired private JwtService jwtService; // Đã thêm
+    @Autowired private JwtService jwtService; 
 
     public AuthResponse login(LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(

@@ -48,9 +48,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                             userDetails, null, userDetails.getAuthorities());
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                    SecurityContextHolder.getContext().setAuthentication(authToken); 
+            }//lưu lại thông tin xác thực vào SecurityContext để Spring Security có thể sử dụng trong các bước tiếp theo    
                 }
-            }
         } catch (io.jsonwebtoken.ExpiredJwtException e) {
             request.setAttribute("exception", "Token đã hết hạn. Vui lòng đăng nhập lại.");
         } catch (io.jsonwebtoken.SignatureException | io.jsonwebtoken.MalformedJwtException e) {

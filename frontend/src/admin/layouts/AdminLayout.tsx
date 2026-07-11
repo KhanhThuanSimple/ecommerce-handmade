@@ -34,7 +34,7 @@ const AdminLayout: React.FC = () => {
     useEffect(() => {
         const timer = setTimeout(() => setGlobalLoading(false), 500);
         
-        // Kết nối WebSocket chung cho toàn bộ giao diện Admin
+   //-
         const client = new Client({
             webSocketFactory: () => new SockJS('http://localhost:8080/ws'),
             debug: (str) => console.log(str),
